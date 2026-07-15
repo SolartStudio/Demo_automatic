@@ -1204,7 +1204,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm">(your logo)</div>
- <div class="app-version" id="app-version-label">Версия 1.07 тестирование</div>
+ <div class="app-version" id="app-version-label">Версия 1.08 тестирование</div>
  </div>
 </div>
 
@@ -2503,6 +2503,18 @@
  </div>
 </div>
 
+<!-- ===== SCREEN: DEPARTMENT PHOTO REPORT RESULTS ===== -->
+<div class="screen" id="screen-department-photo-results">
+ <div class="header">
+ <button class="back-btn" onclick="goBack()">←</button>
+ <span class="header-title" id="department-photo-results-title">Фотоотчёты</span>
+ </div>
+ <div class="content">
+ <div class="section-label">Отчёты</div>
+ <div id="department-photo-results-list"></div>
+ </div>
+</div>
+
 <!-- ===== SCREEN: FOUNDER WAITERS ===== -->
 <div class="screen" id="screen-founder-waiters">
  <div class="header">
@@ -2749,7 +2761,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.07";
+const APP_VERSION = "1.08";
 const APP_CHANNEL = "тестирование";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION} ${APP_CHANNEL}`;
 window.DROVA_INSPECTOR_VERSION = {
@@ -3154,6 +3166,18 @@ async function initCloud() {
  showToast("Ошибка загрузки сотрудников");
  });
 
+ db.collection("departments").orderBy("createdAt", "asc").onSnapshot((snapshot) => {
+ appCache.departments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ LocalDB.set("departments", appCache.departments);
+ applyDepartmentLabels(getPrimaryDepartment());
+ renderHomeGrid();
+ renderFounderMenu();
+ refreshVisibleData();
+ }, (err) => {
+ console.error("departments snapshot error", err);
+ showToast("Ошибка загрузки подразделений");
+ });
+
  db.collection("reports").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
  const allReports = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  appCache.reports = filterRecentPhotoReports(allReports);
@@ -3288,8 +3312,9 @@ async function initCloud() {
 }
 
 async function loadCloudData() {
- const [staffSnap, reportsSnap, finesSnap, inventorySnap, accessRequestsSnap, adminStatsSnap, adminProfilesSnap, bathmasterOrdersSnap, repairRequestsSnap, cookStaffReportsSnap, adminTrainingReportsSnap, founderTasksSnap, forgottenItemsSnap, anonymousFeedbackSnap, settingsDoc] = await Promise.all([
+ const [staffSnap, departmentsSnap, reportsSnap, finesSnap, inventorySnap, accessRequestsSnap, adminStatsSnap, adminProfilesSnap, bathmasterOrdersSnap, repairRequestsSnap, cookStaffReportsSnap, adminTrainingReportsSnap, founderTasksSnap, forgottenItemsSnap, anonymousFeedbackSnap, settingsDoc] = await Promise.all([
  db.collection("staff").get(),
+ db.collection("departments").orderBy("createdAt", "asc").get(),
  db.collection("reports").orderBy("createdAt", "desc").get(),
  db.collection("fines").orderBy("createdAt", "desc").get(),
  db.collection("inventoryRecords").orderBy("createdAt", "desc").get(),
@@ -3307,6 +3332,9 @@ async function loadCloudData() {
  ]);
 
  appCache.staff = staffSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ appCache.departments = departmentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ LocalDB.set("departments", appCache.departments);
+ applyDepartmentLabels(getPrimaryDepartment());
  const loadedReports = reportsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  appCache.reports = filterRecentPhotoReports(loadedReports);
  appCache.fines = finesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -4096,7 +4124,7 @@ function getReports() {
 
 function setReports(arr) {
  appCache.reports = filterRecentPhotoReports(arr);
- LocalDB.set("reports", arr);
+ LocalDB.set("reports", appCache.reports);
  updateUnreadBadges();
 
  if (CLOUD_ENABLED && db) {
@@ -5371,6 +5399,7 @@ function refreshScreen(id) {
  if (id === 'screen-founder-cook-reports-view') renderFounderCookReportsView();
  if (id === 'screen-inventory-start') renderInventoryStart();
  if (id === 'screen-inventory-form') renderInventoryForm();
+ if (id === 'screen-department-photo-results') renderDepartmentPhotoResults();
  if (id === 'screen-founder-waiters') {
  renderShifts();
  renderStaff();
@@ -6199,7 +6228,7 @@ function renderDepartmentManage() {
  dep.processes.forEach(p => {
  const unlocked = isProcessUnlocked(p.key);
  const openAttr = p.key === 'photoReport'
- ? `onclick="openFounderWaiters()"`
+ ? `onclick="openDepartmentPhotoResults()"`
  : `onclick="openProcessLockedStub('${escapeHtml(p.label)}')"`;
  html += `
  <div class="menu-item${unlocked ? '' : ' locked'}" ${openAttr}>
@@ -10278,6 +10307,62 @@ function renderMasseurOrdersForFounder() {
  <div style="font-size:15px;line-height:1.55;margin-top:12px;white-space:pre-line;">${escapeHtml(o.text || '')}</div>
  </div>`;
  }).join('');
+}
+
+function openDepartmentPhotoResults() {
+ const dep = getDepartment(activeManagedDepartmentId) || getPrimaryDepartment();
+ const title = document.getElementById('department-photo-results-title');
+ if (title) title.textContent = dep ? `${dep.name} · Фотоотчёты` : 'Фотоотчёты';
+ renderDepartmentPhotoResults();
+ goTo('screen-department-photo-results');
+}
+
+function renderDepartmentPhotoResults() {
+ const reports = getReports();
+ const el = document.getElementById('department-photo-results-list');
+ if (!el) return;
+ el.innerHTML = '';
+
+ if (!reports.length) {
+ el.innerHTML = `<div class="empty">
+ <div class="empty-icon">📷</div>
+ <div class="empty-title">Фотоотчётов пока нет</div>
+ <div class="empty-sub">Здесь появятся результаты процесса после первой отправки.</div>
+ </div>`;
+ return;
+ }
+
+ const byDate = {};
+ reports.forEach(report => {
+ const date = report.date || toDateKey(new Date(report.createdAt || Date.now()));
+ if (!byDate[date]) byDate[date] = [];
+ byDate[date].push(report);
+ });
+
+ Object.keys(byDate).sort().reverse().forEach(date => {
+ const items = byDate[date];
+ const card = document.createElement('div');
+ card.className = 'shift-card';
+ const parsed = new Date(date + 'T12:00:00');
+ const formatted = parsed.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+ card.innerHTML = `
+ <div class="shift-date">${formatted}${unreadDotHtml(isFounderItemUnread('reportDate', date, Math.max(...items.map(r => getTimeMs(r.createdAt)))))} </div>
+ <div class="shift-meta">${items.length} ${plural(items.length, 'отчёт', 'отчёта', 'отчётов')}</div>`;
+ card.onclick = () => openDepartmentPhotoDate(date, items);
+ el.appendChild(card);
+ });
+}
+
+function openDepartmentPhotoDate(date, reports) {
+ openShiftView(date, reports);
+ const title = document.getElementById('shift-view-title');
+ if (title) title.textContent = `Фотоотчёты · ${formatDateRu(date)}`;
+ const content = document.getElementById('shift-view-content');
+ if (content && content.firstElementChild) {
+ const first = content.firstElementChild;
+ const firstText = String(first.textContent || '').toUpperCase();
+ if (firstText.includes('ДЕЖУРНЫЙ')) first.remove();
+ }
 }
 
 function openFounderWaiters() {
