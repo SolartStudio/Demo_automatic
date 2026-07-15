@@ -340,6 +340,9 @@
  .menu-item.locked { opacity: 0.5; }
  .menu-item.locked:active { background: var(--surface); }
  .menu-item.locked .menu-arrow { font-size: 14px; }
+ .menu-item.process-full-only { opacity: 0.38; filter: grayscale(1); background: var(--surface2); }
+ .menu-item.process-full-only .dep-process-checkbox { pointer-events: none; }
+ .menu-item.process-active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); opacity: 1; }
  .menu-icon {
  width: 44px; height: 44px;
  background: var(--surface2);
@@ -1204,7 +1207,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm">(your logo)</div>
- <div class="app-version" id="app-version-label">Версия 1.08 тестирование</div>
+ <div class="app-version" id="app-version-label">Версия 1.09 тестирование</div>
  </div>
 </div>
 
@@ -2611,7 +2614,7 @@
 <div class="modal-overlay" id="modal-process-locked">
  <div class="modal">
  <div class="modal-title" id="process-locked-title">Раздел заблокирован</div>
- <div class="modal-sub" id="process-locked-sub">Доступно в полной версии приложения.</div>
+ <div class="modal-sub" id="process-locked-sub">Доступно в полной версии.</div>
  <div class="modal-actions">
  <button class="btn btn-primary" onclick="closeModal('modal-process-locked')">Понятно</button>
  </div>
@@ -2669,6 +2672,18 @@
  <a class="btn btn-primary" id="export-ready-link" href="#" download>Открыть файл отдельно</a>
  <button class="btn btn-secondary" onclick="closeExportModal()">Вернуться в приложение</button>
  </div>
+ </div>
+</div>
+
+
+<div class="modal-overlay" id="modal-delete-photo-date">
+ <div class="modal">
+  <div class="modal-title">Удалить отчёт?</div>
+  <div class="modal-sub" id="delete-photo-date-sub">Все фотоотчёты за выбранную дату будут удалены из приложения.</div>
+  <div class="modal-actions">
+   <button class="btn btn-danger" onclick="confirmDeleteDepartmentPhotoDate()">Удалить</button>
+   <button class="btn btn-secondary" onclick="closeModal('modal-delete-photo-date')">Отмена</button>
+  </div>
  </div>
 </div>
 
@@ -2761,7 +2776,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.08";
+const APP_VERSION = "1.09";
 const APP_CHANNEL = "тестирование";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION} ${APP_CHANNEL}`;
 window.DROVA_INSPECTOR_VERSION = {
@@ -6100,7 +6115,7 @@ function openProcessLockedStub(label) {
  const titleEl = document.getElementById('process-locked-title');
  const subEl = document.getElementById('process-locked-sub');
  if (titleEl) titleEl.textContent = label;
- if (subEl) subEl.textContent = `Раздел «${label}» откроется после покупки полной версии приложения.`;
+ if (subEl) subEl.textContent = 'Доступно в полной версии.';
  openModal('modal-process-locked');
 }
 
@@ -6330,12 +6345,12 @@ function renderAddProcessList() {
  }
 
  listEl.innerHTML = available.map(p => `
- <label class="menu-item" style="cursor:pointer;">
+ <label class="menu-item ${isProcessUnlocked(p.key) ? 'process-active' : 'locked process-full-only'}" style="cursor:pointer;">
  <input type="checkbox" value="${p.key}" class="dep-process-checkbox" style="width:20px;height:20px;margin-right:12px;accent-color:var(--accent);flex-shrink:0;">
  <div class="menu-icon">${p.icon}</div>
  <div class="menu-text">
  <div class="menu-title">${escapeHtml(p.label)}</div>
- <div class="menu-desc">${isProcessUnlocked(p.key) ? 'Активно в демо' : 'В демо — «Доступно в полной версии»'}</div>
+ <div class="menu-desc">${isProcessUnlocked(p.key) ? 'Активно' : 'Доступно в полной версии'}</div>
  </div>
  </label>`).join('');
 }
@@ -6344,7 +6359,7 @@ async function submitAddProcesses() {
  const dep = getDepartment(activeManagedDepartmentId);
  if (!dep) return;
 
- const checked = Array.from(document.querySelectorAll('.dep-process-checkbox:checked')).map(el => el.value);
+ const checked = Array.from(document.querySelectorAll('.dep-process-checkbox:checked')).map(el => el.value).filter(isProcessUnlocked);
  const customInput = document.getElementById('dep-add-process-custom');
  const customRaw = customInput ? customInput.value.trim() : '';
  const customLabels = customRaw ? [customRaw] : [];
@@ -10309,6 +10324,64 @@ function renderMasseurOrdersForFounder() {
  }).join('');
 }
 
+let departmentReportSwipeState = null;
+let departmentReportSwipeWasDelete = false;
+let pendingDeleteDepartmentPhotoDate = '';
+
+function startDepartmentReportSwipe(event, date) {
+ const touch = event.touches && event.touches[0];
+ if (!touch) return;
+ departmentReportSwipeState = { date: String(date), startX: touch.clientX, startY: touch.clientY, element: event.currentTarget };
+ departmentReportSwipeWasDelete = false;
+}
+
+function moveDepartmentReportSwipe(event, date) {
+ if (!departmentReportSwipeState || departmentReportSwipeState.date !== String(date)) return;
+ const touch = event.touches && event.touches[0];
+ if (!touch) return;
+ const dx = touch.clientX - departmentReportSwipeState.startX;
+ const dy = Math.abs(touch.clientY - departmentReportSwipeState.startY);
+ if (dx < -20 && dy < 55) {
+  event.preventDefault();
+  departmentReportSwipeState.element.style.transform = `translateX(${Math.max(dx, -110)}px)`;
+ }
+}
+
+function endDepartmentReportSwipe(event, date) {
+ if (!departmentReportSwipeState || departmentReportSwipeState.date !== String(date)) return;
+ const touch = event.changedTouches && event.changedTouches[0];
+ const dx = touch ? touch.clientX - departmentReportSwipeState.startX : 0;
+ const el = departmentReportSwipeState.element;
+ el.style.transform = '';
+ departmentReportSwipeState = null;
+ if (dx <= -75) {
+  departmentReportSwipeWasDelete = true;
+  pendingDeleteDepartmentPhotoDate = String(date);
+  const sub = document.getElementById('delete-photo-date-sub');
+  if (sub) sub.textContent = `Удалить все фотоотчёты за ${formatDateRu(date)}?`;
+  openModal('modal-delete-photo-date');
+ }
+}
+
+async function confirmDeleteDepartmentPhotoDate() {
+ const date = pendingDeleteDepartmentPhotoDate;
+ closeModal('modal-delete-photo-date');
+ pendingDeleteDepartmentPhotoDate = '';
+ if (!date) return;
+ const toDelete = getReports().filter(r => String(r.date || '') === String(date) && !!r.departmentId);
+ if (!toDelete.length) return;
+ const ids = new Set(toDelete.map(r => String(r.id)));
+ appCache.reports = getReports().filter(r => !ids.has(String(r.id)));
+ LocalDB.set('reports', appCache.reports);
+ if (CLOUD_ENABLED && db) {
+  const batch = db.batch();
+  toDelete.forEach(r => batch.delete(db.collection('reports').doc(String(r.id))));
+  await batch.commit();
+ }
+ renderDepartmentPhotoResults();
+ showToast('Отчёт удалён');
+}
+
 function openDepartmentPhotoResults() {
  const dep = getDepartment(activeManagedDepartmentId) || getPrimaryDepartment();
  const title = document.getElementById('department-photo-results-title');
@@ -10342,13 +10415,17 @@ function renderDepartmentPhotoResults() {
  Object.keys(byDate).sort().reverse().forEach(date => {
  const items = byDate[date];
  const card = document.createElement('div');
- card.className = 'shift-card';
+ card.className = 'shift-card swipe-delete-card';
+ card.dataset.reportDate = date;
+ card.addEventListener('touchstart', (event) => startDepartmentReportSwipe(event, date), { passive: true });
+ card.addEventListener('touchmove', (event) => moveDepartmentReportSwipe(event, date), { passive: false });
+ card.addEventListener('touchend', (event) => endDepartmentReportSwipe(event, date), { passive: true });
  const parsed = new Date(date + 'T12:00:00');
  const formatted = parsed.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
  card.innerHTML = `
  <div class="shift-date">${formatted}${unreadDotHtml(isFounderItemUnread('reportDate', date, Math.max(...items.map(r => getTimeMs(r.createdAt)))))} </div>
  <div class="shift-meta">${items.length} ${plural(items.length, 'отчёт', 'отчёта', 'отчётов')}</div>`;
- card.onclick = () => openDepartmentPhotoDate(date, items);
+ card.onclick = () => { if (!departmentReportSwipeWasDelete) openDepartmentPhotoDate(date, items); departmentReportSwipeWasDelete = false; };
  el.appendChild(card);
  });
 }
@@ -11333,12 +11410,18 @@ function openShiftView(date, reps) {
  if (!byBath[key]) byBath[key] = {
  bathName: key,
  reports: [],
- photos: {}
+ photos: {},
+ departmentId: r.departmentId || null
  };
 
  byBath[key].reports.push(r);
 
- if (isSimplePhotoBathName(key)) {
+ if (r.departmentId) {
+ Object.keys(r.photos || {}).forEach(photoKey => {
+  if (!byBath[key].photos[photoKey]) byBath[key].photos[photoKey] = [];
+  if (Array.isArray(r.photos[photoKey])) byBath[key].photos[photoKey].push(...r.photos[photoKey]);
+ });
+ } else if (isSimplePhotoBathName(key)) {
  if (!byBath[key].photos.general) byBath[key].photos.general = [];
  const reportPhotos = [];
  if (r.photos && Array.isArray(r.photos.general)) {
@@ -11367,7 +11450,9 @@ function openShiftView(date, reps) {
  <div style="font-size:18px;font-weight:700;margin-bottom:4px;">${group.bathName}</div>
  <div style="font-size:13px;color:var(--text-2);margin-bottom:16px;">Отчеты: ${reporters}</div>`;
 
- const sections = isSimplePhotoBathName(group.bathName) ? SIMPLE_REPORT_SECTIONS : SECTIONS;
+ const sections = group.departmentId
+ ? getDepartmentReportSections(group.departmentId)
+ : (isSimplePhotoBathName(group.bathName) ? SIMPLE_REPORT_SECTIONS : SECTIONS);
  sections.forEach(section => {
  const photos = group.photos[section.key] || [];
  if (photos.length === 0) return;
