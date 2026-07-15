@@ -1204,7 +1204,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm">(your logo)</div>
- <div class="app-version" id="app-version-label">Версия 1.05 тестирование</div>
+ <div class="app-version" id="app-version-label">Версия 1.06 тестирование</div>
  </div>
 </div>
 
@@ -1935,9 +1935,6 @@
  <label>Название подразделения</label>
  <input type="text" id="dep-create-name" placeholder="Например: Официанты">
  <div class="error-msg" id="dep-create-error">Введите название</div>
- </div>
- <div class="field">
- <input type="text" id="dep-create-logo" placeholder="Например: OF" maxlength="6">
  </div>
  <button class="btn btn-primary" style="margin-top: 8px;" onclick="submitDepartmentCreate()">Создать подразделение</button>
  </div>
@@ -2752,7 +2749,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.05";
+const APP_VERSION = "1.06";
 const APP_CHANNEL = "тестирование";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION} ${APP_CHANNEL}`;
 window.DROVA_INSPECTOR_VERSION = {
@@ -6142,20 +6139,17 @@ function renderFounderMenu() {
 // ============================================================
 function openDepartmentCreateForm() {
  const nameEl = document.getElementById('dep-create-name');
- const logoEl = document.getElementById('dep-create-logo');
  const errEl = document.getElementById('dep-create-error');
  if (nameEl) nameEl.value = '';
- if (logoEl) logoEl.value = '';
  if (errEl) errEl.classList.remove('show');
  goTo('screen-department-create');
 }
 
 async function submitDepartmentCreate() {
  const nameEl = document.getElementById('dep-create-name');
- const logoEl = document.getElementById('dep-create-logo');
  const errEl = document.getElementById('dep-create-error');
  const name = nameEl ? nameEl.value.trim() : '';
- const logo = logoEl ? logoEl.value.trim() : '';
+ const logo = '';
 
  if (!name) {
  if (errEl) errEl.classList.add('show');
@@ -6193,8 +6187,7 @@ function renderDepartmentManage() {
  }
  if (titleEl) titleEl.textContent = dep.name;
 
- let html = `
- <div class="section-label">Процессы</div>`;
+ let html = `<div class="section-label">Процессы</div>`;
 
  if (!dep.processes.length) {
  html += `<div class="empty" style="padding:24px 0;">
@@ -6206,18 +6199,16 @@ function renderDepartmentManage() {
  dep.processes.forEach(p => {
  const unlocked = isProcessUnlocked(p.key);
  const openAttr = p.key === 'photoReport'
- ? `onclick="openDepartmentPhotoConfig()"`
+ ? `onclick="openFounderWaiters()"`
  : `onclick="openProcessLockedStub('${escapeHtml(p.label)}')"`;
  html += `
- <div class="menu-item" style="position:relative;gap:8px;">
- <div style="flex:1;display:flex;align-items:center;gap:14px;cursor:pointer;min-width:0;" ${openAttr}>
+ <div class="menu-item${unlocked ? '' : ' locked'}" ${openAttr}>
  <div class="menu-icon">${p.icon}</div>
  <div class="menu-text">
  <div class="menu-title">${escapeHtml(p.label)}</div>
- <div class="menu-desc">${unlocked ? 'Активно в демо · нажмите для настройки' : 'Доступно в полной версии'}</div>
+ <div class="menu-desc">${unlocked ? 'Отчёты и результаты процесса' : 'Доступно в полной версии'}</div>
  </div>
- </div>
- <button class="btn btn-secondary btn-sm" onclick="removeDepartmentProcessConfirm('${p.key}')" style="flex-shrink:0;">✕</button>
+ <span class="menu-arrow">${unlocked ? '›' : '🔒'}</span>
  </div>`;
  });
  }
@@ -6225,14 +6216,34 @@ function renderDepartmentManage() {
  html += `
  <button class="btn btn-primary" style="margin-top:8px;" onclick="openDepartmentAddProcess()">+ Добавить процесс</button>
  <div class="divider"></div>
- <div class="section-label">Управление подразделением</div>
+ <div class="section-label">Настройки</div>`;
+
+ dep.processes.forEach(p => {
+ const unlocked = isProcessUnlocked(p.key);
+ const openAttr = p.key === 'photoReport'
+ ? `onclick="openDepartmentPhotoConfig()"`
+ : `onclick="openProcessLockedStub('${escapeHtml(p.label)} · настройки')"`;
+ html += `
+ <div class="menu-item" style="position:relative;gap:8px;">
+ <div style="flex:1;display:flex;align-items:center;gap:14px;cursor:pointer;min-width:0;" ${openAttr}>
+ <div class="menu-icon">${p.icon}</div>
+ <div class="menu-text">
+ <div class="menu-title">${escapeHtml(p.label)}</div>
+ <div class="menu-desc">${unlocked ? 'Параметры процесса' : 'Настройки доступны в полной версии'}</div>
+ </div>
+ </div>
+ <button class="btn btn-secondary btn-sm" onclick="removeDepartmentProcessConfirm('${p.key}')" style="flex-shrink:0;">✕</button>
+ </div>`;
+ });
+
+ html += `
  <button class="btn btn-secondary" onclick="toggleDepartmentNameEditor()">Редактировать название</button>
  <div id="dep-name-editor" style="display:none;margin-top:12px;">
  <div class="field" style="margin-bottom:12px;">
  <label>Новое название подразделения</label>
  <input type="text" id="dep-manage-name" value="${escapeHtml(dep.name)}">
  </div>
- <button class="btn btn-secondary" onclick="saveDepartmentSettings()"></button>
+ <button class="btn btn-secondary" onclick="saveDepartmentSettings()">Сохранить название</button>
  </div>
  <button class="btn btn-danger" style="margin-top:10px;" onclick="openDeleteDepartmentModal()">Удалить подразделение</button>`;
 
@@ -11688,7 +11699,7 @@ async function init() {
 // THEME TOGGLE
 // ============================================================
 function initTheme() {
- const saved = localStorage.getItem('drovaTheme') || 'dark';
+ const saved = localStorage.getItem('drovaTheme') || 'light';
  applyTheme(saved);
 }
 
