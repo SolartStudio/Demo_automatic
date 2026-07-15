@@ -84,6 +84,26 @@
  z-index: 20;
  }
  .theme-toggle:active { background: var(--surface3); }
+ .lang-toggle {
+ position: absolute;
+ top: calc(72px + env(safe-area-inset-top, 0px));
+ left: 20px;
+ width: 38px;
+ height: 38px;
+ border: 1px solid var(--border);
+ background: var(--surface2);
+ border-radius: 50%;
+ cursor: pointer;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ font-size: 12px;
+ font-weight: 700;
+ letter-spacing: 0.3px;
+ transition: background 0.15s, border-color 0.15s;
+ z-index: 20;
+ }
+ .lang-toggle:active { background: var(--surface3); }
 
  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -1199,6 +1219,7 @@
 <!-- ===== SCREEN: HOME ===== -->
 <div class="screen active" id="screen-home" style="position:relative;">
  <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle-btn" title="Сменить тему">🌙</button>
+ <button class="lang-toggle" onclick="toggleLanguage()" id="lang-toggle-btn" title="Tilni almashtirish">UZ</button>
  <div style="padding: 48px 20px 0;">
  <div class="logo">(your logo)</div>
  </div>
@@ -1207,7 +1228,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm">(your logo)</div>
- <div class="app-version" id="app-version-label">Версия 1.10 тестирование</div>
+    <div class="app-version" id="app-version-label">Версия 1.11 тестирование</div>
  </div>
 </div>
 
@@ -1215,11 +1236,11 @@
 <div class="screen" id="screen-waiter-register">
  <div class="header">
  <button class="back-btn" onclick="goHome()">←</button>
- <span class="header-title" id="access-role-title">Официант</span>
+ <span class="header-title" id="access-role-title" data-i18n-skip>Официант</span>
  </div>
  <div class="content content-padded">
  <div style="margin-bottom: 32px;">
- <div id="access-role-logo" style="font-size: 13px; color: var(--text-3); letter-spacing: 1px; margin-bottom: 4px;"></div>
+ <div id="access-role-logo" data-i18n-skip style="font-size: 13px; color: var(--text-3); letter-spacing: 1px; margin-bottom: 4px;"></div>
  <div style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Добро пожаловать</div>
  <div style="font-size: 14px; color: var(--text-2); line-height: 1.6;">Введите данные и отправьте запрос на вход. Учредитель подтвердит доступ.</div>
  </div>
@@ -1257,8 +1278,8 @@
  </div>
  <div class="content" style="padding-top: 24px;">
  <div style="margin-bottom: 28px;">
- <div style="font-size: 13px; color: var(--text-3); margin-bottom: 4px;" id="waiter-menu-role-label">Сотрудник</div>
- <div style="font-size: 24px; font-weight: 700;" id="waiter-menu-name">—</div>
+ <div style="font-size: 13px; color: var(--text-3); margin-bottom: 4px;" id="waiter-menu-role-label" data-i18n-skip>Сотрудник</div>
+ <div style="font-size: 24px; font-weight: 700;" id="waiter-menu-name" data-i18n-skip>—</div>
  </div>
  <div id="duty-banner" style="display:none;" class="duty-badge">
  <span>🌅</span>
@@ -1947,7 +1968,7 @@
 <div class="screen" id="screen-department-manage">
  <div class="header">
  <button class="back-btn" onclick="goBack()">←</button>
- <span class="header-title" id="dep-manage-title">Подразделение</span>
+ <span class="header-title" id="dep-manage-title" data-i18n-skip>Подразделение</span>
  </div>
  <div class="content content-padded" id="dep-manage-content"></div>
 </div>
@@ -2570,7 +2591,7 @@
 <div class="screen" id="screen-staff-view">
  <div class="header">
  <button class="back-btn" onclick="goBack()">←</button>
- <span class="header-title" id="staff-view-title">Сотрудник</span>
+ <span class="header-title" id="staff-view-title" data-i18n-skip>Сотрудник</span>
  </div>
  <div class="content" id="staff-view-content"></div>
 </div>
@@ -2776,7 +2797,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.10";
+const APP_VERSION = "1.11";
 const APP_CHANNEL = "тестирование";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION} ${APP_CHANNEL}`;
 window.DROVA_INSPECTOR_VERSION = {
@@ -5269,7 +5290,7 @@ function renderHomeGrid() {
  const label = dep.logoText ? `${escapeHtml(dep.logoText)} · ${escapeHtml(dep.name)}` : escapeHtml(dep.name);
  html += `
  <div class="role-card active-role" onclick="enterRole('waiter')">
- <span class="role-name">${label}</span>
+ <span class="role-name" data-i18n-skip>${label}</span>
  <span style="font-size: 20px;">→</span>
  </div>`;
  });
@@ -6132,8 +6153,8 @@ function renderFounderMenu() {
  <div class="menu-item" onclick="openDepartmentManage('${dep.id}')">
  <div class="menu-icon">🏷️</div>
  <div class="menu-text">
- <div class="menu-title">${escapeHtml(dep.name)}</div>
- <div class="menu-desc">${count ? `${count} ${plural(count, 'процесс', 'процесса', 'процессов')}` : 'Процессы ещё не добавлены'} · настроить</div>
+ <div class="menu-title" data-i18n-skip>${escapeHtml(dep.name)}</div>
+ <div class="menu-desc">${count ? plural(count, 'процесс', 'процесса', 'процессов') : 'Процессы ещё не добавлены'} · настроить</div>
  </div>
  <span class="menu-arrow">›</span>
  </div>`;
@@ -6249,7 +6270,7 @@ function renderDepartmentManage() {
  <div class="menu-item${unlocked ? '' : ' locked'}" ${openAttr}>
  <div class="menu-icon">${p.icon}</div>
  <div class="menu-text">
- <div class="menu-title">${escapeHtml(p.label)}</div>
+ <div class="menu-title"${p.custom ? ' data-i18n-skip' : ''}>${escapeHtml(p.label)}</div>
  <div class="menu-desc">${unlocked ? 'Отчёты и результаты процесса' : 'Доступно в полной версии'}</div>
  </div>
  <span class="menu-arrow">${unlocked ? '›' : '🔒'}</span>
@@ -6272,7 +6293,7 @@ function renderDepartmentManage() {
  <div style="flex:1;display:flex;align-items:center;gap:14px;cursor:pointer;min-width:0;" ${openAttr}>
  <div class="menu-icon">${p.icon}</div>
  <div class="menu-text">
- <div class="menu-title">${escapeHtml(p.label)}</div>
+ <div class="menu-title"${p.custom ? ' data-i18n-skip' : ''}>${escapeHtml(p.label)}</div>
  <div class="menu-desc">${unlocked ? 'Параметры процесса' : 'Настройки доступны в полной версии'}</div>
  </div>
  </div>
@@ -6543,7 +6564,7 @@ function renderFounderStaffList() {
  html += `<div class="section-label">Ожидают одобрения</div>`;
  html += pending.map(req => `
  <div class="card" style="cursor:default;">
- <div class="card-title">${escapeHtml(req.name)} · ${escapeHtml(req.roleLabel || getRoleLabel(req.role))}</div>
+ <div class="card-title" data-i18n-skip>${escapeHtml(req.name)} · ${escapeHtml(req.roleLabel || getRoleLabel(req.role))}</div>
  <div class="card-sub">${escapeHtml(req.login)} · ${req.createdAt ? new Date(req.createdAt).toLocaleString('ru-RU') : ''}</div>
  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;">
  <button class="btn btn-primary" onclick="approveAccessRequestFromFounder('${req.id}')">Одобрить</button>
@@ -6562,7 +6583,7 @@ function renderFounderStaffList() {
  } else {
  html += staff.map(s => `
  <div class="card" onclick="openStaffView('${s.id}')">
- <div class="card-title">${escapeHtml(s.name)} · ${escapeHtml(getStaffRole(s))}</div>
+ <div class="card-title" data-i18n-skip>${escapeHtml(s.name)} · ${escapeHtml(getStaffRole(s))}</div>
  <div class="card-sub">${escapeHtml(s.login || '—')} · добавлен ${s.createdAt ? new Date(s.createdAt).toLocaleDateString('ru-RU') : '—'}</div>
  </div>`).join('');
  }
@@ -8229,7 +8250,7 @@ function openDepartmentReport() {
  activeReport = { bathIndex: null, period: null, photos: {}, mode: 'department', departmentId: dep.id };
  getDepartmentReportSections(dep.id).forEach(s => { activeReport.photos[s.key] = []; });
 
- document.getElementById('bath-report-title').textContent = `Фотоотчёт · ${dep.name}`;
+ document.getElementById('bath-report-title').innerHTML = 'Фотоотчёт · <span data-i18n-skip>' + escapeHtml(dep.name) + '</span>';
  renderBathReportContent();
  goTo('screen-bath-report');
 }
@@ -11649,7 +11670,7 @@ function openStaffView(staffId, replaceCurrent = false) {
 
  <div style="margin-bottom:12px;">
  <div style="font-size:13px;color:var(--text-3);margin-bottom:4px;">Подразделение</div>
- <div style="font-size:16px;font-weight:500;margin-bottom:12px;">${escapeHtml(getStaffRole(s))}</div>
+ <div style="font-size:16px;font-weight:500;margin-bottom:12px;" data-i18n-skip>${escapeHtml(getStaffRole(s))}</div>
  <div style="font-size:13px;color:var(--text-3);margin-bottom:4px;">Telegram логин</div>
  <div style="font-size:16px;font-weight:500;margin-bottom:12px;">${escapeHtml(s.login || '—')}</div>
  <div style="font-size:13px;color:var(--text-3);margin-bottom:4px;">Дата добавления</div>
@@ -11862,6 +11883,7 @@ async function init() {
  showToast("Worker URL не заполнен");
  }
  initTheme();
+ initLang();
  setupGlobalSwipeBack();
 }
 
@@ -11889,6 +11911,987 @@ function toggleTheme() {
  const isLight = document.body.classList.contains('light');
  applyTheme(isLight ? 'dark' : 'light');
 }
+
+// ============================================================
+// LANGUAGE (RU ⇄ UZ) — переключение поверх существующей логики.
+// Ничего в остальном приложении не меняется: перевод накладывается
+// на уже отрисованный DOM и автоматически подхватывает всё, что
+// экраны дорисовывают через innerHTML/textContent, включая будущие
+// разблокированные процессы и подразделения.
+// ============================================================
+const RU_UZ_DICT = {
+"Аттестация будет работать по актуальному меню: из общего списка 60–80 вопросов система будет случайно выдавать 20 вопросов на попытку. Проходить можно будет сколько угодно раз.": "Attestatsiya joriy menyu asosida ishlaydi: umumiy 60–80 ta savol ro'yxatidan tizim har urinishda tasodifiy 20 ta savol beradi. Istalgancha marta topshirish mumkin.",
+"Файл подготовлен. Telegram может открыть файл отдельно, поэтому автоматическое открытие отключено. Нажмите кнопку только если файл действительно нужен.": "Fayl tayyor. Telegram faylni alohida ochishi mumkin, shu sababli avtomatik ochish o'chirilgan. Tugmani faqat fayl haqiqatan kerak bo'lsa bosing.",
+"При первом входе введите Telegram логин, имя и пароль администратора. После успешного входа повторная авторизация не нужна до смены пароля.": "Birinchi kirishda Telegram login, ism va administrator parolini kiriting. Muvaffaqiyatli kirishdan so'ng parol o'zgartirilmaguncha qayta avtorizatsiya shart emas.",
+"Авторы не отображаются и не сохраняются. Видны только текст, фото и сотрудник, если он указан в жалобе. В стаффе видны число и обед/ужин.": "Mualliflar ko'rsatilmaydi va saqlanmaydi. Faqat matn, foto va agar shikoyatda ko'rsatilgan bo'lsa xodim ko'rinadi. Stafda son va tushlik/kechki ovqat ko'rinadi.",
+"Каркас инвентаризации повара добавлен. Шаблон позиций кухни подключим отдельным этапом, чтобы не смешать его с инвентарём официантов.": "Oshpaz inventarizatsiyasi tuzilmasi qo'shildi. Oshxona pozitsiyalari shabloni ofitsiantlar inventari bilan aralashmasligi uchun alohida bosqichda ulanadi.",
+"После сохранения официанты получат кружок уведомления в разделе “Стоп лист”. Если у них указан Telegram ID, сообщение уйдёт и в бот.": "Saqlangandan so'ng ofitsiantlar “Stop-list” bo'limida bildirishnoma belgisini oladi. Agar ularda Telegram ID ko'rsatilgan bo'lsa, xabar botga ham boradi.",
+"Если Telegram ID заполнен и сотрудник нажал Start в основном боте, он сможет получать уведомления по своему подразделению.": "Agar Telegram ID kiritilgan va xodim asosiy botda Start tugmasini bosgan bo'lsa, u o'z bo'limi bo'yicha bildirishnomalar oladi.",
+"CSV подготовлен. Автооткрытие отключено, чтобы Mini App не уводил вас на отдельную страницу без нормального возврата.": "CSV tayyor. Mini App sizni normal qaytish imkonisiz alohida sahifaga olib ketmasligi uchun avtomatik ochish o'chirilgan.",
+"JPG подготовлен. Автооткрытие отключено, чтобы Mini App не уводил вас на отдельную страницу без нормального возврата.": "JPG tayyor. Mini App sizni normal qaytish imkonisiz alohida sahifaga olib ketmasligi uchun avtomatik ochish o'chirilgan.",
+"В шаблоне показаны все 41 позиции. Пустые строки остаются пустыми, чтобы было видно, что сотрудник не заполнил.": "Shablonda barcha 41 ta pozitsiya ko'rsatilgan. Bo'sh qatorlar bo'sh qoladi, shunda xodim to'ldirmagani ko'rinib turadi.",
+"Камера внутри Telegram на этом устройстве недоступна. Нужно разрешить камеру для Telegram в настройках Android.": "Ushbu qurilmada Telegram ichida kamera mavjud emas. Android sozlamalarida Telegram uchun kameraga ruxsat berish kerak.",
+"Камера не открылась. Проверьте: Telegram → разрешения → Камера. Затем закройте и снова откройте Mini App.": "Kamera ochilmadi. Tekshiring: Telegram → ruxsatlar → Kamera. Keyin Mini App'ni yopib, qayta oching.",
+"Белый лист инвентаризации. Заполненные поля подсвечиваются зелёным. Прогресс сохраняется автоматически.": "Oq inventarizatsiya varag'i. To'ldirilgan maydonlar yashil rangda belgilanadi. Jarayon avtomatik saqlanadi.",
+"Сотрудники выбранного подразделения увидят задачу в своём разделе. Фото отправятся после подтверждения.": "Tanlangan bo'lim xodimlari vazifani o'z bo'limida ko'radi. Fotolar tasdiqlashdan so'ng yuboriladi.",
+"Заявка будет отмечена как отремонтированная. Фото после ремонта можно прикрепить при необходимости.": "Ariza ta'mirlangan deb belgilanadi. Zarur bo'lsa, ta'mirdan keyingi fotoni biriktirish mumkin.",
+"Здесь будет просмотр JPG-файлов. Загрузим изображения в GitHub-репозиторий и пропишем их в массиве": "Bu yerda JPG-fayllarni ko'rish bo'ladi. Rasmlarni GitHub-repozitoriyga yuklab, massivga yozamiz",
+"Раздел в разработке. Сейчас здесь подготовлен экран, статистика попыток и место под будущий тест.": "Bo'lim ishlab chiqilmoqda. Hozircha bu yerda ekran, urinishlar statistikasi va kelajakdagi test uchun joy tayyorlangan.",
+"Информация пока не добавлена. Администратор сможет обновлять этот текст в своём KPI-разделе.": "Ma'lumot hali qo'shilmagan. Administrator bu matnni o'z KPI bo'limida yangilay oladi.",
+"Стоп-лист пока пуст. Повар ещё ничего не добавил. Редкий случай, когда пустота даже полезна.": "Stop-list hali bo'sh. Oshpaz hali hech narsa qo'shmagan. Bo'shliq foydali bo'lgan kamdan-kam holat.",
+"Назовите подразделение так, как удобно вашему бизнесу. Процессы добавите на следующем шаге.": "Bo'limga biznesingizga qulay nomni bering. Jarayonlarni keyingi qadamda qo'shasiz.",
+"Напишите, что заканчивается и что нужно купить. Учредитель увидит имя, дату, время и текст.": "Nima tugayotgani va nima sotib olish kerakligini yozing. Muassis ism, sana, vaqt va matnni ko'radi.",
+"Камера не открылась. Проверьте разрешение камеры для Telegram и откройте Mini App заново.": "Kamera ochilmadi. Telegram uchun kamera ruxsatini tekshiring va Mini App'ni qayta oching.",
+"Двигайте график влево или вправо пальцем. Синяя линия: входящие. Зеленая линия: брони.": "Grafikni barmog'ingiz bilan chapga yoki o'ngga suring. Ko'k chiziq: qo'ng'iroqlar. Yashil chiziq: bronlar.",
+"» и все сотрудники этого подразделения будут удалены без возможности восстановления.": "» va bu bo'limning barcha xodimlari qaytarib bo'lmaydigan tarzda o'chiriladi.",
+"Например: закончился веник, нужно 20 штук; мало одноразовых тапочек; купить масло...": "Masalan: supurgi tugadi, 20 dona kerak; bir martalik shippak kam; moy sotib olish...",
+"Учредитель может открыть любое подразделение своим паролем — без отдельной заявки.": "Muassis o'z paroli bilan istalgan bo'limni alohida ariza bermasdan ocha oladi.",
+"У вас есть сохранённый черновик инвентаризации. Можно продолжить с того же места.": "Sizda saqlangan inventarizatsiya qoralamasi bor. Xuddi shu joydan davom ettirish mumkin.",
+"Проверьте отчет. Фото будут отправлены в Telegram только после подтверждения.": "Hisobotni tekshiring. Fotolar faqat tasdiqlashdan so'ng Telegram'ga yuboriladi.",
+"Напишите актуальную информацию, которую официанты увидят в своём KPI-разделе": "Ofitsiantlar o'z KPI bo'limida ko'radigan dolzarb ma'lumotni yozing",
+"Шапка сообщения добавится автоматически. Здесь напишите только список задач.": "Xabar sarlavhasi avtomatik qo'shiladi. Bu yerga faqat vazifalar ro'yxatini yozing.",
+"Например:\nПроверить пульты\nСделать фото цветов до 12:00\nПроверить террасу": "Masalan:\nPultlarni tekshirish\nSoat 12:00 gacha gullar fotosini olish\nTerrasani tekshirish",
+"Введите данные и отправьте запрос на вход. Учредитель подтвердит доступ.": "Ma'lumotlarni kiriting va kirish uchun so'rov yuboring. Muassis kirishni tasdiqlaydi.",
+"Учредитель увидит дату, время, администратора, тему, сотрудников и фото.": "Muassis sana, vaqt, administrator, mavzu, xodimlar va fotoni ko'radi.",
+"Заявки от официантов, пармастеров, массажистов и поваров появятся здесь": "Ofitsiant, parmaster, massajist va oshpazlardan kelgan arizalar shu yerda paydo bo'ladi",
+"Например: Проверить брони с утра Перезвонить гостю Передать сертификаты": "Masalan: Ertalab bronlarni tekshirish Mehmonga qayta qo'ng'iroq qilish Sertifikatlarni topshirish",
+"Учредители видят только текст сообщения и фото. Имя отправителя скрыто.": "Muassislar faqat xabar matni va fotoni ko'radi. Yuboruvchining ismi yashiringan.",
+"⛔ Стоп-лист очищен Откройте приложение → своё подразделение → Стоп лист": "⛔ Stop-list tozalandi Ilovani oching → o'z bo'limingiz → Stop-list",
+"Например: срочно проверить стейшн, вынести мусор, подготовить баню...": "Masalan: shoshilinch stansiyani tekshirish, axlatni chiqarish, hammomni tayyorlash...",
+"Удалить черновик этого фотоотчета? Фото из черновика будут сброшены.": "Ushbu foto hisobot qoralamasini o'chirasizmi? Qoralamadagi fotolar bekor qilinadi.",
+"Firebase config не заполнен. Работаем локально через localStorage.": "Firebase konfiguratsiyasi kiritilmagan. localStorage orqali lokal ishlayapmiz.",
+"Учредитель увидит, кто закрыл задачу, время и прикрепленные фото.": "Muassis vazifani kim yopganini, vaqtni va biriktirilgan fotolarni ko'radi.",
+"Например: течёт кран, не работает свет, сломалась ручка двери...": "Masalan: kran oqmoqda, yorug'lik ishlamayapti, eshik dastagi singan...",
+"Все фотоотчёты за выбранную дату будут удалены из приложения.": "Tanlangan sanadagi barcha foto hisobotlar ilovadan o'chiriladi.",
+"Проверьте текст и фото. Техник увидит заявку после отправки.": "Matn va fotoni tekshiring. Texnik yuborilgandan so'ng arizani ko'radi.",
+"Бар добавим следующим этапом. Сейчас работаем с инвентарём.": "Barni keyingi bosqichda qo'shamiz. Hozircha inventar bilan ishlayapmiz.",
+"Пароль администратора изменён. Вход администратора сброшен": "Administrator paroli o'zgartirildi. Administrator kirishi bekor qilindi",
+"Длинный свайп влево до конца + подтверждение для удаления": "O'chirish uchun chapga oxirigacha suring + tasdiqlang",
+"Здесь появятся результаты процесса после первой отправки.": "Birinchi yuborishdan so'ng jarayon natijalari shu yerda paydo bo'ladi.",
+"Ошибка экрана. Данные не удалены, откройте раздел ещё раз": "Ekran xatosi. Ma'lumotlar o'chirilmagan, bo'limni qayta oching",
+"Поломки от официантов, пармастеров, массажистов и поваров": "Ofitsiant, parmaster, massajist va oshpazlardan nosozliklar",
+"Сотрудники появятся после одобрения входа администратором": "Xodimlar administrator kirishni tasdiqlagach paydo bo'ladi",
+"Напишите стоп-лист или оставьте поле пустым для очистки": "Stop-listni yozing yoki tozalash uchun maydonni bo'sh qoldiring",
+"Проверьте данные. После отправки черновик будет закрыт.": "Ma'lumotlarni tekshiring. Yuborilgandan so'ng qoralama yopiladi.",
+"Официанты появятся после регистрации и одобрения входа": "Ofitsiantlar ro'yxatdan o'tib, kirish tasdiqlangach paydo bo'ladi",
+"Сейчас инвентарь в режиме редактирования пользователем": "Hozir inventar foydalanuvchi tomonidan tahrirlanmoqda",
+"Одобренные сотрудники и администраторы появятся здесь": "Tasdiqlangan xodimlar va administratorlar shu yerda paydo bo'ladi",
+"Например:\\nНет лагмана\\nНет мёда\\nНет говяжьего шашлыка": "Masalan:\\nLag'mon yo'q\\nAsal yo'q\\nMol go'shtidan shashlik yo'q",
+"Они появятся здесь после регистрации в подразделении": "Ular bo'limda ro'yxatdan o'tgach shu yerda paydo bo'ladi",
+"Откройте приложение → своё подразделение → Стоп лист": "Ilovani oching → o'z bo'limingiz → Stop-list",
+"будет удалён из системы. Отчеты и история останутся.": "tizimdan o'chiriladi. Hisobotlar va tarix saqlanib qoladi.",
+"Выберите, как сотрудники будут присылать фотоотчёт.": "Xodimlar foto hisobotni qanday yuborishini tanlang.",
+"Назначить администратора на утро и оставить заметки": "Ertalabga administrator tayinlash va eslatma qoldirish",
+"Откройте приложение → Администратор → Забытые вещи": "Ilovani oching → Administrator → Unutilgan buyumlar",
+"Связь с базой нестабильна, открыта локальная копия": "Bazaga aloqa beqaror, lokal nusxa ochildi",
+"Функционал будет добавлен в следующих обновлениях.": "Funksiya keyingi yangilanishlarda qo'shiladi.",
+"🧳 Администратор принял забытую вещь Администратор:": "🧳 Administrator unutilgan buyumni qabul qildi Administrator:",
+"Инвентаризация редактируется другим пользователем": "Inventarizatsiya boshqa foydalanuvchi tomonidan tahrirlanmoqda",
+"Подразделение и все его сотрудники будут удалены.": "Bo'lim va uning barcha xodimlari o'chiriladi.",
+"Свои разделы отчёта, например «Стейшн», «Терраса»": "O'z hisobot bo'limlari, masalan «Stansiya», «Terrasa»",
+"В демо-версии доступно только одно подразделение": "Demo versiyada faqat bitta bo'lim mavjud",
+"Введите имена сотрудников, каждый с новой строки": "Xodimlar ismini kiriting, har biri yangi qatordan",
+"Например: не сдан отчет, грязный стол, опоздание": "Masalan: hisobot topshirilmadi, stol iflos, kechikish",
+"Откройте Учредитель → Официанты → Инвентаризация": "Muassis → Ofitsiantlar → Inventarizatsiya bo'limini oching",
+"Заполните текст, число и выберите обед или ужин": "Matn, sonni to'ldiring va tushlik yoki kechki ovqatni tanlang",
+"Ошибка связи или сохранения. Попробуйте ещё раз": "Aloqa yoki saqlash xatosi. Qayta urinib ko'ring",
+"Сотрудник прикладывает до 10 фото одним списком": "Xodim bitta ro'yxatda 10 tagacha foto biriktiradi",
+"🧳 Гость оповещен по забытой вещи Администратор:": "🧳 Mehmonga unutilgan buyum haqida xabar berildi Administrator:",
+"Без подтверждения статистику отправить нельзя.": "Tasdiqlamasdan statistikani yuborib bo'lmaydi.",
+"Данные появятся после отправки администратором": "Ma'lumotlar administrator yuborgach paydo bo'ladi",
+"Сообщения из раздела “Заказать” появятся здесь": "“Buyurtma berish” bo'limidan xabarlar shu yerda paydo bo'ladi",
+"Откройте приложение → Учредитель → Сотрудники": "Ilovani oching → Muassis → Xodimlar",
+"Учредитель добавит их в разделе подразделения": "Muassis ularni bo'lim ichida qo'shadi",
+"Добавьте процессы, которые увидят сотрудники": "Xodimlar ko'radigan jarayonlarni qo'shing",
+"Отправленные отчеты обучения появятся здесь": "Yuborilgan ta'lim hisobotlari shu yerda paydo bo'ladi",
+"Срочные задачи от учредителя появятся здесь": "Muassisdan shoshilinch vazifalar shu yerda paydo bo'ladi",
+"Счётчик выше хранит количество за всё время": "Yuqoridagi hisoblagich butun davr sonini saqlaydi",
+"Функционал тестируется и будет расширяться.": "Funksiya sinovdan o'tmoqda va kengaytiriladi.",
+"Откройте Учредитель → Жалобы и предложения": "Muassis → Shikoyat va takliflar bo'limini oching",
+"Отправленные инвентаризации появятся здесь": "Yuborilgan inventarizatsiyalar shu yerda paydo bo'ladi",
+"Новые заявки от официантов появятся здесь": "Ofitsiantlardan yangi arizalar shu yerda paydo bo'ladi",
+"Не удалось сохранить черновик фотоотчета": "Foto hisobot qoralamasini saqlab bo'lmadi",
+"Новые запросы сотрудников появятся здесь": "Xodimlarning yangi so'rovlari shu yerda paydo bo'ladi",
+"Отправленные стафф отчеты появятся здесь": "Yuborilgan staff hisobotlari shu yerda paydo bo'ladi",
+"Редактирование стоп-листа для официантов": "Ofitsiantlar uchun stop-listni tahrirlash",
+"Удалить отчёт статистики администратора?": "Administrator statistika hisobotini o'chirasizmi?",
+"Актуальная информация от администратора": "Administratordan dolzarb ma'lumot",
+"Вы уже зарегистрированы в подразделении": "Siz allaqachon bo'limda ro'yxatdan o'tgansiz",
+"Пароль изменён. Вход учредителя сброшен": "Parol o'zgartirildi. Muassis kirishi bekor qilindi",
+"Показатели не могут быть отрицательными": "Ko'rsatkichlar manfiy bo'lishi mumkin emas",
+"Смены появятся после первого фотоотчета": "Smenalar birinchi foto hisobotdan so'ng paydo bo'ladi",
+"🧳 Официант нашел забытую вещь Официант:": "🧳 Ofitsiant unutilgan buyumni topdi Ofitsiant:",
+"Администратор должен одобрить вход для": "Administrator kirishni tasdiqlashi kerak:",
+"Ошибка запуска. Перезагрузите Mini App": "Ishga tushirish xatosi. Mini App'ni qayta yuklang",
+"Прикрепите 2 фото: скриншот и отложено": "2 ta foto biriktiring: skrinshot va kechiktirilgan",
+"Отчеты администраторов появятся здесь": "Administratorlar hisobotlari shu yerda paydo bo'ladi",
+"Сотрудники появятся после регистрации": "Xodimlar ro'yxatdan o'tgach paydo bo'ladi",
+"Ваши заявки на ремонт появятся здесь": "Ta'mirlash arizalaringiz shu yerda paydo bo'ladi",
+"Заказы от массажистов появятся здесь": "Massajistlardan buyurtmalar shu yerda paydo bo'ladi",
+"Заполните все поля и прикрепите фото": "Barcha maydonlarni to'ldiring va foto biriktiring",
+"Поощрения и штрафы по подразделениям": "Bo'limlar bo'yicha rag'batlar va jarimalar",
+"Сначала войдите в своё подразделение": "Avval o'z bo'limingizga kiring",
+"Функционал добавим следующим этапом.": "Funksiyani keyingi bosqichda qo'shamiz.",
+"Выберите сотрудника и укажите сумму": "Xodimni tanlang va summani kiriting",
+"Заполните число, тему и сотрудников": "Son, mavzu va xodimlarni to'ldiring",
+"Ошибка загрузки жалоб и предложений": "Shikoyat va takliflarni yuklashda xatolik",
+"Ошибка сохранения истории дежурного": "Navbatchi tarixini saqlashda xatolik",
+"Стафф отчеты поваров появятся здесь": "Oshpazlar staff hisobotlari shu yerda paydo bo'ladi",
+"Уже зарегистрирован в подразделении": "Bo'limda allaqachon ro'yxatdan o'tgan",
+"🛠️ Новая заявка на ремонт от повара": "🛠️ Oshpazdan yangi ta'mirlash arizasi",
+"Все готовые процессы уже добавлены": "Barcha tayyor jarayonlar allaqachon qo'shilgan",
+"Настройки доступны в полной версии": "Sozlamalar to'liq versiyada mavjud",
+"Ошибка смены пароля администратора": "Administrator parolini almashtirishda xatolik",
+"🌄 Передача смены На утро назначен:": "🌄 Smena topshirildi Ertalabga tayinlangan:",
+"Cloudflare Worker URL не настроен": "Cloudflare Worker URL sozlanmagan",
+"Активно: создание задач и история": "Faol: vazifa yaratish va tarix",
+"Выберите сотрудника, дату и сумму": "Xodim, sana va summani tanlang",
+"Здесь появятся заказы пармастеров": "Bu yerda parmasterlar buyurtmalari paydo bo'ladi",
+"Сначала войдите как администратор": "Avval administrator sifatida kiring",
+"Сотрудник будет удален из системы": "Xodim tizimdan o'chiriladi",
+"! Завтра вы назначены дежурным (": "! Ertaga siz navbatchi etib tayinlandingiz (",
+"Введите имя и пароль для доступа": "Kirish uchun ism va parolni kiriting",
+"Новые забытые вещи от официантов": "Ofitsiantlardan yangi unutilgan buyumlar",
+"Ошибка загрузки отчетов обучения": "Ta'lim hisobotlarini yuklashda xatolik",
+"Ошибка сохранения администратора": "Administratorni saqlashda xatolik",
+"Продолжить свой черновик · фото:": "Qoralamani davom ettirish · foto:",
+"Сохранить и уведомить официантов": "Saqlash va ofitsiantlarga xabar berish",
+"Задача отправлена, уведомлений:": "Vazifa yuborildi, bildirishnomalar:",
+"Можно создать свой процесс ниже": "Quyida o'z jarayoningizni yaratishingiz mumkin",
+"Отчеты администраторов по датам": "Administratorlar hisobotlari sanalar bo'yicha",
+"Ошибка загрузки администраторов": "Administratorlarni yuklashda xatolik",
+"Своё название и набор процессов": "O'z nomi va jarayonlar to'plami",
+"Сначала войдите в подразделение": "Avval bo'limga kiring",
+"! Завтра вы назначены дежурным": "! Ertaga siz navbatchi etib tayinlandingiz",
+"Введите название подразделения": "Bo'lim nomini kiriting",
+"Заполните хотя бы одну позицию": "Kamida bitta pozitsiyani to'ldiring",
+"На кого жалоба (необязательно)": "Kimga shikoyat (ixtiyoriy)",
+"Назначение штрафов сотрудникам": "Xodimlarga jarima tayinlash",
+"Не удалось скопировать таблицу": "Jadvalni nusxalab bo'lmadi",
+"Ошибка загрузки инвентаризации": "Inventarizatsiyani yuklashda xatolik",
+"Ошибка загрузки отчетов повара": "Oshpaz hisobotlarini yuklashda xatolik",
+"Ошибка отправки инвентаризации": "Inventarizatsiyani yuborishda xatolik",
+"Ошибка удаления инвентаризации": "Inventarizatsiyani o'chirishda xatolik",
+"Подтвердите: Инстаграм отвечен": "Tasdiqlang: Instagramga javob berildi",
+"Что заканчивается и что купить": "Nima tugayapti va nima sotib olish kerak",
+"🧳 Новая забытая вещь Официант:": "🧳 Yangi unutilgan buyum Ofitsiant:",
+"Выберите хотя бы один процесс": "Kamida bitta jarayonni tanlang",
+"Заполните логин, имя и пароль": "Login, ism va parolni to'ldiring",
+"Ошибка загрузки забытых вещей": "Unutilgan buyumlarni yuklashda xatolik",
+"Ошибка загрузки подразделений": "Bo'limlarni yuklashda xatolik",
+"Сменить пароль администратора": "Administrator parolini almashtirish",
+"🌅 Вы назначены дежурным Дата:": "🌅 Siz navbatchi etib tayinlandingiz Sana:",
+"🧳 Забытая вещь закрыта Гость:": "🧳 Unutilgan buyum yopildi Mehmon:",
+"Заявка ожидает подтверждения": "Ariza tasdiqlanishini kutmoqda",
+"Нажмите, чтобы открыть отчет": "Hisobotni ochish uchun bosing",
+"Напишите, что нужно заказать": "Nima buyurtma qilish kerakligini yozing",
+"Новое название подразделения": "Bo'limning yangi nomi",
+"Новые поломки появятся здесь": "Yangi nosozliklar shu yerda paydo bo'ladi",
+"Откройте приложение → Задачи": "Ilovani oching → Vazifalar",
+"Отчет по обучению официантов": "Ofitsiantlar ta'lim hisoboti",
+"Отчёты и результаты процесса": "Jarayon hisobotlari va natijalari",
+"Ошибка отправки забытой вещи": "Unutilgan buyumni yuborishda xatolik",
+"Ошибка сохранения сотрудника": "Xodimni saqlashda xatolik",
+"Ошибка сохранения стоп-листа": "Stop-listni saqlashda xatolik",
+"Раздел инвентаризации повара": "Oshpaz inventarizatsiyasi bo'limi",
+"Срочные задачи от учредителя": "Muassisdan shoshilinch vazifalar",
+"Фото поломки не прикрепляли.": "Nosozlik fotosi biriktirilmagan.",
+"👨‍🍳 Новый стафф отчет повара": "👨‍🍳 Oshpazning yangi staff hisoboti",
+"Firebase config не заполнен": "Firebase konfiguratsiyasi kiritilmagan",
+"Инвентаризация отправлена ✓": "Inventarizatsiya yuborildi ✓",
+"История штрафов будет здесь": "Jarimalar tarixi shu yerda bo'ladi",
+"Нет активной инвентаризации": "Faol inventarizatsiya yo'q",
+"Новые штрафы появятся здесь": "Yangi jarimalar shu yerda paydo bo'ladi",
+"Ошибка загрузки сотрудников": "Xodimlarni yuklashda xatolik",
+"Ошибка сохранения прогресса": "Jarayonni saqlashda xatolik",
+"Передача смены отправлена ✓": "Smena topshirilishi yuborildi ✓",
+"Создайте срочную задачу для": "Uchun shoshilinch vazifa yarating:",
+"Сотрудник удалён из системы": "Xodim tizimdan o'chirildi",
+"Введите название категории": "Toifa nomini kiriting",
+"Динамика входящих и броней": "Qo'ng'iroqlar va bronlar dinamikasi",
+"Добавьте хотя бы одну ниже": "Quyida kamida bittasini qo'shing",
+"Лучший результат: пока нет": "Eng yaxshi natija: hali yo'q",
+"Не удалось отправить отчет": "Hisobotni yuborib bo'lmadi",
+"Неверный пароль учредителя": "Muassis paroli noto'g'ri",
+"Отправляем забытую вещь...": "Unutilgan buyum yuborilmoqda...",
+"Ошибка загрузки статистики": "Statistikani yuklashda xatolik",
+"Ошибка отправки статистики": "Statistikani yuborishda xatolik",
+"Ошибка удаления сотрудника": "Xodimni o'chirishda xatolik",
+"В этом отрезке нет данных": "Bu oraliqda ma'lumot yo'q",
+"Доступно в полной версии.": "To'liq versiyada mavjud.",
+"Забытая вещь отправлена ✓": "Unutilgan buyum yuborildi ✓",
+"Инвентаризация не найдена": "Inventarizatsiya topilmadi",
+"Отправить инвентаризацию?": "Inventarizatsiyani yuborasizmi?",
+"Отправить отчет обучения?": "Ta'lim hisobotini yuborasizmi?",
+"Отчетов обучения пока нет": "Hozircha ta'lim hisobotlari yo'q",
+"Ошибка построения графика": "Grafikni qurishda xatolik",
+"Ошибка сохранения профиля": "Profilni saqlashda xatolik",
+"Посуда и рабочие предметы": "Idish-tovoq va ish buyumlari",
+"Процессы ещё не добавлены": "Jarayonlar hali qo'shilmagan",
+"Процессы ещё не настроены": "Jarayonlar hali sozlanmagan",
+"Сначала войдите как повар": "Avval oshpaz sifatida kiring",
+"Удалить все фотоотчёты за": "Uchun barcha foto hisobotlarni o'chirish:",
+"Фото стаффа и комментарий": "Staff fotosi va izoh",
+"⛔ Повар обновил стоп-лист": "⛔ Oshpaz stop-listni yangiladi",
+"📷 Сделать фото сотрудника": "📷 Xodim fotosini olish",
+"🛠️ Новая заявка на ремонт": "🛠️ Yangi ta'mirlash arizasi",
+"Версия 1.11 тестирование": "Versiya 1.11 sinov",
+"Дежурный ещё не назначен": "Navbatchi hali tayinlanmagan",
+"Доступно в полной версии": "To'liq versiyada mavjud",
+"Звонки, Telegram и брони": "Qo'ng'iroqlar, Telegram va bronlar",
+"Инвентаризация удалена ✓": "Inventarizatsiya o'chirildi ✓",
+"Например: Кассовая смена": "Masalan: Kassa smenasi",
+"Настройки администратора": "Administrator sozlamalari",
+"Ошибка загрузки настроек": "Sozlamalarni yuklashda xatolik",
+"Ошибка сохранения отчета": "Hisobotni saqlashda xatolik",
+"Ошибка сохранения штрафа": "Jarimani saqlashda xatolik",
+"Подразделение не найдено": "Bo'lim topilmadi",
+"Войдите в подразделение": "Bo'limga kiring",
+"Выберите администратора": "Administratorni tanlang",
+"Добавьте хотя бы 1 фото": "Kamida 1 ta foto qo'shing",
+"Напишите, что сломалось": "Nima buzilganini yozing",
+"Не удалось сделать фото": "Foto olib bo'lmadi",
+"Не указывать сотрудника": "Xodimni ko'rsatmaslik",
+"Отправить другую заявку": "Boshqa ariza yuborish",
+"Ошибка входа учредителя": "Muassis kirishida xatolik",
+"Ошибка загрузки заказов": "Buyurtmalarni yuklashda xatolik",
+"Ошибка загрузки отчетов": "Hisobotlarni yuklashda xatolik",
+"Ошибка загрузки поломок": "Nosozliklarni yuklashda xatolik",
+"Ошибка загрузки штрафов": "Jarimalarni yuklashda xatolik",
+"Передач смены пока нет.": "Hozircha smena topshirishlari yo'q.",
+"Подразделение создано ✓": "Bo'lim yaratildi ✓",
+"Пока нет инвентаризаций": "Hozircha inventarizatsiyalar yo'q",
+"Принято администратором": "Administrator tomonidan qabul qilindi",
+"Редактировать стоп лист": "Stop-listni tahrirlash",
+"Статистика отправлена ✓": "Statistika yuborildi ✓",
+"Worker URL не заполнен": "Worker URL kiritilmagan",
+"Вернуться в приложение": "Ilovaga qaytish",
+"Должностные инструкции": "Lavozim yo'riqnomalari",
+"Ещё одно подразделение": "Yana bitta bo'lim",
+"Забытых вещей пока нет": "Hozircha unutilgan buyumlar yo'q",
+"Нажмите, чтобы открыть": "Ochish uchun bosing",
+"Название подразделения": "Bo'lim nomi",
+"Не удалось создать JPG": "JPG yaratib bo'lmadi",
+"Ошибка закрытия задачи": "Vazifani yopishda xatolik",
+"Ошибка закрытия заявки": "Arizani yopishda xatolik",
+"Ошибка отправки задачи": "Vazifani yuborishda xatolik",
+"Ошибка отправки заявки": "Arizani yuborishda xatolik",
+"Ошибка отправки отчета": "Hisobotni yuborishda xatolik",
+"Ошибка удаления записи": "Yozuvni o'chirishda xatolik",
+"Ошибка удаления отчёта": "Hisobotni o'chirishda xatolik",
+"Ошибка удаления штрафа": "Jarimani o'chirishda xatolik",
+"Редактировать название": "Nomni tahrirlash",
+"Текст жалобы по стаффу": "Staff bo'yicha shikoyat matni",
+"Удалить подразделение?": "Bo'limni o'chirasizmi?",
+"назначен(а) дежурным ✓": "navbatchi etib tayinlandi ✓",
+"✅ Новая заявка на вход": "✅ Yangi kirish arizasi",
+"📦 Новая инвентаризация": "📦 Yangi inventarizatsiya",
+"Администратор на утро": "Ertalabgi administrator",
+"Актуальное меню в JPG": "JPG formatidagi joriy menyu",
+"Дата и время отправки": "Yuborish sanasi va vaqti",
+"Заполните число и имя": "Son va ismni to'ldiring",
+"Заявка технику с фото": "Texnikka foto bilan ariza",
+"Инвентаризация занята": "Inventarizatsiya band",
+"Нет данных для заявки": "Ariza uchun ma'lumot yo'q",
+"Открыть файл отдельно": "Faylni alohida ochish",
+"Отправлено анонимно ✓": "Anonim yuborildi ✓",
+"Ошибка загрузки задач": "Vazifalarni yuklashda xatolik",
+"Ошибка передачи смены": "Smena topshirishda xatolik",
+"Ошибка сохранения KPI": "KPI saqlashda xatolik",
+"Пароль администратора": "Administrator paroli",
+"Подразделение удалено": "Bo'lim o'chirildi",
+"Пока никто не одобрен": "Hozircha hech kim tasdiqlanmagan",
+"Прикрепить из галереи": "Galereyadan biriktirish",
+"Раздел в тестировании": "Bo'lim sinovdan o'tmoqda",
+"Раздел фото не найден": "Foto bo'limi topilmadi",
+"Сначала сделайте фото": "Avval foto oling",
+"Создать подразделение": "Bo'lim yaratish",
+"Удалить подразделение": "Bo'limni o'chirish",
+"Фотоотчёт · настройка": "Foto hisobot · sozlash",
+"Черновик восстановлен": "Qoralama tiklandi",
+"Что сделано по задаче": "Vazifa bo'yicha nima qilindi",
+"закрыл заявку повара:": "oshpaz arizasini yopdi:",
+"+ Добавить категорию": "+ Toifa qo'shish",
+"· Не смогли принять:": "· Qabul qila olmadi:",
+"Активных штрафов нет": "Faol jarimalar yo'q",
+"Введите имя и пароль": "Ism va parolni kiriting",
+"Введите новый пароль": "Yangi parolni kiriting",
+"Войдите как официант": "Ofitsiant sifatida kiring",
+"Войти как учредитель": "Muassis sifatida kirish",
+"Жалобы и предложения": "Shikoyat va takliflar",
+"Заказать · Массажист": "Buyurtma berish · Massajist",
+"Заполнить статистику": "Statistikani to'ldirish",
+"Камера ещё не готова": "Kamera hali tayyor emas",
+"Мои последние отчеты": "Mening so'nggi hisobotlarim",
+"Название сохранено ✓": "Nom saqlandi ✓",
+"Открыть в приложении": "Ilovada ochish",
+"Отправляем задачу...": "Vazifa yuborilmoqda...",
+"Отправляем заявку...": "Ariza yuborilmoqda...",
+"Пока нет массажистов": "Hozircha massajistlar yo'q",
+"Пока нет пармастеров": "Hozircha parmasterlar yo'q",
+"Пока нет сотрудников": "Hozircha xodimlar yo'q",
+"Пока никто не открыл": "Hozircha hech kim ochmagan",
+"Последнее обновление": "Oxirgi yangilanish",
+"Процессы добавлены ✓": "Jarayonlar qo'shildi ✓",
+"Соль и перец (минаж)": "Tuz va qalampir (minaj)",
+"Сообщение учредителю": "Muassisga xabar",
+"Сотрудников пока нет": "Hozircha xodimlar yo'q",
+"Стоп-лист обновлён ✓": "Stop-list yangilandi ✓",
+"Текст для официантов": "Ofitsiantlar uchun matn",
+"Фотоотчётов пока нет": "Hozircha foto hisobotlar yo'q",
+"⛔ Обновлён стоп-лист": "⛔ Stop-list yangilandi",
+"✅ Создана задача для": "✅ Uchun vazifa yaratildi:",
+"» из подразделения?": "» bo'limdan?",
+"Вход администратора": "Administrator kirishi",
+"Выберите сотрудника": "Xodimni tanlang",
+"Задача отправлена ✓": "Vazifa yuborildi ✓",
+"Закрываем задачу...": "Vazifa yopilmoqda...",
+"Закрываем заявку...": "Ariza yopilmoqda...",
+"Заявка отправлена ✓": "Ariza yuborildi ✓",
+"Категория добавлена": "Toifa qo'shildi",
+"Назначение на смену": "Smenaga tayinlash",
+"Назначить дежурным?": "Navbatchi etib tayinlansinmi?",
+"Например: 123456789": "Masalan: 123456789",
+"Например: Официанты": "Masalan: Ofitsiantlar",
+"Нет администраторов": "Administratorlar yo'q",
+"Новое подразделение": "Yangi bo'lim",
+"Нужно только 1 фото": "Faqat 1 ta foto kerak",
+"Отправляем отчет...": "Hisobot yuborilmoqda...",
+"Ошибка смены пароля": "Parolni almashtirishda xatolik",
+"Пароли не совпадают": "Parollar mos kelmadi",
+"Пока нет официантов": "Hozircha ofitsiantlar yo'q",
+"Прикрепить скриншот": "Skrinshot biriktirish",
+"Пройти тестирование": "Testdan o'tish",
+"Раздел в разработке": "Bo'lim ishlab chiqilmoqda",
+"Раздел заблокирован": "Bo'lim bloklangan",
+"Рассчитать зарплату": "Ish haqini hisoblash",
+"Скопировать таблицу": "Jadvalni nusxalash",
+"Сообщение дежурному": "Navbatchiga xabar",
+"Сотрудник не найден": "Xodim topilmadi",
+"Статистики пока нет": "Hozircha statistika yo'q",
+"Таблица скопирована": "Jadval nusxalandi",
+"Удалить сотрудника?": "Xodimni o'chirasizmi?",
+"Чашка под американо": "Amerikano uchun chashka",
+"🌅 Назначен дежурный": "🌅 Navbatchi tayinlandi",
+"🎓 Отчет по обучению": "🎓 Ta'lim hisoboti",
+"+ Добавить процесс": "+ Jarayon qo'shish",
+"Вход подтверждён ✓": "Kirish tasdiqlandi ✓",
+"Вы дежурный завтра": "Ertaga siz navbatchisiz",
+"Выберите официанта": "Ofitsiantni tanlang",
+"Выбрать из галереи": "Galereyadan tanlash",
+"Дежурный на завтра": "Ertangi navbatchi",
+"Добавить выбранное": "Tanlanganni qo'shish",
+"Заполните все поля": "Barcha maydonlarni to'ldiring",
+"Заявки сотрудников": "Xodimlar arizalari",
+"Имя администратора": "Administrator ismi",
+"Категорий пока нет": "Hozircha toifalar yo'q",
+"Назначить дежурным": "Navbatchi etib tayinlash",
+"Новая забытая вещь": "Yangi unutilgan buyum",
+"Нужно сделать фото": "Foto olish kerak",
+"Ожидает выполнения": "Bajarilishini kutmoqda",
+"Отправляем фото...": "Foto yuborilmoqda...",
+"Параметры процесса": "Jarayon parametrlari",
+"Пароль и параметры": "Parol va parametrlar",
+"Подтвердите пароль": "Parolni tasdiqlang",
+"Последняя передача": "Oxirgi topshirish",
+"Профиль сохранён ✓": "Profil saqlandi ✓",
+"Процессов пока нет": "Hozircha jarayonlar yo'q",
+"Скриншот переписки": "Yozishma skrinshoti",
+"Сотрудник удалён ✓": "Xodim o'chirildi ✓",
+"Сохранить название": "Nomni saqlash",
+"Список сотрудников": "Xodimlar ro'yxati",
+"Удалить сотрудника": "Xodimni o'chirish",
+"Фото от учредителя": "Muassisdan foto",
+"Фото после починки": "Ta'mirlashdan keyingi foto",
+"Фото после ремонта": "Ta'mirdan keyingi foto",
+"Чашка под эспрессо": "Espresso uchun chashka",
+"Что нужно заказать": "Nima buyurtma qilish kerak",
+"Штрафы и поощрения": "Jarima va rag'batlar",
+"← К подразделениям": "← Bo'limlarga",
+"✅ Вход подтверждён": "✅ Kirish tasdiqlandi",
+"✅ Новая задача для": "✅ Uchun yangi vazifa:",
+"Войдите как повар": "Oshpaz sifatida kiring",
+"Задача не найдена": "Vazifa topilmadi",
+"Заметки на завтра": "Ertangi eslatmalar",
+"Запись не найдена": "Yozuv topilmadi",
+"Заявка не найдена": "Ariza topilmadi",
+"Заявка отправлена": "Ariza yuborildi",
+"Инстаграм отвечен": "Instagramga javob berildi",
+"Коктейльная рюмка": "Kokteyl stakanchasi",
+"Колба для кальяна": "Kalyan kolbasi",
+"Корзинка для угля": "Ko'mir savatchasi",
+"Лучший результат:": "Eng yaxshi natija:",
+"Назначить на утро": "Ertalabga tayinlash",
+"Напишите текст...": "Matn yozing...",
+"Не смогли принять": "Qabul qila olmadi",
+"Новых записей нет": "Yangi yozuvlar yo'q",
+"Ожидают одобрения": "Tasdiqlanishini kutmoqda",
+"Отправить задачу?": "Vazifani yuborasizmi?",
+"Отправить заявку?": "Arizani yuborasizmi?",
+"Отчет отправлен ✓": "Hisobot yuborildi ✓",
+"Отчеты не найдены": "Hisobotlar topilmadi",
+"Ошибка назначения": "Tayinlashda xatolik",
+"Панель управления": "Boshqaruv paneli",
+"Пароль учредителя": "Muassis paroli",
+"Последняя попытка": "Oxirgi urinish",
+"Просто пакет фото": "Oddiy foto to'plami",
+"Сохранить профиль": "Profilni saqlash",
+"Сохраняем фото...": "Foto saqlanmoqda...",
+"Текст предложения": "Taklif matni",
+"Удалить процесс «": "Jarayonni o'chirish «",
+"Файл подготовлен.": "Fayl tayyor.",
+"Чашка для кальяна": "Kalyan chashkasi",
+"Шланг для кальяна": "Kalyan shlangi",
+"ещё не обновлялся": "hali yangilanmagan",
+"ожидает одобрения": "tasdiqlanishini kutmoqda",
+"💬 Новая анонимная": "💬 Yangi anonim",
+"📷 Новый фотоотчёт": "📷 Yangi foto hisobot",
+"Введите название": "Nomni kiriting",
+"ДЕЖУРНЫЙ УТРОМ ·": "ERTALABGI NAVBATCHI ·",
+"Добавить процесс": "Jarayon qo'shish",
+"Добро пожаловать": "Xush kelibsiz",
+"Задача закрыта ✓": "Vazifa yopildi ✓",
+"Заказов пока нет": "Hozircha buyurtmalar yo'q",
+"Запись удалена ✓": "Yozuv o'chirildi ✓",
+"Заявка закрыта ✓": "Ariza yopildi ✓",
+"Заявка на ремонт": "Ta'mirlash arizasi",
+"Заявка отклонена": "Ariza rad etildi",
+"Заявки на ремонт": "Ta'mirlash arizalari",
+"Инвентаризация ·": "Inventarizatsiya ·",
+"Камера не готова": "Kamera tayyor emas",
+"Лучший результат": "Eng yaxshi natija",
+"Назначен на утро": "Ertalabga tayinlangan",
+"Например: Стейшн": "Masalan: Stansiya",
+"Описание поломки": "Nosozlik tavsifi",
+"Отправить задачу": "Vazifani yuborish",
+"Отправить запрос": "So'rovni yuborish",
+"Отправить заявку": "Arizani yuborish",
+"Отправить отчет?": "Hisobotni yuborasizmi?",
+"Повторите пароль": "Parolni takrorlang",
+"Пока нет отчетов": "Hozircha hisobotlar yo'q",
+"Пока штрафов нет": "Hozircha jarimalar yo'q",
+"Поломок пока нет": "Hozircha nosozliklar yo'q",
+"Последние отчеты": "So'nggi hisobotlar",
+"Последние штрафы": "So'nggi jarimalar",
+"Постановка задач": "Vazifa qo'yish",
+"Сохранить пароль": "Parolni saqlash",
+"Статистика центр": "Statistika markazi",
+"Стоп-лист очищен": "Stop-list tozalandi",
+"Текст по желанию": "Matn ixtiyoriy",
+"Удалить черновик": "Qoralamani o'chirish",
+"Штраф сохранён ✓": "Jarima saqlandi ✓",
+"жалоба по стаффу": "staff bo'yicha shikoyat",
+"✅ Задача закрыта": "✅ Vazifa yopildi",
+"🧾 Новый заказ от": "🧾 Yangi buyurtma:",
+"Активные штрафы": "Faol jarimalar",
+"Алгоритм работы": "Ish algoritmi",
+"Вы вышли в меню": "Menyuga chiqdingiz",
+"Данных пока нет": "Hozircha ma'lumot yo'q",
+"Дата добавления": "Qo'shilgan sana",
+"Дежурный завтра": "Ertangi navbatchi",
+"Закрытие заявки": "Arizani yopish",
+"Закрыть задачу?": "Vazifani yopasizmi?",
+"Закрыть заявку?": "Arizani yopasizmi?",
+"Заполните отчет": "Hisobotni to'ldiring",
+"Заявок пока нет": "Hozircha arizalar yo'q",
+"История заказов": "Buyurtmalar tarixi",
+"История штрафов": "Jarimalar tarixi",
+"Кружка Капучино": "Kapuchino krujkasi",
+"Маленькие ложки": "Kichik qoshiqlar",
+"Меню массажиста": "Massajist menyusi",
+"Меню пармастера": "Parmaster menyusi",
+"Напишите задачу": "Vazifani yozing",
+"Например: 27.06": "Masalan: 27.06",
+"Например: 50000": "Masalan: 50000",
+"Неверный пароль": "Parol noto'g'ri",
+"Нет сотрудников": "Xodimlar yo'q",
+"Новая категория": "Yangi toifa",
+"Отправить отчет": "Hisobotni yuborish",
+"Отремонтировано": "Ta'mirlandi",
+"Отчет не найден": "Hisobot topilmadi",
+"Ошибка отправки": "Yuborishda xatolik",
+"Подготовить CSV": "CSV tayyorlash",
+"Подготовить JPG": "JPG tayyorlash",
+"Прикрепить фото": "Foto biriktirish",
+"Сохранить штраф": "Jarimani saqlash",
+"Фото добавлено:": "Foto qo'shildi:",
+"Черновик удалён": "Qoralama o'chirildi",
+"администраторов": "administratorlar",
+"✅ Ремонт закрыт": "✅ Ta'mirlash yopildi",
+"KPI · Официант": "KPI · Ofitsiant",
+"KPI обновлён ✓": "KPI yangilandi ✓",
+"Telegram логин": "Telegram login",
+"Администратор:": "Administrator:",
+"Администраторы": "Administratorlar",
+"Все сотрудники": "Barcha xodimlar",
+"Гость оповещен": "Mehmonga xabar berildi",
+"Добавить штраф": "Jarima qo'shish",
+"Задач пока нет": "Hozircha vazifalar yo'q",
+"Задача закрыта": "Vazifa yopildi",
+"Закрыть задачу": "Vazifani yopish",
+"Закрыть заявку": "Arizani yopish",
+"Заявки на вход": "Kirish arizalari",
+"Имя сотрудника": "Xodim ismi",
+"Имя учредителя": "Muassis ismi",
+"Инвентаризация": "Inventarizatsiya",
+"История заявок": "Arizalar tarixi",
+"История пустая": "Tarix bo'sh",
+"Лимит фото: 10": "Foto limiti: 10",
+"Напишите текст": "Matn yozing",
+"Нет сотрудника": "Xodim yo'q",
+"Нет, вернуться": "Yo'q, qaytish",
+"Новая задача ·": "Yangi vazifa ·",
+"Номер телефона": "Telefon raqami",
+"Отчёт удалён ✓": "Hisobot o'chirildi ✓",
+"Передача смены": "Smena topshirish",
+"Процесс удалён": "Jarayon o'chirildi",
+"Серв тарелки Б": "Katta serv likopcha",
+"Серв тарелки М": "Kichik serv likopcha",
+"Сменить пароль": "Parolni almashtirish",
+"Столовые ложки": "Osh qoshiqlari",
+"Удалить отчёт?": "Hisobotni o'chirasizmi?",
+"Фото добавлено": "Foto qo'shildi",
+"Штраф удалён ✓": "Jarima o'chirildi ✓",
+"закрыл задачу:": "vazifani yopdi:",
+"закрыл заявку:": "arizani yopdi:",
+"Администратор": "Administrator",
+"Введите число": "Sonni kiriting",
+"Выберите баню": "Hammomni tanlang",
+"Да, отправить": "Ha, yuborish",
+"Здравствуйте,": "Assalomu alaykum,",
+"Зона ожидания": "Kutish zonasi",
+"История задач": "Vazifalar tarixi",
+"Лимит фото: 2": "Foto limiti: 2",
+"Лимит фото: 3": "Foto limiti: 3",
+"Лимит фото: 5": "Foto limiti: 5",
+"Название бани": "Hammom nomi",
+"Обед или ужин": "Tushlik yoki kechki ovqat",
+"Одобрить вход": "Kirishni tasdiqlash",
+"Отправляем...": "Yuborilmoqda...",
+"Пивная кружка": "Pivo krujkasi",
+"По категориям": "Toifalar bo'yicha",
+"Подразделение": "Bo'lim",
+"Подразделения": "Bo'limlar",
+"Пока нет смен": "Hozircha smenalar yo'q",
+"Сделать заказ": "Buyurtma berish",
+"Список задач:": "Vazifalar ro'yxati:",
+"Тема обучения": "Ta'lim mavzusi",
+"Фото закрытия": "Yopish fotosi",
+"Шампань флюте": "Shampan flyutasi",
+"Штрафов всего": "Jami jarimalar",
+"· Фотоотчёты": "· Foto hisobotlar",
+"Барная ложка": "Bar qoshig'i",
+"Без названия": "Nomsiz",
+"Без описания": "Tavsifsiz",
+"Безопасность": "Xavfsizlik",
+"В разработке": "Ishlab chiqilmoqda",
+"Винный бокал": "Vino bokali",
+"Забытые вещи": "Unutilgan buyumlar",
+"Использовать": "Foydalanish",
+"Кто отправил": "Kim yubordi",
+"Наименование": "Nomi",
+"Новый пароль": "Yangi parol",
+"Отчёт удалён": "Hisobot o'chirildi",
+"Пивной бокал": "Pivo bokali",
+"Пример пути:": "Yo'l namunasi:",
+"Свой процесс": "O'z jarayoni",
+"Сделать фото": "Foto olish",
+"Смена повара": "Oshpaz smenasi",
+"Сменить тему": "Mavzuni almashtirish",
+"Список задач": "Vazifalar ro'yxati",
+"Сумма штрафа": "Jarima summasi",
+"Текст жалобы": "Shikoyat matni",
+"Текст задачи": "Vazifa matni",
+"Тестирование": "Sinov",
+"Учредитель ·": "Muassis ·",
+"Фото поломки": "Nosozlik fotosi",
+"Фотоотчеты ·": "Foto hisobotlar ·",
+"Фотоотчёты ·": "Foto hisobotlar ·",
+"тестирование": "sinov",
+"· Дежурный:": "· Navbatchi:",
+"· настроить": "· sozlash",
+"Без заметок": "Eslatmasiz",
+"Брони общее": "Bronlar jami",
+"Введите имя": "Ismni kiriting",
+"Войдите как": "Sifatida kiring:",
+"Да, закрыть": "Ha, yopish",
+"Дата смены:": "Smena sanasi:",
+"Дата штрафа": "Jarima sanasi",
+"Инвентарь ·": "Inventar ·",
+"Комментарий": "Izoh",
+"Лимит фото:": "Foto limiti:",
+"Не назначен": "Tayinlanmagan",
+"Нет доступа": "Kirish yo'q",
+"Новый отчет": "Yangi hisobot",
+"Подтвердить": "Tasdiqlash",
+"Предложения": "Takliflar",
+"Прием пищи:": "Ovqatlanish:",
+"Просмотрено": "Ko'rildi",
+"Редактирует": "Tahrirlamoqda",
+"Сертификаты": "Sertifikatlar",
+"Сотрудники:": "Xodimlar:",
+"Стафф отчет": "Staff hisobot",
+"Фотоотчёт ·": "Foto hisobot ·",
+"массажистов": "massajistlar",
+"пармастеров": "parmasterlar",
+"предложение": "taklif",
+"сотрудников": "xodimlar",
+"· добавлен": "· qo'shildi",
+"Активность": "Faollik",
+"Аттестация": "Attestatsiya",
+"Барный нож": "Bar pichog'i",
+"Брони с ПВ": "PV bilan bronlar",
+"Да, уверен": "Ha, ishonchim komil",
+"Заявок нет": "Arizalar yo'q",
+"Количество": "Miqdor",
+"Конверсия:": "Konversiya:",
+"Массажисты": "Massajistlar",
+"Неизвестно": "Noma'lum",
+"Новая вещь": "Yangi buyum",
+"Обучение ·": "Ta'lim ·",
+"Пармастера": "Parmasterlar",
+"Пепельница": "Kuldon",
+"Под чайник": "Choynak uchun",
+"Пока пусто": "Hozircha bo'sh",
+"Продолжить": "Davom etish",
+"Салфетница": "Salfetkadon",
+"Сотрудники": "Xodimlar",
+"Статистика": "Statistika",
+"Учредитель": "Muassis",
+"Файл готов": "Fayl tayyor",
+"Фотоотчеты": "Foto hisobotlar",
+"Фотоотчёты": "Foto hisobotlar",
+"официантов": "ofitsiantlar",
+"сотрудника": "xodim",
+"← К списку": "← Ro'yxatga",
+"🛠️ Задача:": "🛠️ Vazifa:",
+"· Звонки:": "· Qo'ng'iroqlar:",
+"Без числа": "Sonsiz",
+"Входящие:": "Kiruvchi:",
+"Документы": "Hujjatlar",
+"Имя гостя": "Mehmon ismi",
+"Инвентарь": "Inventar",
+"Карандаши": "Qalamlar",
+"Категории": "Toifalar",
+"Массажист": "Massajist",
+"Назначить": "Tayinlash",
+"Настройки": "Sozlamalar",
+"Отклонить": "Rad etish",
+"Отправить": "Yuborish",
+"Официанты": "Ofitsiantlar",
+"Пармастер": "Parmaster",
+"Переснять": "Qayta suratga olish",
+"Плейсматы": "Stol salfetkalari",
+"Поломки ·": "Nosozliklar ·",
+"Поощрения": "Rag'batlar",
+"Прочитано": "O'qildi",
+"Сахарница": "Qanddon",
+"Сотрудник": "Xodim",
+"Сохранить": "Saqlash",
+"Стоп лист": "Stop-list",
+"Фото вещи": "Buyum fotosi",
+"Фотоотчёт": "Foto hisobot",
+"процессов": "jarayonlar",
+"сотрудник": "xodim",
+"· Брони:": "· Bronlar:",
+"Без даты": "Sanasiz",
+"Без темы": "Mavzusiz",
+"Ваше имя": "Ismingiz",
+"Входящие": "Kiruvchi",
+"Выберите": "Tanlang",
+"ДЕЖУРНЫЙ": "NAVBATCHI",
+"Дежурный": "Navbatchi",
+"Задачи ·": "Vazifalar ·",
+"Заказать": "Buyurtma berish",
+"Заметки:": "Eslatmalar:",
+"На кого:": "Kimga:",
+"Обучение": "Ta'lim",
+"Одобрить": "Tasdiqlash",
+"Описание": "Tavsif",
+"Отложено": "Kechiktirilgan",
+"Официант": "Ofitsiant",
+"Передал:": "Topshirdi:",
+"Повара ·": "Oshpazlar ·",
+"Процессы": "Jarayonlar",
+"Рейтинг:": "Reyting:",
+"Сфоткать": "Suratga olish",
+"Телеграм": "Telegram",
+"Техничка": "Farrosh",
+"Шкатулки": "Quticha",
+"процесса": "jarayon",
+"техников": "texniklar",
+"техничек": "farroshlar",
+"топников": "o'tinchilar",
+"Активно": "Faol",
+"Байская": "Boy",
+"Задачи:": "Vazifalar:",
+"Закрыта": "Yopiq",
+"Заметки": "Eslatmalar",
+"Обновил": "Yangiladi",
+"Одобрен": "Tasdiqlandi",
+"Ожидает": "Kutmoqda",
+"От кого": "Kimdan",
+"Открыта": "Ochiq",
+"Отчетов": "Hisobotlar",
+"Отчеты:": "Hisobotlar:",
+"Передал": "Topshirdi",
+"Поломка": "Nosozlik",
+"Поломки": "Nosozliklar",
+"Понятно": "Tushunarli",
+"Попыток": "Urinishlar",
+"Причина": "Sabab",
+"Профиль": "Profil",
+"Разделы": "Bo'limlar",
+"Ресепшн": "Resepshn",
+"Терраса": "Terrasa",
+"Удалить": "O'chirish",
+"Ханская": "Xon",
+"ожидает": "kutmoqda",
+"отчетов": "hisobotlar",
+"отчётов": "hisobotlar",
+"поваров": "oshpazlar",
+"позиций": "pozitsiyalar",
+"процесс": "jarayon",
+"← Назад": "← Orqaga",
+"Айсбак": "Muz idishi",
+"Блюдца": "Likobchalar",
+"Бокалы": "Bokallar",
+"Брони:": "Bronlar:",
+"Версия": "Versiya",
+"Время:": "Vaqt:",
+"Гость:": "Mehmon:",
+"Графин": "Grafin",
+"Джигер": "Jigger",
+"Добрая": "Mehribon",
+"Жалобы": "Shikoyatlar",
+"Задача": "Vazifa",
+"Задачи": "Vazifalar",
+"Заказы": "Buyurtmalar",
+"Закрыл": "Yopdi",
+"Заявка": "Ariza",
+"Звонки": "Qo'ng'iroqlar",
+"Калауд": "Kalaud",
+"Кальян": "Kalyan",
+"Лесная": "O'rmon",
+"Начать": "Boshlash",
+"Нашел:": "Topdi:",
+"Отмена": "Bekor qilish",
+"Отчёты": "Hisobotlar",
+"Панель": "Panel",
+"Пароль": "Parol",
+"Первая": "Birinchi",
+"Питчер": "Pitcher",
+"Повара": "Oshpazlar",
+"Пульты": "Pultlar",
+"Раздел": "Bo'lim",
+"Статус": "Holat",
+"Стейшн": "Stansiya",
+"Техник": "Texnik",
+"Топник": "O'tinchi",
+"Чайник": "Choynak",
+"Число:": "Son:",
+"Штрафы": "Jarimalar",
+"Щипчик": "Qisqich",
+"жалоба": "shikoyat",
+"заявка": "ariza",
+"заявки": "arizalar",
+"заявок": "arizalar",
+"отчета": "hisobot",
+"отчёта": "hisobot",
+"Айриш": "Irish",
+"Баня:": "Hammom:",
+"Брони": "Bronlar",
+"Вилки": "Vilkalar",
+"Войти": "Kirish",
+"Время": "Vaqt",
+"Гость": "Mehmon",
+"Дата:": "Sana:",
+"Заказ": "Buyurtma",
+"Малая": "Kichik",
+"Нашел": "Topdi",
+"Новая": "Yangi",
+"Повар": "Oshpaz",
+"Режим": "Rejim",
+"Рожок": "Konussimon stakan",
+"Смена": "Smena",
+"Смены": "Smenalar",
+"Стафф": "Staff",
+"Текст": "Matn",
+"Тема:": "Mavzu:",
+"Цветы": "Gullar",
+"Чашки": "Chashkalar",
+"Число": "Son",
+"отчет": "hisobot",
+"отчёт": "hisobot",
+"Баня": "Hammom",
+"Вход": "Kirish",
+"Дата": "Sana",
+"Даты": "Sanalar",
+"Для:": "Uchun:",
+"Меню": "Menyu",
+"Ножи": "Pichoqlar",
+"Ночь": "Tun",
+"Обед": "Tushlik",
+"Смен": "Smena",
+"Стол": "Stol",
+"Тема": "Mavzu",
+"Ужин": "Kechki ovqat",
+"Утро": "Ertalab",
+"Фото": "Foto",
+"смен": "smena",
+"фото": "foto",
+"Бар": "Bar",
+"Имя": "Ism",
+"На:": "Uchun:",
+"Шот": "Shot",
+"сум": "so'm",
+"До": "Gacha",
+"на": "ga",
+"Например:\nНет лагмана\nНет мёда\nНет говяжьего шашлыка": "Masalan:\nLag'mon yo'q\nAsal yo'q\nMol go'shtidan shashlik yo'q",
+"Выйти": "Chiqish",
+"От:": "Kimdan:"
+};
+
+const RU_UZ_KEYS_SORTED = Object.keys(RU_UZ_DICT).sort((a, b) => b.length - a.length);
+
+function escapeRegExpForLang(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+const RU_UZ_REGEX = RU_UZ_KEYS_SORTED.length
+  ? new RegExp(RU_UZ_KEYS_SORTED.map(escapeRegExpForLang).join('|'), 'g')
+  : null;
+
+function translateRuToUz(text) {
+  if (!text || !RU_UZ_REGEX) return text;
+  return text.replace(RU_UZ_REGEX, (m) => (Object.prototype.hasOwnProperty.call(RU_UZ_DICT, m) ? RU_UZ_DICT[m] : m));
+}
+
+let currentLang = localStorage.getItem('appLang') || 'ru';
+const langOriginalTextCache = new WeakMap();
+const langOriginalAttrCache = new WeakMap();
+const LANG_ATTRS = ['placeholder', 'title'];
+// Элементы с data-i18n-skip содержат текст, который печатает сам пользователь
+// (название подразделения, свои процессы, имена сотрудников и т.д.) —
+// такой текст не должен переводиться при переключении языка.
+const LANG_SKIP_ATTR = 'data-i18n-skip';
+let langObserver = null;
+let langTranslating = false;
+
+function translateTextNode(node) {
+  if (!node) return;
+  if (node.parentElement && node.parentElement.closest('[' + LANG_SKIP_ATTR + ']')) return;
+  if (!langOriginalTextCache.has(node)) {
+    langOriginalTextCache.set(node, node.nodeValue);
+  }
+  const original = langOriginalTextCache.get(node);
+  const next = currentLang === 'uz' ? translateRuToUz(original) : original;
+  if (node.nodeValue !== next) node.nodeValue = next;
+}
+
+function translateElementAttrs(el) {
+  if (!el || el.nodeType !== 1) return;
+  let cache = langOriginalAttrCache.get(el);
+  if (!cache) {
+    cache = {};
+    langOriginalAttrCache.set(el, cache);
+  }
+  LANG_ATTRS.forEach((attr) => {
+    if (!el.hasAttribute || !el.hasAttribute(attr)) return;
+    if (cache[attr] === undefined) cache[attr] = el.getAttribute(attr);
+    const next = currentLang === 'uz' ? translateRuToUz(cache[attr]) : cache[attr];
+    if (el.getAttribute(attr) !== next) el.setAttribute(attr, next);
+  });
+}
+
+function translateSubtree(root) {
+  if (!root) return;
+  if (root.nodeType === 3) {
+    translateTextNode(root);
+    return;
+  }
+  if (root.nodeType !== 1) return;
+  if (root.hasAttribute && root.hasAttribute(LANG_SKIP_ATTR)) return;
+
+  translateElementAttrs(root);
+  if (root.querySelectorAll) {
+    root.querySelectorAll('[placeholder], [title]').forEach((el) => {
+      if (!el.closest('[' + LANG_SKIP_ATTR + ']')) translateElementAttrs(el);
+    });
+  }
+
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      if (node.nodeType === 1) {
+        return node.hasAttribute(LANG_SKIP_ATTR) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_SKIP;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  let node;
+  while ((node = walker.nextNode())) {
+    if (node.nodeType === 3) translateTextNode(node);
+  }
+}
+
+function withLangObserverPaused(fn) {
+  langTranslating = true;
+  try {
+    fn();
+  } finally {
+    langTranslating = false;
+  }
+}
+
+function setupLanguageObserver() {
+  if (langObserver) return;
+  langObserver = new MutationObserver((mutations) => {
+    if (langTranslating) return;
+    if (currentLang !== 'uz') return;
+    withLangObserverPaused(() => {
+      mutations.forEach((m) => {
+        if (m.type === 'childList') {
+          m.addedNodes.forEach((n) => {
+            if (n.nodeType === 1) translateSubtree(n);
+            else if (n.nodeType === 3) translateTextNode(n);
+          });
+        } else if (m.type === 'characterData') {
+          translateTextNode(m.target);
+        } else if (m.type === 'attributes' && LANG_ATTRS.includes(m.attributeName)) {
+          translateElementAttrs(m.target);
+        }
+      });
+    });
+  });
+  langObserver.observe(document.body, {
+    childList: true,
+    subtree: true,
+    characterData: true,
+    attributes: true,
+    attributeFilter: LANG_ATTRS
+  });
+}
+
+function applyLanguage(lang) {
+  currentLang = lang === 'uz' ? 'uz' : 'ru';
+  localStorage.setItem('appLang', currentLang);
+  document.documentElement.lang = currentLang === 'uz' ? 'uz' : 'ru';
+  const btn = document.getElementById('lang-toggle-btn');
+  if (btn) btn.textContent = currentLang === 'uz' ? 'RU' : 'UZ';
+  withLangObserverPaused(() => {
+    translateSubtree(document.body);
+  });
+}
+
+function toggleLanguage() {
+  applyLanguage(currentLang === 'uz' ? 'ru' : 'uz');
+}
+
+function initLang() {
+  setupLanguageObserver();
+  applyLanguage(currentLang);
+}
+
 
 
 window.addEventListener('error', (event) => {
