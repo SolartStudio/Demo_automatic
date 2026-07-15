@@ -1204,7 +1204,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm">(your logo)</div>
- <div class="app-version" id="app-version-label">Версия 1.06 тестирование</div>
+ <div class="app-version" id="app-version-label">Версия 1.07 тестирование</div>
  </div>
 </div>
 
@@ -2737,7 +2737,7 @@ const firebaseConfig = {
 };
 
 // Пример: "https://drova-photo-worker.YOUR_SUBDOMAIN.workers.dev"
-const TELEGRAM_PHOTO_WORKER_URL = "https://drova-telegram-storage.swiftkartofel.workers.dev";
+const TELEGRAM_PHOTO_WORKER_URL = "https://demo-telegram-storage.swiftkartofel.workers.dev";
 
 // Deep links for Telegram notifications.
 // If your Worker knows BOT_USERNAME + WEBAPP_SHORT_NAME, it can build the button from startParam.
@@ -2749,7 +2749,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.06";
+const APP_VERSION = "1.07";
 const APP_CHANNEL = "тестирование";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION} ${APP_CHANNEL}`;
 window.DROVA_INSPECTOR_VERSION = {
