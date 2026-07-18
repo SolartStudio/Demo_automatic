@@ -1228,7 +1228,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm">(your logo)</div>
-    <div class="app-version" id="app-version-label">Версия 1.11 тестирование</div>
+    <div class="app-version" id="app-version-label">Версия 1.12</div>
  </div>
 </div>
 
@@ -2797,14 +2797,12 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.11";
-const APP_CHANNEL = "тестирование";
-const APP_VERSION_LABEL = `Версия ${APP_VERSION} ${APP_CHANNEL}`;
+const APP_VERSION = "1.12";
+const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.DROVA_INSPECTOR_VERSION = {
  version: APP_VERSION,
- channel: APP_CHANNEL,
  label: APP_VERSION_LABEL,
- updatedAt: "2026-07-15"
+ updatedAt: "2026-07-18"
 };
 
 let db = null;
@@ -12135,7 +12133,7 @@ const RU_UZ_DICT = {
 "⛔ Повар обновил стоп-лист": "⛔ Oshpaz stop-listni yangiladi",
 "📷 Сделать фото сотрудника": "📷 Xodim fotosini olish",
 "🛠️ Новая заявка на ремонт": "🛠️ Yangi ta'mirlash arizasi",
-"Версия 1.11 тестирование": "Versiya 1.11 sinov",
+"Версия 1.12": "Versiya 1.12",
 "Дежурный ещё не назначен": "Navbatchi hali tayinlanmagan",
 "Доступно в полной версии": "To'liq versiyada mavjud",
 "Звонки, Telegram и брони": "Qo'ng'iroqlar, Telegram va bronlar",
