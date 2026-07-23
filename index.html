@@ -1431,7 +1431,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm">(ваш логотип)</div>
-    <div class="app-version" id="app-version-label">Версия 1.12</div>
+    <div class="app-version" id="app-version-label">Версия 1.19</div>
  </div>
 </div>
 
@@ -3000,7 +3000,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.12";
+const APP_VERSION = "1.19";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.DROVA_INSPECTOR_VERSION = {
  version: APP_VERSION,
@@ -12043,10 +12043,15 @@ async function init() {
  const versionEl = document.getElementById('app-version-label');
  if (versionEl) versionEl.textContent = APP_VERSION_LABEL;
 
- try {
- await initCloud();
- } catch (e) {
- console.error('initCloud failed', e);
+ // ------------------------------------------------------------------
+ // Мгновенная отрисовка из локального кэша (localStorage), без ожидания
+ // сети. Раньше весь экран ждал полный цикл await initCloud() (Promise.all
+ // из 16 запросов к Firestore + подписки), поэтому главный экран был
+ // пустым 3-4 секунды. Теперь экран показывается сразу же из последней
+ // сохранённой копии, а облачные данные (если получены) приходят следом
+ // через уже существующие onSnapshot-подписки и сами обновляют экран —
+ // отдельно ничего пересчитывать не нужно.
+ // ------------------------------------------------------------------
  appCache.staff = LocalDB.get("staff") || appCache.staff || [];
  appCache.departments = LocalDB.get("departments") || appCache.departments || [];
  appCache.reports = LocalDB.get("reports") || appCache.reports || [];
@@ -12067,8 +12072,6 @@ async function init() {
  appCache.founderTasks = LocalDB.get("founderTasks") || appCache.founderTasks || [];
  appCache.kpiContent = LocalDB.get("kpiContent") || appCache.kpiContent || getDefaultKpiContent();
  appCache.stopList = LocalDB.get("stopList") || appCache.stopList || getDefaultStopList();
- showToast('Связь с базой нестабильна, открыта локальная копия');
- }
 
  applyDepartmentLabels(getPrimaryDepartment());
  renderHomeGrid();
@@ -12096,15 +12099,27 @@ async function init() {
  updateUnreadBadges();
  startTechnicianRepairReminderTimer();
  initDeepLinkRoute();
+ initTheme();
+ initLang();
+ setupGlobalSwipeBack();
+
+ // ------------------------------------------------------------------
+ // Синхронизация с Firestore идёт в фоне уже после того, как экран
+ // показан. Если сеть ответит — onSnapshot-подписки внутри initCloud()
+ // сами обновят appCache и перерисуют нужные экраны (это уже было).
+ // ------------------------------------------------------------------
+ try {
+ await initCloud();
+ } catch (e) {
+ console.error('initCloud failed', e);
+ showToast('Связь с базой нестабильна, открыта локальная копия');
+ }
 
  if (!CLOUD_ENABLED) {
  showToast("Firebase config не заполнен");
  } else if (!TELEGRAM_PHOTO_ENABLED) {
  showToast("Worker URL не заполнен");
  }
- initTheme();
- initLang();
- setupGlobalSwipeBack();
 }
 
 // ============================================================
@@ -12365,7 +12380,7 @@ const RU_UZ_DICT = {
 "⛔ Повар обновил стоп-лист": "⛔ Oshpaz stop-listni yangiladi",
 "📷 Сделать фото сотрудника": "📷 Xodim fotosini olish",
 "🛠️ Новая заявка на ремонт": "🛠️ Yangi ta'mirlash arizasi",
-"Версия 1.12": "Versiya 1.12",
+"Версия 1.19": "Versiya 1.19",
 "Дежурный ещё не назначен": "Navbatchi hali tayinlanmagan",
 "Доступно в полной версии": "To'liq versiyada mavjud",
 "Звонки, Telegram и брони": "Qo'ng'iroqlar, Telegram va bronlar",
