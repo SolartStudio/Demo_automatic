@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>(ваш логотип)</title>
+<title></title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1413,7 +1413,7 @@
  <div class="home-brand-row">
  <div class="home-brand">
  <div class="home-logo-mark">&#10022;</div>
- <div class="home-logo-text">(ваш логотип)</div>
+ <div class="home-logo-text" data-i18n-skip></div>
  </div>
  <div class="home-top-controls">
  <button class="lang-toggle" onclick="toggleLanguage()" id="lang-toggle-btn" title="Tilni almashtirish">UZ</button>
@@ -1430,8 +1430,95 @@
  </div>
  </div>
  <div class="home-footer">
- <div class="logo-sm">(ваш логотип)</div>
+ <div class="logo-sm" data-i18n-skip></div>
     <div class="app-version" id="app-version-label">Версия 1.19</div>
+ </div>
+</div>
+
+<!-- ===== SCREEN: CREATE BUSINESS ===== -->
+<div class="screen" id="screen-create-business">
+ <div class="header">
+ <button class="back-btn" onclick="goHome()">←</button>
+ <span class="header-title">Создать бизнес</span>
+ </div>
+ <div class="content content-padded">
+ <div style="margin-bottom: 32px;">
+ <div style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Настройка вашей компании</div>
+ <div style="font-size: 14px; color: var(--text-2); line-height: 1.5;">Эти данные понадобятся для входа как учредитель на новом устройстве.</div>
+ </div>
+ <div class="field">
+ <label>Ваше имя</label>
+ <input type="text" id="create-business-name" placeholder="Как вас зовут" autocomplete="name">
+ </div>
+ <div class="field">
+ <label>Название компании</label>
+ <input type="text" id="create-business-company" data-i18n-skip placeholder="Например: Салон красоты Луна">
+ </div>
+ <div class="field">
+ <label>Придумайте пароль учредителя</label>
+ <input type="password" id="create-business-pwd" placeholder="••••" autocomplete="off" onkeydown="if(event.key==='Enter') submitCreateBusiness()">
+ <div class="error-msg" id="create-business-error">Заполните все поля</div>
+ </div>
+ <button class="btn btn-primary" onclick="submitCreateBusiness()">Создать бизнес</button>
+ </div>
+</div>
+
+<!-- ===== SCREEN: JOIN BUSINESS ===== -->
+<div class="screen" id="screen-join-business">
+ <div class="header">
+ <button class="back-btn" onclick="goHome()">←</button>
+ <span class="header-title">Войти в бизнес</span>
+ </div>
+ <div class="content content-padded">
+ <div class="tabs">
+ <div class="tab active" id="join-tab-founder" onclick="switchJoinTab('founder')">Я учредитель</div>
+ <div class="tab" id="join-tab-staff" onclick="switchJoinTab('staff')">Я сотрудник</div>
+ </div>
+
+ <div id="join-founder-pane">
+ <div style="margin-bottom: 24px; font-size: 14px; color: var(--text-2); line-height: 1.5;">Вход на новом устройстве по имени и паролю, которые вы указали при создании бизнеса.</div>
+ <div class="field">
+ <label>Имя учредителя</label>
+ <input type="text" id="join-founder-name" placeholder="Ваше имя" autocomplete="name">
+ </div>
+ <div class="field">
+ <label>Пароль</label>
+ <input type="password" id="join-founder-pwd" placeholder="••••" autocomplete="off" onkeydown="if(event.key==='Enter') submitFounderRecovery()">
+ <div class="error-msg" id="join-founder-error">Введите имя и пароль</div>
+ </div>
+ <button class="btn btn-primary" onclick="submitFounderRecovery()">Войти</button>
+ </div>
+
+ <div id="join-staff-pane" style="display:none;">
+ <div style="margin-bottom: 24px; font-size: 14px; color: var(--text-2); line-height: 1.5;">Введите код, который дал вам учредитель или администратор подразделения.</div>
+ <div class="field">
+ <label>Код подразделения</label>
+ <input type="text" id="join-staff-code" placeholder="Например: AB3K9X" autocomplete="off" autocapitalize="characters" onkeydown="if(event.key==='Enter') submitEmployeeCode()">
+ <div class="error-msg" id="join-staff-error">Введите код</div>
+ </div>
+ <button class="btn btn-primary" onclick="submitEmployeeCode()">Продолжить</button>
+ </div>
+ </div>
+</div>
+
+
+<!-- ===== SCREEN: EMPLOYEE JOIN CONFIRM (по коду подразделения) ===== -->
+<div class="screen" id="screen-employee-join-confirm">
+ <div class="header">
+ <button class="back-btn" onclick="goHome()">←</button>
+ <span class="header-title">Регистрация</span>
+ </div>
+ <div class="content content-padded">
+ <div style="margin-bottom: 32px;">
+ <div style="font-size: 13px; color: var(--text-3); letter-spacing: 1px; margin-bottom: 4px;">ПОДРАЗДЕЛЕНИЕ</div>
+ <div style="font-size: 20px; font-weight: 700;" id="employee-join-dep-name" data-i18n-skip></div>
+ </div>
+ <div class="field">
+ <label>Ваше имя</label>
+ <input type="text" id="employee-join-name" placeholder="Ваше имя" autocomplete="name" onkeydown="if(event.key==='Enter') submitEmployeeJoinConfirm()">
+ <div class="error-msg" id="employee-join-error">Введите имя</div>
+ </div>
+ <button class="btn btn-primary" onclick="submitEmployeeJoinConfirm()">Готово</button>
  </div>
 </div>
 
@@ -3010,6 +3097,41 @@ window.DROVA_INSPECTOR_VERSION = {
 
 let db = null;
 
+// ============================================================
+// МУЛЬТИТЕНАНТНОСТЬ: обёртка над db.collection(), которая на каждое
+// чтение добавляет фильтр .where("businessId","==",мой бизнес), а на
+// каждую запись — само поле businessId. Так разные компании, открывшие
+// одного бота, физически не видят и не могут перезаписать чужие данные.
+// Коллекция "businesses" (список самих компаний) и "settings" (там ключ
+// документа — сам businessId, поле не нужно) через эту обёртку не идут.
+// ============================================================
+function biz(collectionName) {
+ const bizId = getCurrentBusinessId();
+ const ref = db.collection(collectionName);
+
+ function withBusinessId(data) {
+ return Object.assign({}, data, { businessId: bizId });
+ }
+
+ function scopedQuery() {
+ return ref.where('businessId', '==', bizId);
+ }
+
+ return {
+ get: () => scopedQuery().get(),
+ onSnapshot: (onNext, onError) => scopedQuery().onSnapshot(onNext, onError),
+ orderBy: (field, dir) => ({
+ get: () => scopedQuery().orderBy(field, dir).get(),
+ onSnapshot: (onNext, onError) => scopedQuery().orderBy(field, dir).onSnapshot(onNext, onError)
+ }),
+ doc: (id) => ({
+ get: () => ref.doc(id).get(),
+ set: (data, opts) => ref.doc(id).set(withBusinessId(data), opts),
+ delete: () => ref.doc(id).delete()
+ })
+ };
+}
+
 const appCache = {
  staff: [],
  departments: [],
@@ -3148,7 +3270,7 @@ async function setStopList(data) {
  LocalDB.set("stopList", next);
 
  if (CLOUD_ENABLED && db) {
- await db.collection("settings").doc("main").set({
+ await db.collection("settings").doc(getCurrentBusinessId()).set({
  stopList: next,
  updatedAt: new Date().toISOString()
  }, { merge: true });
@@ -3173,7 +3295,7 @@ async function setKpiText(role, section, textValue) {
  LocalDB.set("kpiContent", data);
 
  if (CLOUD_ENABLED && db) {
- await db.collection("settings").doc("main").set({
+ await db.collection("settings").doc(getCurrentBusinessId()).set({
  kpiContent: data,
  updatedAt: new Date().toISOString()
  }, { merge: true });
@@ -3268,7 +3390,7 @@ async function saveAdminProfile(profile) {
  setAdminProfiles(arr);
 
  if (CLOUD_ENABLED && db) {
- await db.collection("adminProfiles").doc(String(profile.id)).set(profile, { merge: true });
+ await biz("adminProfiles").doc(String(profile.id)).set(profile, { merge: true });
  }
 }
 
@@ -3329,7 +3451,7 @@ async function ensureFounderEmployee(name) {
  appCache.staff = arr;
  LocalDB.set("staff", arr);
  if (CLOUD_ENABLED && db) {
- await db.collection("staff").doc(String(founder.id)).set(founder, { merge: true });
+ await biz("staff").doc(String(founder.id)).set(founder, { merge: true });
  }
  localStorage.setItem("currentFounderId", String(founder.id));
  LocalDB.set("founderProfile", founder);
@@ -3394,7 +3516,7 @@ async function initCloud() {
  await loadCloudData();
  await cleanupExpiredPhotoReports();
 
- db.collection("staff").onSnapshot((snapshot) => {
+ biz("staff").onSnapshot((snapshot) => {
  appCache.staff = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  LocalDB.set("staff", appCache.staff);
  refreshVisibleData();
@@ -3403,7 +3525,7 @@ async function initCloud() {
  showToast("Ошибка загрузки сотрудников");
  });
 
- db.collection("departments").orderBy("createdAt", "asc").onSnapshot((snapshot) => {
+ biz("departments").orderBy("createdAt", "asc").onSnapshot((snapshot) => {
  appCache.departments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  LocalDB.set("departments", appCache.departments);
  applyDepartmentLabels(getPrimaryDepartment());
@@ -3415,7 +3537,7 @@ async function initCloud() {
  showToast("Ошибка загрузки подразделений");
  });
 
- db.collection("reports").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+ biz("reports").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
  const allReports = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  appCache.reports = filterRecentPhotoReports(allReports);
  LocalDB.set("reports", appCache.reports);
@@ -3425,7 +3547,7 @@ async function initCloud() {
  showToast("Ошибка загрузки отчетов");
  });
 
- db.collection("fines").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+ biz("fines").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
  appCache.fines = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  refreshVisibleData();
  }, (err) => {
@@ -3433,7 +3555,7 @@ async function initCloud() {
  showToast("Ошибка загрузки штрафов");
  });
 
- db.collection("inventoryRecords").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+ biz("inventoryRecords").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
  appCache.inventoryRecords = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  refreshVisibleData();
  }, (err) => {
@@ -3441,7 +3563,7 @@ async function initCloud() {
  showToast("Ошибка загрузки инвентаризации");
  });
 
- db.collection("adminStats").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+ biz("adminStats").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
  appCache.adminStats = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  refreshVisibleData();
  }, (err) => {
@@ -3449,7 +3571,7 @@ async function initCloud() {
  showToast("Ошибка загрузки статистики");
  });
 
- db.collection("adminProfiles").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+ biz("adminProfiles").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
  appCache.adminProfiles = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  LocalDB.set("adminProfiles", appCache.adminProfiles);
  refreshVisibleData();
@@ -3458,7 +3580,7 @@ async function initCloud() {
  showToast("Ошибка загрузки администраторов");
  });
 
- db.collection("bathmasterOrders").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+ biz("bathmasterOrders").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
  appCache.bathmasterOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  refreshVisibleData();
  }, (err) => {
@@ -3466,7 +3588,7 @@ async function initCloud() {
  showToast("Ошибка загрузки заказов");
  });
 
- db.collection("repairRequests").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+ biz("repairRequests").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
  appCache.repairRequests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  refreshVisibleData();
  }, (err) => {
@@ -3474,7 +3596,7 @@ async function initCloud() {
  showToast("Ошибка загрузки поломок");
  });
 
- db.collection("cookStaffReports").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+ biz("cookStaffReports").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
  appCache.cookStaffReports = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  LocalDB.set("cookStaffReports", appCache.cookStaffReports);
  refreshVisibleData();
@@ -3483,7 +3605,7 @@ async function initCloud() {
  showToast("Ошибка загрузки отчетов повара");
  });
 
- db.collection("adminTrainingReports").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+ biz("adminTrainingReports").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
  appCache.adminTrainingReports = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  LocalDB.set("adminTrainingReports", appCache.adminTrainingReports);
  refreshVisibleData();
@@ -3492,7 +3614,7 @@ async function initCloud() {
  showToast("Ошибка загрузки отчетов обучения");
  });
 
- db.collection("founderTasks").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+ biz("founderTasks").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
  appCache.founderTasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  LocalDB.set("founderTasks", appCache.founderTasks);
  LocalDB.set("forgottenItems", appCache.forgottenItems);
@@ -3502,7 +3624,7 @@ async function initCloud() {
  showToast("Ошибка загрузки задач");
  });
 
- db.collection("forgottenItems").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+ biz("forgottenItems").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
  appCache.forgottenItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  LocalDB.set("forgottenItems", appCache.forgottenItems);
  refreshVisibleData();
@@ -3511,7 +3633,7 @@ async function initCloud() {
  showToast("Ошибка загрузки забытых вещей");
  });
 
- db.collection("anonymousFeedback").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+ biz("anonymousFeedback").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
  appCache.anonymousFeedback = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  LocalDB.set("anonymousFeedback", appCache.anonymousFeedback);
  refreshVisibleData();
@@ -3520,7 +3642,7 @@ async function initCloud() {
  showToast("Ошибка загрузки жалоб и предложений");
  });
 
- db.collection("settings").doc("main").onSnapshot((doc) => {
+ db.collection("settings").doc(getCurrentBusinessId()).onSnapshot((doc) => {
  const data = doc.exists ? doc.data() : {};
  appCache.dutyAssignment = data.dutyAssignment || null;
  appCache.dutyAssignmentsByDate = data.dutyAssignmentsByDate || LocalDB.get("dutyAssignmentsByDate") || {};
@@ -3550,22 +3672,22 @@ async function initCloud() {
 
 async function loadCloudData() {
  const [staffSnap, departmentsSnap, reportsSnap, finesSnap, inventorySnap, accessRequestsSnap, adminStatsSnap, adminProfilesSnap, bathmasterOrdersSnap, repairRequestsSnap, cookStaffReportsSnap, adminTrainingReportsSnap, founderTasksSnap, forgottenItemsSnap, anonymousFeedbackSnap, settingsDoc] = await Promise.all([
- db.collection("staff").get(),
- db.collection("departments").orderBy("createdAt", "asc").get(),
- db.collection("reports").orderBy("createdAt", "desc").get(),
- db.collection("fines").orderBy("createdAt", "desc").get(),
- db.collection("inventoryRecords").orderBy("createdAt", "desc").get(),
- db.collection("accessRequests").orderBy("createdAt", "desc").get(),
- db.collection("adminStats").orderBy("createdAt", "desc").get(),
- db.collection("adminProfiles").orderBy("createdAt", "desc").get(),
- db.collection("bathmasterOrders").orderBy("createdAt", "desc").get(),
- db.collection("repairRequests").orderBy("createdAt", "desc").get(),
- db.collection("cookStaffReports").orderBy("createdAt", "desc").get(),
- db.collection("adminTrainingReports").orderBy("createdAt", "desc").get(),
- db.collection("founderTasks").orderBy("createdAt", "desc").get(),
- db.collection("forgottenItems").orderBy("createdAt", "desc").get(),
- db.collection("anonymousFeedback").orderBy("createdAt", "desc").get(),
- db.collection("settings").doc("main").get()
+ biz("staff").get(),
+ biz("departments").orderBy("createdAt", "asc").get(),
+ biz("reports").orderBy("createdAt", "desc").get(),
+ biz("fines").orderBy("createdAt", "desc").get(),
+ biz("inventoryRecords").orderBy("createdAt", "desc").get(),
+ biz("accessRequests").orderBy("createdAt", "desc").get(),
+ biz("adminStats").orderBy("createdAt", "desc").get(),
+ biz("adminProfiles").orderBy("createdAt", "desc").get(),
+ biz("bathmasterOrders").orderBy("createdAt", "desc").get(),
+ biz("repairRequests").orderBy("createdAt", "desc").get(),
+ biz("cookStaffReports").orderBy("createdAt", "desc").get(),
+ biz("adminTrainingReports").orderBy("createdAt", "desc").get(),
+ biz("founderTasks").orderBy("createdAt", "desc").get(),
+ biz("forgottenItems").orderBy("createdAt", "desc").get(),
+ biz("anonymousFeedback").orderBy("createdAt", "desc").get(),
+ db.collection("settings").doc(getCurrentBusinessId()).get()
  ]);
 
  appCache.staff = staffSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -3610,7 +3732,7 @@ async function loadCloudData() {
  LocalDB.set("technicianRepairReminderLog", appCache.technicianRepairReminderLog);
 
  if (!settingsDoc.exists) {
- await db.collection("settings").doc("main").set({
+ await db.collection("settings").doc(getCurrentBusinessId()).set({
  founderPassword: "5552",
  adminPassword: "3235",
  dutyAssignment: null,
@@ -3683,7 +3805,7 @@ function setWaiter(data) {
  LocalDB.set("staff", appCache.staff);
 
  if (CLOUD_ENABLED && db) {
- db.collection("staff").doc(String(data.id)).set(data, { merge: true })
+ biz("staff").doc(String(data.id)).set(data, { merge: true })
  .catch(err => {
  console.error(err);
  showToast("Ошибка сохранения сотрудника");
@@ -3753,7 +3875,7 @@ async function saveAccessRequest(req) {
  setAccessRequests(arr);
 
  if (CLOUD_ENABLED && db) {
- await db.collection("accessRequests").doc(String(req.id)).set(req, { merge: true });
+ await biz("accessRequests").doc(String(req.id)).set(req, { merge: true });
  }
 }
 
@@ -3762,7 +3884,7 @@ async function deleteAccessRequest(requestId) {
  setAccessRequests(getAccessRequests().filter(r => String(r.id) !== id));
 
  if (CLOUD_ENABLED && db) {
- await db.collection("accessRequests").doc(id).delete();
+ await biz("accessRequests").doc(id).delete();
  }
 }
 
@@ -3800,7 +3922,7 @@ function setDepartments(arr) {
  LocalDB.set("departments", arr);
  if (CLOUD_ENABLED && db) {
  arr.forEach(d => {
- db.collection("departments").doc(String(d.id)).set(d, { merge: true })
+ biz("departments").doc(String(d.id)).set(d, { merge: true })
  .catch(err => console.error("department save error", err));
  });
  }
@@ -3863,6 +3985,111 @@ async function createDepartment(name, logoText) {
  return dep;
 }
 
+// ============================================================
+// БИЗНЕСЫ (мультитенантность) — один бот, много независимых компаний.
+// Каждое устройство хранит businessId локально; все данные в облаке
+// помечаются этим businessId, чтобы разные компании не видели друг друга.
+// ============================================================
+function generateBusinessId() {
+ return 'biz_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+}
+
+function generateJoinCode() {
+ const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // без похожих символов O/0, I/1
+ let code = '';
+ for (let i = 0; i < 6; i++) {
+ code += alphabet[Math.floor(Math.random() * alphabet.length)];
+ }
+ return code;
+}
+
+function getCurrentBusinessId() {
+ return localStorage.getItem('businessId') || null;
+}
+
+function setCurrentBusinessId(id) {
+ if (id) localStorage.setItem('businessId', String(id));
+ else localStorage.removeItem('businessId');
+}
+
+function getCurrentBusiness() {
+ return appCache.business || null;
+}
+
+async function createBusiness(founderName, companyName, password) {
+ const cleanFounderName = String(founderName || '').trim();
+ const cleanCompanyName = String(companyName || '').trim();
+ const cleanPassword = String(password || '').trim();
+ if (!cleanFounderName || !cleanCompanyName || !cleanPassword) {
+ return { error: 'Заполните все поля' };
+ }
+
+ const businessId = generateBusinessId();
+ const business = {
+ id: businessId,
+ founderName: cleanFounderName,
+ companyName: cleanCompanyName,
+ founderPassword: cleanPassword,
+ createdAt: new Date().toISOString()
+ };
+
+ appCache.business = business;
+ setCurrentBusinessId(businessId);
+ LocalDB.set('business', business);
+ appCache.founderPassword = cleanPassword;
+ LocalDB.set('founderPassword', cleanPassword);
+
+ // Свежий бизнес — своя, пустая песочница данных.
+ appCache.departments = [];
+ appCache.staff = [];
+ LocalDB.set('departments', []);
+ LocalDB.set('staff', []);
+
+ if (CLOUD_ENABLED && db) {
+ try {
+ await db.collection('businesses').doc(businessId).set(business);
+ } catch (err) {
+ console.error('createBusiness error', err);
+ return { error: 'Не удалось сохранить бизнес. Проверьте соединение.' };
+ }
+ }
+
+ return { business };
+}
+
+async function findBusinessByCredentials(founderName, password) {
+ const cleanName = String(founderName || '').trim();
+ const cleanPassword = String(password || '').trim();
+ if (!cleanName || !cleanPassword) return null;
+
+ if (CLOUD_ENABLED && db) {
+ try {
+ const snap = await db.collection('businesses').where('founderName', '==', cleanName).get();
+ const match = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+ .find(b => String(b.founderPassword) === cleanPassword);
+ return match || null;
+ } catch (err) {
+ console.error('findBusinessByCredentials error', err);
+ return null;
+ }
+ }
+
+ // Локальный офлайн-режим: сверяем с последним сохранённым бизнесом на этом устройстве.
+ const local = LocalDB.get('business');
+ if (local && String(local.founderName) === cleanName && String(local.founderPassword) === cleanPassword) {
+ return local;
+ }
+ return null;
+}
+
+function enterBusiness(business) {
+ appCache.business = business;
+ setCurrentBusinessId(business.id);
+ LocalDB.set('business', business);
+ appCache.founderPassword = business.founderPassword;
+ LocalDB.set('founderPassword', business.founderPassword);
+}
+
 async function updateDepartment(id, patch) {
  const arr = getDepartments();
  const idx = arr.findIndex(d => String(d.id) === String(id));
@@ -3915,7 +4142,7 @@ async function deleteDepartment(id) {
  const arr = getDepartments().filter(d => String(d.id) !== String(id));
  setDepartments(arr);
  if (CLOUD_ENABLED && db) {
- await db.collection("departments").doc(String(id)).delete().catch(err => console.error("department delete error", err));
+ await biz("departments").doc(String(id)).delete().catch(err => console.error("department delete error", err));
  }
  applyDepartmentLabels(getPrimaryDepartment());
 }
@@ -3941,7 +4168,7 @@ function findApprovedStaffByIdentity(identity = {}) {
 async function refreshStaffForAccessCheck() {
  if (!CLOUD_ENABLED || !db) return;
  try {
- const snapshot = await db.collection("staff").get();
+ const snapshot = await biz("staff").get();
  appCache.staff = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  LocalDB.set("staff", appCache.staff);
  } catch (err) {
@@ -4295,7 +4522,7 @@ function setStaff(arr) {
 
  if (CLOUD_ENABLED && db) {
  arr.forEach(s => {
- db.collection("staff").doc(String(s.id)).set(s, { merge: true })
+ biz("staff").doc(String(s.id)).set(s, { merge: true })
  .catch(err => console.error("staff save error", err));
  });
  }
@@ -4335,7 +4562,7 @@ async function cleanupExpiredPhotoReports() {
 
  if (!CLOUD_ENABLED || !db) return;
 
- const snapshot = await db.collection("reports").get();
+ const snapshot = await biz("reports").get();
  const expiredDocs = snapshot.docs.filter(doc => {
  const report = { id: doc.id, ...doc.data() };
  return !isPhotoReportWithinRetention(report, nowMs);
@@ -4366,7 +4593,7 @@ function setReports(arr) {
 
  if (CLOUD_ENABLED && db) {
  arr.forEach(r => {
- db.collection("reports").doc(String(r.id)).set(r, { merge: true })
+ biz("reports").doc(String(r.id)).set(r, { merge: true })
  .catch(err => {
  console.error(err);
  showToast("Ошибка сохранения отчета");
@@ -4384,7 +4611,7 @@ function setDutyAssignment(data) {
  LocalDB.set("dutyAssignment", data);
 
  if (CLOUD_ENABLED && db) {
- db.collection("settings").doc("main").set({
+ db.collection("settings").doc(getCurrentBusinessId()).set({
  dutyAssignment: data,
  updatedAt: new Date().toISOString()
  }, { merge: true }).catch(err => {
@@ -4405,7 +4632,7 @@ async function setDutyAssignmentForDate(dateKey, data) {
  LocalDB.set("dutyAssignmentsByDate", archive);
 
  if (CLOUD_ENABLED && db) {
- await db.collection("settings").doc("main").set({
+ await db.collection("settings").doc(getCurrentBusinessId()).set({
  dutyAssignmentsByDate: archive,
  updatedAt: new Date().toISOString()
  }, { merge: true });
@@ -4430,7 +4657,7 @@ function setFounderPassword(pwd) {
  clearFounderSession();
 
  if (CLOUD_ENABLED && db) {
- db.collection("settings").doc("main").set({
+ db.collection("settings").doc(getCurrentBusinessId()).set({
  founderPassword: pwd,
  updatedAt: new Date().toISOString()
  }, { merge: true }).catch(err => {
@@ -4451,7 +4678,7 @@ function setAdminPassword(pwd) {
  clearCurrentAdminProfile();
 
  if (CLOUD_ENABLED && db) {
- db.collection("settings").doc("main").set({
+ db.collection("settings").doc(getCurrentBusinessId()).set({
  adminPassword: pwd,
  updatedAt: new Date().toISOString()
  }, { merge: true }).catch(err => {
@@ -4471,7 +4698,7 @@ function setFines(arr) {
 
  if (CLOUD_ENABLED && db) {
  arr.forEach(f => {
- db.collection("fines").doc(String(f.id)).set(f, { merge: true })
+ biz("fines").doc(String(f.id)).set(f, { merge: true })
  .catch(err => {
  console.error(err);
  showToast("Ошибка сохранения штрафа");
@@ -4485,7 +4712,7 @@ function saveFine(fine) {
  LocalDB.set("fines", appCache.fines);
 
  if (CLOUD_ENABLED && db) {
- db.collection("fines").doc(String(fine.id)).set(fine, { merge: true })
+ biz("fines").doc(String(fine.id)).set(fine, { merge: true })
  .catch(err => {
  console.error(err);
  showToast("Ошибка сохранения штрафа");
@@ -4505,7 +4732,7 @@ function incrementStaffFineTotal(staffId) {
  LocalDB.set("staff", appCache.staff);
 
  if (CLOUD_ENABLED && db) {
- db.collection("staff").doc(id).set({
+ biz("staff").doc(id).set({
  finesTotal: nextTotal,
  updatedAt: updated.updatedAt
  }, { merge: true }).catch(err => console.error("fine total save error", err));
@@ -4536,7 +4763,7 @@ async function deleteStaff(staffId) {
 
  if (CLOUD_ENABLED && db) {
  try {
- await db.collection("staff").doc(id).delete();
+ await biz("staff").doc(id).delete();
  } catch (err) {
  console.error(err);
  showToast("Ошибка удаления сотрудника");
@@ -4579,7 +4806,7 @@ async function setPhotoReportDraft(draft) {
  LocalDB.set("photoReportDrafts", arr);
 
  if (CLOUD_ENABLED && db) {
- await db.collection("settings").doc("main").set({
+ await db.collection("settings").doc(getCurrentBusinessId()).set({
  photoReportDrafts: arr,
  updatedAt: new Date().toISOString()
  }, { merge: true });
@@ -4600,7 +4827,7 @@ async function clearPhotoReportDraft(period, bathIndex, staffId = '') {
  LocalDB.set("photoReportDrafts", appCache.photoReportDrafts);
 
  if (CLOUD_ENABLED && db) {
- await db.collection("settings").doc("main").set({
+ await db.collection("settings").doc(getCurrentBusinessId()).set({
  photoReportDrafts: appCache.photoReportDrafts,
  updatedAt: new Date().toISOString()
  }, { merge: true });
@@ -4716,7 +4943,7 @@ async function setInventoryDraft(data) {
  LocalDB.set("inventoryDraft", data);
 
  if (CLOUD_ENABLED && db) {
- await db.collection("settings").doc("main").set({
+ await db.collection("settings").doc(getCurrentBusinessId()).set({
  inventoryDraft: data,
  updatedAt: new Date().toISOString()
  }, { merge: true });
@@ -4728,7 +4955,7 @@ async function clearInventoryDraft() {
  LocalDB.remove("inventoryDraft");
 
  if (CLOUD_ENABLED && db) {
- await db.collection("settings").doc("main").set({
+ await db.collection("settings").doc(getCurrentBusinessId()).set({
  inventoryDraft: null,
  updatedAt: new Date().toISOString()
  }, { merge: true });
@@ -4745,7 +4972,7 @@ async function saveInventoryRecord(record) {
  updateUnreadBadges();
 
  if (CLOUD_ENABLED && db) {
- await db.collection("inventoryRecords").doc(String(record.id)).set(record, { merge: true });
+ await biz("inventoryRecords").doc(String(record.id)).set(record, { merge: true });
  }
 }
 
@@ -4757,7 +4984,7 @@ async function deleteInventoryRecordById(recordId) {
  updateUnreadBadges();
 
  if (CLOUD_ENABLED && db) {
- await db.collection("inventoryRecords").doc(id).delete();
+ await biz("inventoryRecords").doc(id).delete();
  }
 
  refreshVisibleData();
@@ -4773,7 +5000,7 @@ async function saveAdminStat(record) {
  updateUnreadBadges();
 
  if (CLOUD_ENABLED && db) {
- await db.collection("adminStats").doc(String(record.id)).set(record, { merge: true });
+ await biz("adminStats").doc(String(record.id)).set(record, { merge: true });
  }
 }
 
@@ -4784,7 +5011,7 @@ async function deleteAdminStatById(statId) {
  updateUnreadBadges();
 
  if (CLOUD_ENABLED && db) {
- await db.collection("adminStats").doc(id).delete();
+ await biz("adminStats").doc(id).delete();
  }
 
  refreshVisibleData();
@@ -4801,7 +5028,7 @@ async function saveBathmasterOrder(order) {
  updateUnreadBadges();
 
  if (CLOUD_ENABLED && db) {
- await db.collection("bathmasterOrders").doc(String(order.id)).set(order, { merge: true });
+ await biz("bathmasterOrders").doc(String(order.id)).set(order, { merge: true });
  }
 }
 
@@ -4813,14 +5040,14 @@ async function saveRepairRequest(req) {
  appCache.repairRequests = arr;
  LocalDB.set("repairRequests", arr);
  updateUnreadBadges();
- if (CLOUD_ENABLED && db) await db.collection("repairRequests").doc(String(req.id)).set(req, { merge: true });
+ if (CLOUD_ENABLED && db) await biz("repairRequests").doc(String(req.id)).set(req, { merge: true });
 }
 
 async function updateRepairRequest(req) {
  appCache.repairRequests = getRepairRequests().map(r => String(r.id) === String(req.id) ? req : r);
  LocalDB.set("repairRequests", appCache.repairRequests);
  updateUnreadBadges();
- if (CLOUD_ENABLED && db) await db.collection("repairRequests").doc(String(req.id)).set(req, { merge: true });
+ if (CLOUD_ENABLED && db) await biz("repairRequests").doc(String(req.id)).set(req, { merge: true });
  renderRepairHistoryForCurrentActor();
 }
 
@@ -4832,7 +5059,7 @@ async function saveCookStaffReport(report) {
  appCache.cookStaffReports = arr;
  LocalDB.set("cookStaffReports", arr);
  updateUnreadBadges();
- if (CLOUD_ENABLED && db) await db.collection("cookStaffReports").doc(String(report.id)).set(report, { merge: true });
+ if (CLOUD_ENABLED && db) await biz("cookStaffReports").doc(String(report.id)).set(report, { merge: true });
 }
 
 function getAdminTrainingReports() { return appCache.adminTrainingReports || []; }
@@ -4843,7 +5070,7 @@ async function saveAdminTrainingReport(report) {
  appCache.adminTrainingReports = arr;
  LocalDB.set("adminTrainingReports", arr);
  updateUnreadBadges();
- if (CLOUD_ENABLED && db) await db.collection("adminTrainingReports").doc(String(report.id)).set(report, { merge: true });
+ if (CLOUD_ENABLED && db) await biz("adminTrainingReports").doc(String(report.id)).set(report, { merge: true });
 }
 
 
@@ -4858,7 +5085,7 @@ async function saveForgottenItem(item) {
  LocalDB.set("forgottenItems", arr);
  updateUnreadBadges();
  if (CLOUD_ENABLED && db) {
- await db.collection("forgottenItems").doc(String(item.id)).set(item, { merge: true });
+ await biz("forgottenItems").doc(String(item.id)).set(item, { merge: true });
  }
 }
 
@@ -4867,7 +5094,7 @@ async function updateForgottenItem(item) {
  LocalDB.set("forgottenItems", appCache.forgottenItems);
  updateUnreadBadges();
  if (CLOUD_ENABLED && db) {
- await db.collection("forgottenItems").doc(String(item.id)).set(item, { merge: true });
+ await biz("forgottenItems").doc(String(item.id)).set(item, { merge: true });
  }
 }
 
@@ -4882,7 +5109,7 @@ async function saveAnonymousFeedback(item) {
  appCache.anonymousFeedback = arr;
  LocalDB.set("anonymousFeedback", arr);
  if (CLOUD_ENABLED && db) {
- await db.collection("anonymousFeedback").doc(String(publicItem.id)).set({
+ await biz("anonymousFeedback").doc(String(publicItem.id)).set({
  ...publicItem,
  ...getAnonymousFeedbackAuditFields()
  }, { merge: true });
@@ -4897,7 +5124,7 @@ async function deleteAnonymousFeedbackById(feedbackId) {
  updateUnreadBadges();
 
  if (CLOUD_ENABLED && db) {
- await db.collection("anonymousFeedback").doc(id).delete();
+ await biz("anonymousFeedback").doc(id).delete();
  }
 
  refreshVisibleData();
@@ -4909,7 +5136,7 @@ async function deleteFineById(fineId) {
  LocalDB.set("fines", appCache.fines);
 
  if (CLOUD_ENABLED && db) {
- await db.collection("fines").doc(id).delete();
+ await biz("fines").doc(id).delete();
  }
 
  refreshVisibleData();
@@ -5260,7 +5487,7 @@ async function setTechnicianRepairReminderLog(log) {
  LocalDB.set("technicianRepairReminderLog", appCache.technicianRepairReminderLog);
 
  if (CLOUD_ENABLED && db) {
- await db.collection("settings").doc("main").set({
+ await db.collection("settings").doc(getCurrentBusinessId()).set({
  technicianRepairReminderLog: appCache.technicianRepairReminderLog,
  updatedAt: new Date().toISOString()
  }, { merge: true });
@@ -5481,6 +5708,11 @@ function renderHomeGrid() {
  const grid = document.getElementById('home-role-grid');
  if (!grid) return;
 
+ if (!getCurrentBusinessId()) {
+ renderBusinessLanding();
+ return;
+ }
+
  let html = `
  <div class="role-card active-role" onclick="enterFounder()">
  <div class="role-icon">&#128081;</div>
@@ -5505,6 +5737,241 @@ function renderHomeGrid() {
  });
 
  grid.innerHTML = html;
+}
+
+// ============================================================
+// СТАРТОВЫЙ ЭКРАН ДЛЯ НОВОГО УСТРОЙСТВА — пока businessId не известен,
+// вместо списка ролей показываем выбор «Создать бизнес» / «Войти в бизнес».
+// ============================================================
+function renderBusinessLanding() {
+ const grid = document.getElementById('home-role-grid');
+ if (!grid) return;
+
+ grid.innerHTML = `
+ <div class="role-card active-role" onclick="openCreateBusiness()">
+ <div class="role-icon">&#127970;</div>
+ <div class="role-copy">
+ <span class="role-name">Создать бизнес</span>
+ <div class="role-desc">Вы учредитель и открываете компанию впервые</div>
+ </div>
+ <span class="role-arrow">→</span>
+ </div>
+ <div class="role-card active-role" onclick="openJoinBusiness()">
+ <div class="role-icon">&#128273;</div>
+ <div class="role-copy">
+ <span class="role-name">Войти в бизнес</span>
+ <div class="role-desc">У вас уже есть код сотрудника или пароль учредителя</div>
+ </div>
+ <span class="role-arrow">→</span>
+ </div>`;
+}
+
+function openCreateBusiness() {
+ document.getElementById('create-business-name').value = '';
+ document.getElementById('create-business-company').value = '';
+ document.getElementById('create-business-pwd').value = '';
+ document.getElementById('create-business-error').classList.remove('show');
+ goTo('screen-create-business');
+}
+
+async function submitCreateBusiness() {
+ const name = document.getElementById('create-business-name').value.trim();
+ const company = document.getElementById('create-business-company').value.trim();
+ const pwd = document.getElementById('create-business-pwd').value.trim();
+ const err = document.getElementById('create-business-error');
+
+ if (!name || !company || !pwd) {
+ err.textContent = 'Заполните все поля';
+ err.classList.add('show');
+ return;
+ }
+
+ const result = await createBusiness(name, company, pwd);
+ if (result.error) {
+ err.textContent = result.error;
+ err.classList.add('show');
+ return;
+ }
+ err.classList.remove('show');
+
+ try {
+ const founderProfile = await ensureFounderEmployee(name);
+ setFounderSession(founderProfile);
+ localStorage.setItem('founderActiveRole', 'founder');
+ // Перезагружаем страницу: все real-time подписки на Firestore (onSnapshot)
+ // создаются один раз при старте приложения и «запоминают» businessId,
+ // который был известен в тот момент. Раз businessId только что появился,
+ // подписки нужно пересоздать заново — самый надёжный способ это сделать
+ // чисто — перезапустить init() с нуля через перезагрузку.
+ location.reload();
+ } catch (e) {
+ console.error(e);
+ showToast('Бизнес создан, но вход не выполнен — попробуйте войти как учредитель');
+ goHome();
+ }
+}
+
+function openJoinBusiness() {
+ document.getElementById('join-founder-name').value = '';
+ document.getElementById('join-founder-pwd').value = '';
+ document.getElementById('join-founder-error').classList.remove('show');
+ goTo('screen-join-business');
+}
+
+async function submitFounderRecovery() {
+ const name = document.getElementById('join-founder-name').value.trim();
+ const pwd = document.getElementById('join-founder-pwd').value.trim();
+ const err = document.getElementById('join-founder-error');
+
+ if (!name || !pwd) {
+ err.textContent = 'Введите имя и пароль';
+ err.classList.add('show');
+ return;
+ }
+
+ const business = await findBusinessByCredentials(name, pwd);
+ if (!business) {
+ err.textContent = 'Бизнес не найден. Проверьте имя и пароль';
+ err.classList.add('show');
+ return;
+ }
+ err.classList.remove('show');
+ enterBusiness(business);
+
+ try {
+ const founderProfile = await ensureFounderEmployee(name);
+ setFounderSession(founderProfile);
+ localStorage.setItem('founderActiveRole', 'founder');
+ location.reload();
+ } catch (e) {
+ console.error(e);
+ showToast('Ошибка входа учредителя');
+ }
+}
+
+function switchJoinTab(tab) {
+ const founderTab = document.getElementById('join-tab-founder');
+ const staffTab = document.getElementById('join-tab-staff');
+ const founderPane = document.getElementById('join-founder-pane');
+ const staffPane = document.getElementById('join-staff-pane');
+ if (!founderTab || !staffTab || !founderPane || !staffPane) return;
+
+ if (tab === 'staff') {
+ staffTab.classList.add('active');
+ founderTab.classList.remove('active');
+ staffPane.style.display = 'block';
+ founderPane.style.display = 'none';
+ } else {
+ founderTab.classList.add('active');
+ staffTab.classList.remove('active');
+ founderPane.style.display = 'block';
+ staffPane.style.display = 'none';
+ }
+}
+
+async function submitEmployeeCode() {
+ const codeInput = document.getElementById('join-staff-code');
+ const err = document.getElementById('join-staff-error');
+ const code = (codeInput.value || '').trim().toUpperCase();
+
+ if (!code) {
+ err.textContent = 'Введите код';
+ err.classList.add('show');
+ return;
+ }
+
+ let foundDep = null;
+ try {
+ if (CLOUD_ENABLED && db) {
+ // Единственный намеренно НЕ отфильтрованный по businessId запрос —
+ // именно он и должен искать код по всем компаниям сразу, чтобы найти,
+ // какой компании он принадлежит.
+ const snap = await db.collection('departments').where('joinCode', '==', code).get();
+ if (!snap.empty) foundDep = { id: snap.docs[0].id, ...snap.docs[0].data() };
+ } else {
+ const localDeps = LocalDB.get('departments') || [];
+ foundDep = localDeps.find(d => String(d.joinCode || '').toUpperCase() === code) || null;
+ }
+ } catch (e) {
+ console.error('submitEmployeeCode lookup error', e);
+ err.textContent = 'Ошибка проверки кода. Попробуйте ещё раз';
+ err.classList.add('show');
+ return;
+ }
+
+ if (!foundDep || !foundDep.businessId) {
+ err.textContent = 'Код не найден. Проверьте правильность';
+ err.classList.add('show');
+ return;
+ }
+ err.classList.remove('show');
+
+ let business = null;
+ try {
+ if (CLOUD_ENABLED && db) {
+ const bizDoc = await db.collection('businesses').doc(foundDep.businessId).get();
+ if (bizDoc.exists) business = { id: bizDoc.id, ...bizDoc.data() };
+ } else {
+ const localBiz = LocalDB.get('business');
+ if (localBiz && localBiz.id === foundDep.businessId) business = localBiz;
+ }
+ } catch (e) {
+ console.error('submitEmployeeCode business lookup error', e);
+ }
+
+ if (!business) {
+ err.textContent = 'Не удалось найти компанию по этому коду';
+ err.classList.add('show');
+ return;
+ }
+
+ enterBusiness(business);
+ localStorage.setItem('pendingJoinDepartmentId', String(foundDep.id));
+ localStorage.setItem('pendingJoinDepartmentName', foundDep.name || '');
+ location.reload();
+}
+
+async function submitEmployeeJoinConfirm() {
+ const nameInput = document.getElementById('employee-join-name');
+ const err = document.getElementById('employee-join-error');
+ const name = (nameInput.value || '').trim();
+
+ if (!name) {
+ err.textContent = 'Введите имя';
+ err.classList.add('show');
+ return;
+ }
+ err.classList.remove('show');
+
+ const depId = localStorage.getItem('pendingJoinDepartmentId');
+ const dep = getDepartment(depId);
+ const nowIso = new Date().toISOString();
+ const staffMember = fillTelegramMeta({
+ id: 'staff_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+ login: 'employee',
+ name: name,
+ role: 'waiter',
+ roleLabel: dep ? dep.name : getRoleLabel('waiter'),
+ approvedAt: nowIso,
+ createdAt: nowIso,
+ updatedAt: nowIso
+ });
+
+ const staff = getStaff().filter(s => String(s.id) !== String(staffMember.id));
+ staff.push(staffMember);
+ setStaff(staff);
+ if (CLOUD_ENABLED && db) {
+ await biz('staff').doc(String(staffMember.id)).set(staffMember, { merge: true });
+ }
+
+ setWaiter(staffMember);
+ localStorage.removeItem('pendingJoinDepartmentId');
+ localStorage.removeItem('pendingJoinDepartmentName');
+ showToast('Добро пожаловать ✓');
+ screenStack = ['screen-home'];
+ document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active'));
+ goTo('screen-waiter-menu');
+ renderWaiterMenu();
 }
 
 // ============================================================
@@ -6501,6 +6968,20 @@ function renderDepartmentManage() {
  html += `
  <button class="btn btn-primary" style="margin-top:8px;" onclick="openDepartmentAddProcess()">+ Добавить процесс</button>
  <div class="divider"></div>
+ <div class="section-label">Сотрудники</div>
+ <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px;">
+ <div style="font-size:14px;color:var(--text-2);line-height:1.5;margin-bottom:14px;">Отправьте этот код новому сотруднику — он введёт его при регистрации и попадёт именно в это подразделение.</div>
+ ${dep.joinCode ? `
+ <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+ <div style="flex:1;font-size:24px;font-weight:800;letter-spacing:4px;text-align:center;background:var(--surface2);border-radius:var(--radius-sm);padding:12px;" data-i18n-skip>${escapeHtml(dep.joinCode)}</div>
+ <button class="btn-icon btn-secondary" onclick="copyDepartmentJoinCode()" title="Скопировать">📋</button>
+ </div>
+ <button class="btn btn-secondary" onclick="generateDepartmentJoinCode()">Сгенерировать новый код</button>
+ ` : `
+ <button class="btn btn-primary" onclick="generateDepartmentJoinCode()">Добавить сотрудника</button>
+ `}
+ </div>
+ <div class="divider"></div>
  <div class="section-label">Настройки</div>`;
 
  dep.processes.forEach(p => {
@@ -6543,6 +7024,44 @@ function toggleDepartmentNameEditor() {
  const input = document.getElementById('dep-manage-name');
  if (input) input.focus();
  }
+}
+
+async function generateDepartmentJoinCode() {
+ const dep = getDepartment(activeManagedDepartmentId);
+ if (!dep) return;
+ const code = generateJoinCode();
+ await updateDepartment(dep.id, { joinCode: code });
+ renderDepartmentManage();
+ showToast('Код создан ✓');
+}
+
+async function copyDepartmentJoinCode() {
+ const dep = getDepartment(activeManagedDepartmentId);
+ if (!dep || !dep.joinCode) return;
+ try {
+ if (navigator.clipboard && navigator.clipboard.writeText) {
+ await navigator.clipboard.writeText(dep.joinCode);
+ showToast('Код скопирован');
+ return;
+ }
+ } catch (err) {
+ console.warn('clipboard write failed', err);
+ }
+ const textarea = document.createElement('textarea');
+ textarea.value = dep.joinCode;
+ textarea.style.position = 'fixed';
+ textarea.style.left = '-9999px';
+ textarea.style.top = '0';
+ document.body.appendChild(textarea);
+ textarea.focus();
+ textarea.select();
+ try {
+ document.execCommand('copy');
+ showToast('Код скопирован');
+ } catch (err) {
+ showToast('Не удалось скопировать код');
+ }
+ document.body.removeChild(textarea);
 }
 
 async function saveDepartmentSettings() {
@@ -7623,7 +8142,7 @@ async function saveFounderTask(task) {
  LocalDB.set("founderTasks", arr);
  updateUnreadBadges();
  if (CLOUD_ENABLED && db) {
- await db.collection("founderTasks").doc(String(task.id)).set(task, { merge: true });
+ await biz("founderTasks").doc(String(task.id)).set(task, { merge: true });
  }
 }
 
@@ -7632,7 +8151,7 @@ async function updateFounderTask(task) {
  LocalDB.set("founderTasks", appCache.founderTasks);
  updateUnreadBadges();
  if (CLOUD_ENABLED && db) {
- await db.collection("founderTasks").doc(String(task.id)).set(task, { merge: true });
+ await biz("founderTasks").doc(String(task.id)).set(task, { merge: true });
  }
 }
 
@@ -9431,7 +9950,7 @@ async function approveAccessRequest(requestId) {
  staff.push(staffMember);
  setStaff(staff);
  if (CLOUD_ENABLED && db) {
- await db.collection("staff").doc(String(staffMember.id)).set(staffMember, { merge: true });
+ await biz("staff").doc(String(staffMember.id)).set(staffMember, { merge: true });
  }
 
  await deleteAccessRequest(req.id);
@@ -9617,7 +10136,7 @@ async function setAdminShiftHandover(data) {
  appCache.adminShiftHandover = data;
  LocalDB.set("adminShiftHandover", data);
  if (CLOUD_ENABLED && db) {
- await db.collection("settings").doc("main").set({
+ await db.collection("settings").doc(getCurrentBusinessId()).set({
  adminShiftHandover: data,
  updatedAt: new Date().toISOString()
  }, { merge: true });
@@ -10836,7 +11355,7 @@ async function deleteAdminProfileById(adminId) {
  }
 
  if (CLOUD_ENABLED && db) {
- await db.collection("adminProfiles").doc(id).delete();
+ await biz("adminProfiles").doc(id).delete();
  }
 
  refreshVisibleData();
@@ -11798,7 +12317,7 @@ async function saveFounderEmployeeProfile() {
  const arr = getAdminProfiles().map(a => String(a.id) === String(employee.id) ? { ...a, ...clean } : a);
  setAdminProfiles(arr);
  if (CLOUD_ENABLED && db) {
- await db.collection("adminProfiles").doc(String(employee.id)).set(clean, { merge: true });
+ await biz("adminProfiles").doc(String(employee.id)).set(clean, { merge: true });
  }
  } else {
  const clean = { ...payload };
@@ -11808,7 +12327,7 @@ async function saveFounderEmployeeProfile() {
  appCache.staff = arr;
  LocalDB.set("staff", arr);
  if (CLOUD_ENABLED && db) {
- await db.collection("staff").doc(String(employee.id)).set(clean, { merge: true });
+ await biz("staff").doc(String(employee.id)).set(clean, { merge: true });
  }
  const currentRole = localStorage.getItem("currentStaffRole");
  if (String(localStorage.getItem("currentStaffId_" + clean.role)) === String(clean.id)) {
@@ -12103,6 +12622,17 @@ async function init() {
  initLang();
  setupGlobalSwipeBack();
 
+ // После перезагрузки, вызванной submitEmployeeCode(), businessId уже
+ // проставлен и подразделение известно — остаётся только спросить имя.
+ const pendingJoinDepartmentId = localStorage.getItem('pendingJoinDepartmentId');
+ if (pendingJoinDepartmentId) {
+ const depNameEl = document.getElementById('employee-join-dep-name');
+ if (depNameEl) depNameEl.textContent = localStorage.getItem('pendingJoinDepartmentName') || 'Подразделение';
+ screenStack = ['screen-home', 'screen-employee-join-confirm'];
+ document.getElementById('screen-home').classList.remove('active');
+ document.getElementById('screen-employee-join-confirm').classList.add('active');
+ }
+
  // ------------------------------------------------------------------
  // Синхронизация с Firestore идёт в фоне уже после того, как экран
  // показан. Если сеть ответит — onSnapshot-подписки внутри initCloud()
@@ -12126,8 +12656,9 @@ async function init() {
 // THEME TOGGLE
 // ============================================================
 function initTheme() {
- const saved = localStorage.getItem('drovaTheme') || 'light';
- applyTheme(saved);
+ // Демо/продажный инструмент: каждая загрузка стартует со светлой темой,
+ // независимо от того, что могло остаться в localStorage с прошлых сессий.
+ applyTheme('light');
 }
 
 function applyTheme(theme) {
@@ -12994,7 +13525,36 @@ const RU_UZ_DICT = {
 "на": "ga",
 "Например:\nНет лагмана\nНет мёда\nНет говяжьего шашлыка": "Masalan:\nLag'mon yo'q\nAsal yo'q\nMol go'shtidan shashlik yo'q",
 "Выйти": "Chiqish",
-"От:": "Kimdan:"
+"От:": "Kimdan:",
+"Создать бизнес": "Biznes yaratish",
+"Войти в бизнес": "Biznesga kirish",
+"Вы учредитель и открываете компанию впервые": "Siz asoschisiz va kompaniyani birinchi marta ochyapsiz",
+"У вас уже есть код сотрудника или пароль учредителя": "Sizda xodim kodi yoki asoschi paroli allaqachon bor",
+"Настройка вашей компании": "Kompaniyangizni sozlash",
+"Эти данные понадобятся для входа как учредитель на новом устройстве.": "Bu ma'lumotlar yangi qurilmada asoschi sifatida kirish uchun kerak bo'ladi.",
+"Как вас зовут": "Ismingiz nima",
+"Название компании": "Kompaniya nomi",
+"Придумайте пароль учредителя": "Asoschi parolini o'ylab toping",
+"Я учредитель": "Men asoschiman",
+"Я сотрудник": "Men xodimman",
+"Вход на новом устройстве по имени и паролю, которые вы указали при создании бизнеса.": "Biznes yaratishda ko'rsatgan ism va parolingiz orqali yangi qurilmada kirish.",
+"Введите код, который дал вам учредитель или администратор подразделения.": "Sizga asoschi yoki bo'lim administratori bergan kodni kiriting.",
+"Код подразделения": "Bo'lim kodi",
+"Например: AB3K9X": "Masalan: AB3K9X",
+"Введите код": "Kodni kiriting",
+"Регистрация": "Ro'yxatdan o'tish",
+"ПОДРАЗДЕЛЕНИЕ": "BO'LIM",
+"Готово": "Tayyor",
+"Бизнес не найден. Проверьте имя и пароль": "Biznes topilmadi. Ism va parolni tekshiring",
+"Бизнес создан, но вход не выполнен — попробуйте войти как учредитель": "Biznes yaratildi, lekin kirish amalga oshmadi — asoschi sifatida kirishga harakat qiling",
+"Добро пожаловать ✓": "Xush kelibsiz ✓",
+"Код не найден. Проверьте правильность": "Kod topilmadi. To'g'riligini tekshiring",
+"Код скопирован": "Kod nusxalandi",
+"Код создан ✓": "Kod yaratildi ✓",
+"Не удалось найти компанию по этому коду": "Ushbu kod bo'yicha kompaniya topilmadi",
+"Не удалось скопировать код": "Kodni nusxalab bo'lmadi",
+"Не удалось сохранить бизнес. Проверьте соединение.": "Biznesni saqlab bo'lmadi. Ulanishni tekshiring.",
+"Ошибка проверки кода. Попробуйте ещё раз": "Kodni tekshirishda xatolik. Qayta urinib ko'ring",
 };
 
 const RU_UZ_KEYS_SORTED = Object.keys(RU_UZ_DICT).sort((a, b) => b.length - a.length);
@@ -13012,7 +13572,7 @@ function translateRuToUz(text) {
   return text.replace(RU_UZ_REGEX, (m) => (Object.prototype.hasOwnProperty.call(RU_UZ_DICT, m) ? RU_UZ_DICT[m] : m));
 }
 
-let currentLang = localStorage.getItem('appLang') || 'ru';
+let currentLang = 'ru'; // каждая загрузка стартует с русского языка, независимо от прошлых сессий
 const langOriginalTextCache = new WeakMap();
 const langOriginalAttrCache = new WeakMap();
 const LANG_ATTRS = ['placeholder', 'title'];
