@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>(your logo)</title>
+<title>(ваш логотип)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
  :root {
  --bg: #000000;
@@ -11,33 +14,147 @@
  --surface2: #1f1f1f;
  --surface3: #292929;
  --border: #2c2c2c;
- --accent: #FF9800;
- --accent-dim: #cc7a00;
+ --border-strong: #3a3a3a;
+ --accent: #1E6E69;
+ --accent-dim: #164F4B;
+ --accent-soft: rgba(30,110,105,0.22);
  --text: #f5f5f5;
  --text-2: #a3a3a3;
  --text-3: #5c5c5c;
  --danger: #e05252;
  --success: #52a97c;
- --radius: 14px;
- --radius-sm: 8px;
+ --radius: 20px;
+ --radius-sm: 14px;
+ --shadow-raised: 0 1px 0 rgba(255,255,255,0.04) inset, 0 6px 18px rgba(0,0,0,0.55);
+ --shadow-pressed: inset 0 2px 6px rgba(0,0,0,0.6);
  }
  /* ============================================================
  LIGHT THEME — все экраны, все разделы, включая будущие
  ============================================================ */
  body.light {
- --bg: #ffffff;
- --surface: #ffffff;
- --surface2: #f2f5fb;
- --surface3: #e8edf7;
- --border: #dde3f0;
- --accent: #1878F3;
- --accent-dim: #4167B2;
- --text: #14181f;
- --text-2: #4a5568;
- --text-3: #8a92a3;
- --danger: #cc3b3b;
- --success: #3a8a60;
+ --bg: #EEE7D9;
+ --surface: #F7F2E6;
+ --surface2: #EFE6D0;
+ --surface3: #E4DABF;
+ --border: #DED4BC;
+ --border-strong: #CFC2A2;
+ --accent: #1E6E69;
+ --accent-dim: #164F4B;
+ --accent-soft: rgba(30,110,105,0.12);
+ --text: #2E2B22;
+ --text-2: #6E6650;
+ --text-3: #A39875;
+ --danger: #C1443B;
+ --success: #3F8F63;
+ --radius: 20px;
+ --radius-sm: 14px;
+ --shadow-raised: 0 1px 0 rgba(255,255,255,0.6) inset, 0 8px 20px rgba(120,104,60,0.14);
+ --shadow-pressed: inset 0 2px 6px rgba(120,104,60,0.18);
+ font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
  }
+
+ /* ============================================================
+ VISUAL REDESIGN LAYER (cards, fonts, shadows, icon/arrow chips)
+ Applies to BOTH themes identically — only the CSS variables
+ above (bg/surface/border/accent/radius/shadow tokens) differ
+ per theme, so dark keeps its black surface + teal accent while
+ light keeps its cream surface + teal accent.
+ ============================================================ */
+ .header-title,
+ .modal-title,
+ .card-title,
+ .role-name,
+ .menu-title,
+ .staff-name,
+ .shift-date,
+ .empty-title,
+ .wip-title,
+ .photo-section-title,
+ .camera-title,
+ .logo,
+ .logo-sm {
+ font-family: 'Quicksand', sans-serif;
+ font-weight: 700;
+ }
+
+ .card,
+ .role-card,
+ .menu-item,
+ .staff-item,
+ .shift-card,
+ .duty-item,
+ .photo-section,
+ .report-section,
+ .doc-placeholder,
+ .stat-box,
+ .tabs,
+ .toast,
+ .modal,
+ .add-photo-btn,
+ .btn-secondary,
+ .field input,
+ .field select,
+ .field textarea {
+ border-color: var(--border-strong);
+ box-shadow: var(--shadow-raised);
+ }
+ .field input,
+ .field select,
+ .field textarea {
+ box-shadow: var(--shadow-pressed);
+ }
+ .card:active,
+ .role-card:active,
+ .menu-item:active,
+ .staff-item:active,
+ .shift-card:active,
+ .duty-item:active {
+ box-shadow: var(--shadow-pressed);
+ }
+ body.light .modal {
+ box-shadow: 0 -10px 30px rgba(120,104,60,0.18);
+ }
+
+ .menu-icon,
+ .staff-avatar,
+ .profile-photo-box {
+ background: var(--accent-soft);
+ color: var(--accent);
+ border-radius: 16px;
+ }
+ .staff-avatar,
+ .profile-photo-box {
+ border-radius: 50%;
+ }
+ .menu-arrow {
+ width: 28px; height: 28px;
+ border-radius: 10px;
+ background: var(--accent);
+ color: #fff;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ font-size: 14px;
+ }
+
+ .btn-primary {
+ color: #fff;
+ box-shadow: 0 6px 14px rgba(22,79,75,0.3);
+ }
+ .notify-badge {
+ color: #fff;
+ }
+ .theme-toggle,
+ .lang-toggle {
+ border-radius: var(--radius-sm);
+ border-color: var(--border-strong);
+ box-shadow: var(--shadow-raised);
+ }
+ .tab.active {
+ background: var(--accent-soft);
+ color: var(--accent-dim);
+ }
+ body .stat-val { color: var(--accent); }
 
  body.light input[type="date"] { color-scheme: light; }
 
@@ -64,53 +181,126 @@
  body.light .inventory-view-row { border-bottom-color: var(--border); }
  body.light .inventory-view-name { color: var(--text); }
 
- .theme-toggle {
- position: absolute;
- /* На части Android Telegram рисует свою верхнюю панель поверх Mini App.
- Поэтому кнопка темы уводится ниже, а не живёт в зоне системных часов. */
- top: calc(72px + env(safe-area-inset-top, 0px));
- right: 20px;
+ .theme-toggle, .lang-toggle {
  width: 38px;
  height: 38px;
  border: 1px solid var(--border);
  background: var(--surface2);
- border-radius: 50%;
+ border-radius: 12px;
  cursor: pointer;
  display: flex;
  align-items: center;
  justify-content: center;
  font-size: 18px;
  transition: background 0.15s, border-color 0.15s;
- z-index: 20;
+ flex-shrink: 0;
  }
- .theme-toggle:active { background: var(--surface3); }
- .lang-toggle {
- position: absolute;
- top: calc(72px + env(safe-area-inset-top, 0px));
- left: 20px;
- width: 38px;
- height: 38px;
- border: 1px solid var(--border);
- background: var(--surface2);
- border-radius: 50%;
- cursor: pointer;
+ .lang-toggle { font-size: 12px; font-weight: 700; letter-spacing: 0.3px; }
+ .theme-toggle:active, .lang-toggle:active { background: var(--surface3); }
+
+ /* HOME SCREEN BRAND ROW */
+ .home-brand-row {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 12px;
+ padding: calc(20px + env(safe-area-inset-top, 0px)) 20px 0;
+ }
+ .home-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+ .home-logo-mark {
+ width: 40px; height: 40px;
+ border-radius: 12px;
+ background: var(--accent);
+ color: #fff;
+ display: flex; align-items: center; justify-content: center;
+ font-size: 18px;
+ flex-shrink: 0;
+ }
+ .home-logo-text {
+ font-size: 15px;
+ font-weight: 800;
+ letter-spacing: 2px;
+ text-transform: uppercase;
+ color: var(--text);
+ overflow: hidden;
+ text-overflow: ellipsis;
+ white-space: nowrap;
+ }
+ .home-top-controls { display: flex; gap: 10px; flex-shrink: 0; }
+ .home-eyebrow {
+ font-size: 12px;
+ font-weight: 700;
+ letter-spacing: 0.08em;
+ text-transform: uppercase;
+ color: var(--text-3);
+ margin: 28px 0 8px;
+ }
+ .home-headline {
+ font-size: 22px;
+ font-weight: 700;
+ color: var(--text);
+ margin: 0 0 22px;
+ line-height: 1.3;
+ }
+ .home-logo-text, .home-headline { font-family: 'Quicksand', sans-serif; }
+
+ /* ROLE CARD internals (icon / copy / arrow) — same in both themes */
+ .role-copy { flex: 1; min-width: 0; }
+ .role-icon {
+ display: flex;
+ width: 46px; height: 46px;
+ border-radius: 16px;
+ background: var(--accent-soft);
+ color: var(--accent);
+ align-items: center; justify-content: center;
+ font-size: 21px;
+ flex-shrink: 0;
+ }
+ .role-desc {
+ display: block;
+ margin-top: 3px;
+ font-size: 12.5px;
+ color: var(--text-2);
+ line-height: 1.4;
+ }
+ .role-arrow {
+ width: 30px; height: 30px;
+ border-radius: 10px;
+ background: var(--accent);
+ color: #fff;
  display: flex;
  align-items: center;
  justify-content: center;
- font-size: 12px;
- font-weight: 700;
- letter-spacing: 0.3px;
- transition: background 0.15s, border-color 0.15s;
- z-index: 20;
+ font-size: 16px;
+ flex-shrink: 0;
  }
- .lang-toggle:active { background: var(--surface3); }
+ .home-status-strip {
+ margin-top: 20px;
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ padding: 12px 14px;
+ background: var(--surface2);
+ border: 1px solid var(--border);
+ border-radius: var(--radius-sm);
+ box-shadow: var(--shadow-pressed);
+ border-color: var(--border-strong);
+ }
+ .home-status-dot {
+ width: 7px; height: 7px;
+ border-radius: 50%;
+ background: var(--accent);
+ flex-shrink: 0;
+ box-shadow: 0 0 0 3px var(--accent-soft);
+ }
+ .home-status-strip span { font-size: 12px; color: var(--text-2); }
 
  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
  body {
  background: var(--bg);
  color: var(--text);
- font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+ font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
  min-height: 100dvh;
  overflow-x: hidden;
  }
@@ -228,6 +418,7 @@
  transition: background 0.15s, border-color 0.15s;
  display: flex;
  align-items: center;
+ gap: 14px;
  justify-content: space-between;
  }
  .role-card:active { background: var(--surface2); border-color: var(--accent); }
@@ -607,6 +798,7 @@
  padding: 24px 20px 36px;
  width: 100%;
  animation: slideUp 0.25s ease;
+ box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
  }
  @keyframes slideUp {
  from { transform: translateY(100%); opacity: 0; }
@@ -1218,16 +1410,27 @@
 
 <!-- ===== SCREEN: HOME ===== -->
 <div class="screen active" id="screen-home" style="position:relative;">
- <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle-btn" title="Сменить тему">🌙</button>
- <button class="lang-toggle" onclick="toggleLanguage()" id="lang-toggle-btn" title="Tilni almashtirish">UZ</button>
- <div style="padding: 48px 20px 0;">
- <div class="logo">(your logo)</div>
+ <div class="home-brand-row">
+ <div class="home-brand">
+ <div class="home-logo-mark">&#10022;</div>
+ <div class="home-logo-text">(ваш логотип)</div>
  </div>
- <div class="content" style="padding-top: 32px;">
+ <div class="home-top-controls">
+ <button class="lang-toggle" onclick="toggleLanguage()" id="lang-toggle-btn" title="Tilni almashtirish">UZ</button>
+ <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle-btn" title="Сменить тему">🌙</button>
+ </div>
+ </div>
+ <div class="content" style="padding-top: 8px;">
+ <div class="home-eyebrow">Вход в систему</div>
+ <div class="home-headline">Выберите роль,<br>чтобы продолжить</div>
  <div class="role-grid" id="home-role-grid"></div>
+ <div class="home-status-strip">
+ <div class="home-status-dot"></div>
+ <span>Готово к работе</span>
+ </div>
  </div>
  <div class="home-footer">
- <div class="logo-sm">(your logo)</div>
+ <div class="logo-sm">(ваш логотип)</div>
     <div class="app-version" id="app-version-label">Версия 1.12</div>
  </div>
 </div>
@@ -1274,7 +1477,7 @@
 <!-- ===== SCREEN: WAITER MENU ===== -->
 <div class="screen" id="screen-waiter-menu">
  <div style="padding: 32px 20px 0;">
- <div class="logo" style="font-size: 16px; letter-spacing: 1px;">(your logo)</div>
+ <div class="logo" style="font-size: 16px; letter-spacing: 1px;">(ваш логотип)</div>
  </div>
  <div class="content" style="padding-top: 24px;">
  <div style="margin-bottom: 28px;">
@@ -1289,7 +1492,7 @@
  <div id="waiter-menu-dynamic"></div>
 </div>
  <div class="footer" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
- <span class="logo-sm">(your logo)</span>
+ <span class="logo-sm">(ваш логотип)</span>
  <button class="btn btn-secondary btn-sm" onclick="waiterLogout()">Выйти</button>
  </div>
 </div>
@@ -1512,7 +1715,7 @@
 <!-- ===== SCREEN: ADMIN MENU ===== -->
 <div class="screen" id="screen-admin-menu">
  <div style="padding: 32px 20px 0;">
- <div class="logo" style="font-size: 16px; letter-spacing: 1px;">(your logo)</div>
+ <div class="logo" style="font-size: 16px; letter-spacing: 1px;">(ваш логотип)</div>
  </div>
  <div class="content" style="padding-top: 24px;">
  <div style="margin-bottom: 28px;">
@@ -1618,7 +1821,7 @@
  </div>
  </div>
  <div class="footer" style="display:flex; justify-content:space-between; align-items:center;">
- <span class="logo-sm">(your logo)</span>
+ <span class="logo-sm">(ваш логотип)</span>
  <button class="btn btn-secondary btn-sm" onclick="adminLogout()">Выйти</button>
  </div>
 </div>
@@ -1921,7 +2124,7 @@
 <!-- ===== SCREEN: FOUNDER MENU ===== -->
 <div class="screen" id="screen-founder-menu">
  <div style="padding: 32px 20px 0;">
- <div class="logo" style="font-size: 16px; letter-spacing: 1px;">(your logo)</div>
+ <div class="logo" style="font-size: 16px; letter-spacing: 1px;">(ваш логотип)</div>
  </div>
  <div class="content" style="padding-top: 24px;">
  <div style="margin-bottom: 28px;">
@@ -1940,7 +2143,7 @@
  </div>
  </div>
  <div class="footer" style="display:flex; justify-content:space-between; align-items:center;">
- <span class="logo-sm">(your logo)</span>
+ <span class="logo-sm">(ваш логотип)</span>
  <button class="btn btn-secondary btn-sm" onclick="founderLogout()">Выйти</button>
  </div>
 </div>
@@ -2129,7 +2332,7 @@
 <!-- ===== SCREEN: BATHMASTER MENU ===== -->
 <div class="screen" id="screen-bathmaster-menu">
  <div style="padding: 32px 20px 0;">
- <div class="logo" style="font-size: 16px; letter-spacing: 1px;">(your logo)</div>
+ <div class="logo" style="font-size: 16px; letter-spacing: 1px;">(ваш логотип)</div>
  </div>
  <div class="content" style="padding-top: 24px;">
  <div style="margin-bottom: 28px;">
@@ -2187,7 +2390,7 @@
  </div>
  </div>
  <div class="footer" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
- <span class="logo-sm">(your logo)</span>
+ <span class="logo-sm">(ваш логотип)</span>
  <button class="btn btn-secondary btn-sm" onclick="staffLogout()">Выйти</button>
  </div>
 </div>
@@ -2232,7 +2435,7 @@
 <!-- ===== SCREEN: MASSEUR MENU ===== -->
 <div class="screen" id="screen-masseur-menu">
  <div style="padding: 32px 20px 0;">
- <div class="logo" style="font-size: 16px; letter-spacing: 1px;">(your logo)</div>
+ <div class="logo" style="font-size: 16px; letter-spacing: 1px;">(ваш логотип)</div>
  </div>
  <div class="content" style="padding-top: 24px;">
  <div style="margin-bottom: 28px;">
@@ -2267,7 +2470,7 @@
  </div>
  </div>
  <div class="footer" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
- <span class="logo-sm">(your logo)</span>
+ <span class="logo-sm">(ваш логотип)</span>
  <button class="btn btn-secondary btn-sm" onclick="staffLogout()">Выйти</button>
  </div>
 </div>
@@ -2275,7 +2478,7 @@
 <!-- ===== SCREEN: COOK MENU ===== -->
 <div class="screen" id="screen-cook-menu">
  <div style="padding: 32px 20px 0;">
- <div class="logo" style="font-size: 16px; letter-spacing: 1px;">(your logo)</div>
+ <div class="logo" style="font-size: 16px; letter-spacing: 1px;">(ваш логотип)</div>
  </div>
  <div class="content" style="padding-top: 24px;">
  <div style="margin-bottom: 28px;">
@@ -2317,7 +2520,7 @@
  </div>
  </div>
  <div class="footer" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
- <span class="logo-sm">(your logo)</span>
+ <span class="logo-sm">(ваш логотип)</span>
  <button class="btn btn-secondary btn-sm" onclick="staffLogout()">Выйти</button>
  </div>
 </div>
@@ -2378,13 +2581,13 @@
 
 <!-- ===== SCREEN: TECHNICIAN MENU ===== -->
 <div class="screen" id="screen-technician-menu">
- <div style="padding: 32px 20px 0;"><div class="logo" style="font-size: 16px; letter-spacing: 1px;">(your logo)</div></div>
+ <div style="padding: 32px 20px 0;"><div class="logo" style="font-size: 16px; letter-spacing: 1px;">(ваш логотип)</div></div>
  <div class="content" style="padding-top: 24px;">
  <div style="margin-bottom: 28px;"><div style="font-size: 13px; color: var(--text-3); margin-bottom: 4px;">Техник</div><div style="font-size: 24px; font-weight: 700;" id="technician-menu-name">—</div></div>
  <div class="section-label">Меню</div>
  <div class="menu-item" onclick="openTechnicianRepairs()"><div class="menu-icon">🛠️</div><div class="menu-text"><div class="menu-title-row"><div class="menu-title">Заявки на ремонт</div><span class="notify-badge" id="badge-technician-repairs">0</span></div><div class="menu-desc">Поломки от официантов, пармастеров, массажистов и поваров</div></div><span class="menu-arrow">›</span></div>
  </div>
- <div class="footer" style="display:flex; justify-content:space-between; align-items:center; gap:12px;"><span class="logo-sm">(your logo)</span><button class="btn btn-secondary btn-sm" onclick="staffLogout()">Выйти</button></div>
+ <div class="footer" style="display:flex; justify-content:space-between; align-items:center; gap:12px;"><span class="logo-sm">(ваш логотип)</span><button class="btn btn-secondary btn-sm" onclick="staffLogout()">Выйти</button></div>
 </div>
 
 <!-- ===== SCREEN: REPAIR CREATE ===== -->
@@ -5280,16 +5483,24 @@ function renderHomeGrid() {
 
  let html = `
  <div class="role-card active-role" onclick="enterFounder()">
+ <div class="role-icon">&#128081;</div>
+ <div class="role-copy">
  <span class="role-name">Учредитель</span>
- <span style="font-size: 20px;">→</span>
+ <div class="role-desc">Отчёты, аналитика, управление подразделениями</div>
+ </div>
+ <span class="role-arrow">→</span>
  </div>`;
 
  getDepartments().forEach(dep => {
  const label = dep.logoText ? `${escapeHtml(dep.logoText)} · ${escapeHtml(dep.name)}` : escapeHtml(dep.name);
  html += `
  <div class="role-card active-role" onclick="enterRole('waiter')">
+ <div class="role-icon">&#128101;</div>
+ <div class="role-copy">
  <span class="role-name" data-i18n-skip>${label}</span>
- <span style="font-size: 20px;">→</span>
+ <div class="role-desc">Задачи, фотоотчёты и процессы подразделения</div>
+ </div>
+ <span class="role-arrow">→</span>
  </div>`;
  });
 
@@ -6117,12 +6328,12 @@ function renderDepartmentStaffMenu() {
  const unlocked = isProcessUnlocked(p.key);
  const clickAttr = unlocked
  ? `onclick="openDepartmentReport()"`
- : `onclick="openProcessLockedStub('${escapeHtml(p.label)}')"`;
+ : `onclick="openProcessLockedStub('${escapeHtml(p.label)}', ${p.custom ? 'true' : 'false'})"`;
  return `
  <div class="menu-item ${unlocked ? '' : 'locked'}" ${clickAttr}>
  <div class="menu-icon">${p.icon}</div>
  <div class="menu-text">
- <div class="menu-title">${escapeHtml(p.label)}</div>
+ <div class="menu-title"${p.custom ? ' data-i18n-skip' : ''}>${escapeHtml(p.label)}</div>
  <div class="menu-desc">${unlocked ? 'Нажмите, чтобы открыть' : 'Доступно в полной версии'}</div>
  </div>
  <span class="menu-arrow">${unlocked ? '›' : '🔒'}</span>
@@ -6130,10 +6341,21 @@ function renderDepartmentStaffMenu() {
  }).join('');
 }
 
-function openProcessLockedStub(label) {
+function openProcessLockedStub(label, isCustom, suffix) {
  const titleEl = document.getElementById('process-locked-title');
  const subEl = document.getElementById('process-locked-sub');
- if (titleEl) titleEl.textContent = label;
+ if (titleEl) {
+ titleEl.innerHTML = '';
+ const labelSpan = document.createElement('span');
+ if (isCustom) labelSpan.setAttribute('data-i18n-skip', '');
+ labelSpan.textContent = label;
+ titleEl.appendChild(labelSpan);
+ if (suffix) {
+ const suffixSpan = document.createElement('span');
+ suffixSpan.textContent = suffix;
+ titleEl.appendChild(suffixSpan);
+ }
+ }
  if (subEl) subEl.textContent = 'Доступно в полной версии.';
  openModal('modal-process-locked');
 }
@@ -6263,7 +6485,7 @@ function renderDepartmentManage() {
  const unlocked = isProcessUnlocked(p.key);
  const openAttr = p.key === 'photoReport'
  ? `onclick="openDepartmentPhotoResults()"`
- : `onclick="openProcessLockedStub('${escapeHtml(p.label)}')"`;
+ : `onclick="openProcessLockedStub('${escapeHtml(p.label)}', ${p.custom ? 'true' : 'false'})"`;
  html += `
  <div class="menu-item${unlocked ? '' : ' locked'}" ${openAttr}>
  <div class="menu-icon">${p.icon}</div>
@@ -6285,7 +6507,7 @@ function renderDepartmentManage() {
  const unlocked = isProcessUnlocked(p.key);
  const openAttr = p.key === 'photoReport'
  ? `onclick="openDepartmentPhotoConfig()"`
- : `onclick="openProcessLockedStub('${escapeHtml(p.label)} · настройки')"`;
+ : `onclick="openProcessLockedStub('${escapeHtml(p.label)}', ${p.custom ? 'true' : 'false'}, ' · настройки')"`;
  html += `
  <div class="menu-item" style="position:relative;gap:8px;">
  <div style="flex:1;display:flex;align-items:center;gap:14px;cursor:pointer;min-width:0;" ${openAttr}>
@@ -11918,6 +12140,16 @@ function toggleTheme() {
 // разблокированные процессы и подразделения.
 // ============================================================
 const RU_UZ_DICT = {
+" · настройки": " · sozlamalar",
+"Например:\nПроверить брони с утра\nПерезвонить гостю\nПередать сертификаты": "Masalan:\nErtalab bronlarni tekshirish\nMehmonga qayta qo'ng'iroq qilish\nSertifikatlarni topshirish",
+"Аттестация в разработке": "Attestatsiya ishlab chiqilmoqda",
+"(ваш логотип)": "(sizning logotipingiz)",
+"Вход в систему": "Tizimga kirish",
+"Выберите роль,": "Rolni tanlang,",
+"чтобы продолжить": "davom etish uchun",
+"Готово к работе": "Ishga tayyor",
+"Отчёты, аналитика, управление подразделениями": "Hisobotlar, tahlil, bo'limlarni boshqarish",
+"Задачи, фотоотчёты и процессы подразделения": "Bo'lim vazifalari, fotohisobotlari va jarayonlari",
 "Аттестация будет работать по актуальному меню: из общего списка 60–80 вопросов система будет случайно выдавать 20 вопросов на попытку. Проходить можно будет сколько угодно раз.": "Attestatsiya joriy menyu asosida ishlaydi: umumiy 60–80 ta savol ro'yxatidan tizim har urinishda tasodifiy 20 ta savol beradi. Istalgancha marta topshirish mumkin.",
 "Файл подготовлен. Telegram может открыть файл отдельно, поэтому автоматическое открытие отключено. Нажмите кнопку только если файл действительно нужен.": "Fayl tayyor. Telegram faylni alohida ochishi mumkin, shu sababli avtomatik ochish o'chirilgan. Tugmani faqat fayl haqiqatan kerak bo'lsa bosing.",
 "При первом входе введите Telegram логин, имя и пароль администратора. После успешного входа повторная авторизация не нужна до смены пароля.": "Birinchi kirishda Telegram login, ism va administrator parolini kiriting. Muvaffaqiyatli kirishdan so'ng parol o'zgartirilmaguncha qayta avtorizatsiya shart emas.",
@@ -11983,7 +12215,7 @@ const RU_UZ_DICT = {
 "Откройте приложение → Администратор → Забытые вещи": "Ilovani oching → Administrator → Unutilgan buyumlar",
 "Связь с базой нестабильна, открыта локальная копия": "Bazaga aloqa beqaror, lokal nusxa ochildi",
 "Функционал будет добавлен в следующих обновлениях.": "Funksiya keyingi yangilanishlarda qo'shiladi.",
-"🧳 Администратор принял забытую вещь Администратор:": "🧳 Administrator unutilgan buyumni qabul qildi Administrator:",
+"🧳 Администратор принял забытую вещь\n\nАдминистратор: ": "🧳 Administrator unutilgan buyumni qabul qildi\n\nAdministrator: ",
 "Инвентаризация редактируется другим пользователем": "Inventarizatsiya boshqa foydalanuvchi tomonidan tahrirlanmoqda",
 "Подразделение и все его сотрудники будут удалены.": "Bo'lim va uning barcha xodimlari o'chiriladi.",
 "Свои разделы отчёта, например «Стейшн», «Терраса»": "O'z hisobot bo'limlari, masalan «Stansiya», «Terrasa»",
@@ -11994,7 +12226,7 @@ const RU_UZ_DICT = {
 "Заполните текст, число и выберите обед или ужин": "Matn, sonni to'ldiring va tushlik yoki kechki ovqatni tanlang",
 "Ошибка связи или сохранения. Попробуйте ещё раз": "Aloqa yoki saqlash xatosi. Qayta urinib ko'ring",
 "Сотрудник прикладывает до 10 фото одним списком": "Xodim bitta ro'yxatda 10 tagacha foto biriktiradi",
-"🧳 Гость оповещен по забытой вещи Администратор:": "🧳 Mehmonga unutilgan buyum haqida xabar berildi Administrator:",
+"🧳 Гость оповещен по забытой вещи\n\nАдминистратор: ": "🧳 Mehmonga unutilgan buyum haqida xabar berildi\n\nAdministrator: ",
 "Без подтверждения статистику отправить нельзя.": "Tasdiqlamasdan statistikani yuborib bo'lmaydi.",
 "Данные появятся после отправки администратором": "Ma'lumotlar administrator yuborgach paydo bo'ladi",
 "Сообщения из раздела “Заказать” появятся здесь": "“Buyurtma berish” bo'limidan xabarlar shu yerda paydo bo'ladi",
@@ -12018,7 +12250,7 @@ const RU_UZ_DICT = {
 "Пароль изменён. Вход учредителя сброшен": "Parol o'zgartirildi. Muassis kirishi bekor qilindi",
 "Показатели не могут быть отрицательными": "Ko'rsatkichlar manfiy bo'lishi mumkin emas",
 "Смены появятся после первого фотоотчета": "Smenalar birinchi foto hisobotdan so'ng paydo bo'ladi",
-"🧳 Официант нашел забытую вещь Официант:": "🧳 Ofitsiant unutilgan buyumni topdi Ofitsiant:",
+"🧳 Официант нашел забытую вещь\n\nОфициант: ": "🧳 Ofitsiant unutilgan buyumni topdi\n\nOfitsiant: ",
 "Администратор должен одобрить вход для": "Administrator kirishni tasdiqlashi kerak:",
 "Ошибка запуска. Перезагрузите Mini App": "Ishga tushirish xatosi. Mini App'ni qayta yuklang",
 "Прикрепите 2 фото: скриншот и отложено": "2 ta foto biriktiring: skrinshot va kechiktirilgan",
@@ -12040,14 +12272,14 @@ const RU_UZ_DICT = {
 "Все готовые процессы уже добавлены": "Barcha tayyor jarayonlar allaqachon qo'shilgan",
 "Настройки доступны в полной версии": "Sozlamalar to'liq versiyada mavjud",
 "Ошибка смены пароля администратора": "Administrator parolini almashtirishda xatolik",
-"🌄 Передача смены На утро назначен:": "🌄 Smena topshirildi Ertalabga tayinlangan:",
+"🌄 Передача смены\n\nНа утро назначен: ": "🌄 Smena topshirildi\n\nErtalabga tayinlangan: ",
 "Cloudflare Worker URL не настроен": "Cloudflare Worker URL sozlanmagan",
 "Активно: создание задач и история": "Faol: vazifa yaratish va tarix",
 "Выберите сотрудника, дату и сумму": "Xodim, sana va summani tanlang",
 "Здесь появятся заказы пармастеров": "Bu yerda parmasterlar buyurtmalari paydo bo'ladi",
 "Сначала войдите как администратор": "Avval administrator sifatida kiring",
 "Сотрудник будет удален из системы": "Xodim tizimdan o'chiriladi",
-"! Завтра вы назначены дежурным (": "! Ertaga siz navbatchi etib tayinlandingiz (",
+"!\n\nЗавтра вы назначены дежурным (": "!\n\nErtaga siz navbatchi etib tayinlandingiz (",
 "Введите имя и пароль для доступа": "Kirish uchun ism va parolni kiriting",
 "Новые забытые вещи от официантов": "Ofitsiantlardan yangi unutilgan buyumlar",
 "Ошибка загрузки отчетов обучения": "Ta'lim hisobotlarini yuklashda xatolik",
@@ -12060,7 +12292,7 @@ const RU_UZ_DICT = {
 "Ошибка загрузки администраторов": "Administratorlarni yuklashda xatolik",
 "Своё название и набор процессов": "O'z nomi va jarayonlar to'plami",
 "Сначала войдите в подразделение": "Avval bo'limga kiring",
-"! Завтра вы назначены дежурным": "! Ertaga siz navbatchi etib tayinlandingiz",
+"!\n\nЗавтра вы назначены дежурным": "!\n\nErtaga siz navbatchi etib tayinlandingiz",
 "Введите название подразделения": "Bo'lim nomini kiriting",
 "Заполните хотя бы одну позицию": "Kamida bitta pozitsiyani to'ldiring",
 "На кого жалоба (необязательно)": "Kimga shikoyat (ixtiyoriy)",
@@ -12078,8 +12310,8 @@ const RU_UZ_DICT = {
 "Ошибка загрузки забытых вещей": "Unutilgan buyumlarni yuklashda xatolik",
 "Ошибка загрузки подразделений": "Bo'limlarni yuklashda xatolik",
 "Сменить пароль администратора": "Administrator parolini almashtirish",
-"🌅 Вы назначены дежурным Дата:": "🌅 Siz navbatchi etib tayinlandingiz Sana:",
-"🧳 Забытая вещь закрыта Гость:": "🧳 Unutilgan buyum yopildi Mehmon:",
+"🌅 Вы назначены дежурным\n\nДата: ": "🌅 Siz navbatchi etib tayinlandingiz\n\nSana: ",
+"🧳 Забытая вещь закрыта\n\nГость: ": "🧳 Unutilgan buyum yopildi\n\nMehmon: ",
 "Заявка ожидает подтверждения": "Ariza tasdiqlanishini kutmoqda",
 "Нажмите, чтобы открыть отчет": "Hisobotni ochish uchun bosing",
 "Напишите, что нужно заказать": "Nima buyurtma qilish kerakligini yozing",
