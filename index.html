@@ -3966,12 +3966,10 @@ async function deleteAccessRequest(requestId) {
 // DEPARTMENTS (адаптивные подразделения)
 // Учредитель сам создаёт подразделения и наполняет их процессами.
 // Технически каждое подразделение работает через шаблон роли 'waiter' —
-// самый полнофункциональный из готовых ролей. В демо-версии допускается
-// только одно подразделение, и только процесс "Фотоотчёт" активен —
-// остальные добавляются в меню, но остаются заблокированными (апсейл).
+// самый полнофункциональный из готовых ролей. На этапе тестирования
+// все готовые процессы доступны в конструкторе учредителя.
 // ============================================================
 const DEMO_DEPARTMENT_LIMIT = 1;
-const DEMO_UNLOCKED_PROCESS_KEYS = ['photoReport'];
 
 const PROCESS_CATALOG = [
  { key: 'photoReport', label: 'Фотоотчёт', icon: '📷' },
@@ -4038,7 +4036,7 @@ function getDepartmentStaffList(departmentId) {
 }
 
 function isProcessUnlocked(key) {
- return DEMO_UNLOCKED_PROCESS_KEYS.includes(key);
+ return PROCESS_CATALOG.some(p => p.key === key);
 }
 
 function getCatalogProcess(key) {
