@@ -3160,7 +3160,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.20";
+const APP_VERSION = "1.028";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
@@ -3551,22 +3551,23 @@ function getFounderActor(role = 'founder') {
  };
 }
 
-// Одноразовая очистка записей, перенесённых из DROVA Inspector.
-// Учредитель и новые сотрудники с departmentId остаются; старые записи без
-// подразделения, администраторы старой схемы и прежние заявки удаляются.
+// Полная одноразовая очистка сотрудников перед тестированием конструктора.
+// Оставляем только учредителя. Удаляем сотрудников независимо от того,
+// успели ли старые записи получить departmentId.
 async function purgeLegacyDrovaEmployeesOnce() {
- const cleanupKey = 'legacyDrovaEmployeesPurgedV120';
- const keepNewDepartmentStaff = list => (Array.isArray(list) ? list : [])
- .filter(person => String(person.role || '') === 'founder' || Boolean(person.departmentId));
+ const cleanupKey = 'allEmployeesPurgedV1028';
+ const keepFoundersOnly = list => (Array.isArray(list) ? list : [])
+ .filter(person => String(person.role || '') === 'founder');
 
  if (!CLOUD_ENABLED || !db) {
  if (LocalDB.get(cleanupKey)) return;
- appCache.staff = keepNewDepartmentStaff(appCache.staff);
+ appCache.staff = keepFoundersOnly(appCache.staff);
  appCache.adminProfiles = [];
  appCache.accessRequests = [];
  LocalDB.set('staff', appCache.staff);
  LocalDB.set('adminProfiles', []);
  LocalDB.set('accessRequests', []);
+ clearCurrentWaiter();
  LocalDB.set(cleanupKey, true);
  return;
  }
@@ -3584,7 +3585,7 @@ async function purgeLegacyDrovaEmployeesOnce() {
  const docsToDelete = [
  ...staffSnap.docs.filter(doc => {
  const person = doc.data() || {};
- return String(person.role || '') !== 'founder' && !person.departmentId;
+ return String(person.role || '') !== 'founder';
  }),
  ...adminSnap.docs,
  ...requestSnap.docs
@@ -3596,15 +3597,16 @@ async function purgeLegacyDrovaEmployeesOnce() {
  await batch.commit();
  }
 
- appCache.staff = keepNewDepartmentStaff(appCache.staff);
+ appCache.staff = keepFoundersOnly(appCache.staff);
  appCache.adminProfiles = [];
  appCache.accessRequests = [];
  LocalDB.set('staff', appCache.staff);
  LocalDB.set('adminProfiles', []);
  LocalDB.set('accessRequests', []);
+ clearCurrentWaiter();
  await settingsRef.set({
  [cleanupKey]: true,
- legacyDrovaEmployeesPurgedAt: new Date().toISOString(),
+ allEmployeesPurgedAt: new Date().toISOString(),
  updatedAt: new Date().toISOString()
  }, { merge: true });
 }
@@ -3638,6 +3640,7 @@ async function initCloud() {
  appCache.anonymousFeedback = LocalDB.get("anonymousFeedback") || [];
  appCache.kpiContent = LocalDB.get("kpiContent") || getDefaultKpiContent();
  appCache.stopList = LocalDB.get("stopList") || getDefaultStopList();
+ await purgeLegacyDrovaEmployeesOnce();
  return;
  }
 
@@ -4044,7 +4047,26 @@ const PROCESS_CATALOG = [
 ];
 
 function getDepartments() {
- return appCache.departments || [];
+ return (appCache.departments || []).map(dep => {
+ const seen = new Set();
+ const processes = (Array.isArray(dep.processes) ? dep.processes : []).map(item => {
+ const key = typeof item === 'string' ? item : item && item.key;
+ if (!key || seen.has(key)) return null;
+ seen.add(key);
+ const catalog = getCatalogProcess(key);
+ if (catalog) return { key: catalog.key, label: catalog.label, icon: catalog.icon, custom: false };
+ if (item && typeof item === 'object') {
+ return {
+ key,
+ label: item.label || 'Свой процесс',
+ icon: item.icon || '⚙️',
+ custom: true
+ };
+ }
+ return null;
+ }).filter(Boolean);
+ return { ...dep, processes };
+ });
 }
 
 function setDepartments(arr) {
@@ -4086,6 +4108,7 @@ function getStaffDepartmentId(staff) {
 // через которую заходят все кастомные подразделения).
 function getMyDepartmentId() {
  const w = getWaiter();
+ if (w && w.isFounderSession && activePreviewDepartmentId) return String(activePreviewDepartmentId);
  return w ? getStaffDepartmentId(w) : null;
 }
 
@@ -4134,8 +4157,7 @@ async function createDepartment(name, logoText) {
  createdAt: new Date().toISOString()
  };
 
- const arr = getDepartments();
- arr.push(dep);
+ const arr = [...getDepartments(), dep];
  setDepartments(arr);
  applyDepartmentLabels(dep);
  return dep;
@@ -4260,22 +4282,23 @@ async function addProcessesToDepartment(id, processKeys, customLabels) {
  const dep = getDepartment(id);
  if (!dep) return null;
  const existingKeys = new Set(dep.processes.map(p => p.key));
+ const nextProcesses = dep.processes.map(p => ({ ...p }));
 
  (processKeys || []).forEach(key => {
  if (existingKeys.has(key)) return;
  const catalogItem = getCatalogProcess(key);
  if (!catalogItem) return;
- dep.processes.push({ key: catalogItem.key, label: catalogItem.label, icon: catalogItem.icon, custom: false });
+ nextProcesses.push({ key: catalogItem.key, label: catalogItem.label, icon: catalogItem.icon, custom: false });
  existingKeys.add(key);
  });
 
  (customLabels || []).forEach(label => {
  const clean = String(label || '').trim();
  if (!clean) return;
- dep.processes.push({ key: 'custom_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6), label: clean, icon: '⚙️', custom: true });
+ nextProcesses.push({ key: 'custom_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6), label: clean, icon: '⚙️', custom: true });
  });
 
- return updateDepartment(id, { processes: dep.processes });
+ return updateDepartment(id, { processes: nextProcesses });
 }
 
 async function removeProcessFromDepartment(id, processKey) {
@@ -4289,11 +4312,25 @@ async function deleteDepartment(id) {
  const dep = getDepartment(id);
  if (!dep) return;
 
- // Освобождаем демо-слот: подразделение работает через роль 'waiter',
- // поэтому вместе с ним убираем и сотрудников/заявки этой роли.
- setStaff(getStaff().filter(s => String(s.role) !== 'waiter'));
- setAccessRequests(getAccessRequests().filter(r => String(r.role) !== 'waiter'));
+ // Удаляем только сотрудников и заявки выбранного подразделения.
+ // Соседние подразделения не должны затрагиваться.
+ const removedStaffIds = new Set(
+ getDepartmentStaffList(id).map(s => String(s.id))
+ );
+ setStaff(getStaff().filter(s => !removedStaffIds.has(String(s.id))));
+ setAccessRequests(getAccessRequests().filter(r =>
+ String(r.departmentId || '') !== String(id)
+ ));
+ const currentWaiter = getWaiter();
+ if (currentWaiter && removedStaffIds.has(String(currentWaiter.id))) {
  clearStaffRoleSession('waiter');
+ }
+ if (CLOUD_ENABLED && db && removedStaffIds.size) {
+ for (const staffId of removedStaffIds) {
+ await biz("staff").doc(staffId).delete()
+ .catch(err => console.error("department staff delete error", err));
+ }
+ }
 
  const arr = getDepartments().filter(d => String(d.id) !== String(id));
  setDepartments(arr);
@@ -5848,6 +5885,7 @@ function runPendingDeepLinkRoute() {
 // NAVIGATION
 // ============================================================
 let screenStack = ['screen-home'];
+let activePreviewDepartmentId = null;
 
 function goTo(screenId) {
  const current = screenStack[screenStack.length - 1];
@@ -5899,7 +5937,7 @@ function renderHomeGrid() {
  getDepartments().forEach(dep => {
  const label = dep.logoText ? `${escapeHtml(dep.logoText)} · ${escapeHtml(dep.name)}` : escapeHtml(dep.name);
  html += `
- <div class="role-card active-role" onclick="enterRole('waiter')">
+ <div class="role-card active-role" onclick="enterDepartmentRole('${dep.id}')">
  <div class="role-icon">&#128101;</div>
  <div class="role-copy">
  <span class="role-name" data-i18n-skip>${label}</span>
@@ -5910,6 +5948,19 @@ function renderHomeGrid() {
  });
 
  grid.innerHTML = html;
+}
+
+function enterDepartmentRole(departmentId) {
+ activePreviewDepartmentId = String(departmentId || '');
+ const current = getWaiter();
+ if (current && !current.isFounderSession) {
+ const staffDepartmentId = getStaffDepartmentId(current);
+ if (String(staffDepartmentId) !== activePreviewDepartmentId) {
+ showToast('Этот сотрудник зарегистрирован в другом подразделении');
+ return;
+ }
+ }
+ enterRole('waiter');
 }
 
 // ============================================================
@@ -6923,7 +6974,7 @@ function renderWaiterMenu() {
  return;
  }
  document.getElementById('waiter-menu-name').textContent = w.name;
- const dep = getPrimaryDepartment();
+ const dep = getDepartment(getMyDepartmentId()) || getPrimaryDepartment();
  const roleLabelEl = document.getElementById('waiter-menu-role-label');
  if (roleLabelEl) roleLabelEl.textContent = dep ? dep.name : 'Сотрудник';
  renderDepartmentStaffMenu();
