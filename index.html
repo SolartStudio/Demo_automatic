@@ -3160,12 +3160,12 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.19";
+const APP_VERSION = "1.20";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
  label: APP_VERSION_LABEL,
- updatedAt: "2026-07-18"
+ updatedAt: "2026-07-29"
 };
 
 let db = null;
@@ -3551,6 +3551,64 @@ function getFounderActor(role = 'founder') {
  };
 }
 
+// Одноразовая очистка записей, перенесённых из DROVA Inspector.
+// Учредитель и новые сотрудники с departmentId остаются; старые записи без
+// подразделения, администраторы старой схемы и прежние заявки удаляются.
+async function purgeLegacyDrovaEmployeesOnce() {
+ const cleanupKey = 'legacyDrovaEmployeesPurgedV120';
+ const keepNewDepartmentStaff = list => (Array.isArray(list) ? list : [])
+ .filter(person => String(person.role || '') === 'founder' || Boolean(person.departmentId));
+
+ if (!CLOUD_ENABLED || !db) {
+ if (LocalDB.get(cleanupKey)) return;
+ appCache.staff = keepNewDepartmentStaff(appCache.staff);
+ appCache.adminProfiles = [];
+ appCache.accessRequests = [];
+ LocalDB.set('staff', appCache.staff);
+ LocalDB.set('adminProfiles', []);
+ LocalDB.set('accessRequests', []);
+ LocalDB.set(cleanupKey, true);
+ return;
+ }
+
+ const settingsRef = db.collection('settings').doc(getCurrentBusinessId());
+ const settingsSnap = await settingsRef.get();
+ const settings = settingsSnap.exists ? settingsSnap.data() : {};
+ if (settings[cleanupKey]) return;
+
+ const [staffSnap, adminSnap, requestSnap] = await Promise.all([
+ biz('staff').get(),
+ biz('adminProfiles').get(),
+ biz('accessRequests').get()
+ ]);
+ const docsToDelete = [
+ ...staffSnap.docs.filter(doc => {
+ const person = doc.data() || {};
+ return String(person.role || '') !== 'founder' && !person.departmentId;
+ }),
+ ...adminSnap.docs,
+ ...requestSnap.docs
+ ];
+
+ for (let offset = 0; offset < docsToDelete.length; offset += 450) {
+ const batch = db.batch();
+ docsToDelete.slice(offset, offset + 450).forEach(doc => batch.delete(doc.ref));
+ await batch.commit();
+ }
+
+ appCache.staff = keepNewDepartmentStaff(appCache.staff);
+ appCache.adminProfiles = [];
+ appCache.accessRequests = [];
+ LocalDB.set('staff', appCache.staff);
+ LocalDB.set('adminProfiles', []);
+ LocalDB.set('accessRequests', []);
+ await settingsRef.set({
+ [cleanupKey]: true,
+ legacyDrovaEmployeesPurgedAt: new Date().toISOString(),
+ updatedAt: new Date().toISOString()
+ }, { merge: true });
+}
+
 async function initCloud() {
  if (!CLOUD_ENABLED) {
  console.warn("Firebase config не заполнен. Работаем локально через localStorage.");
@@ -3587,6 +3645,7 @@ async function initCloud() {
  db = firebase.firestore();
 
  await loadCloudData();
+ await purgeLegacyDrovaEmployeesOnce();
  await cleanupExpiredPhotoReports();
 
  biz("staff").onSnapshot((snapshot) => {
@@ -4032,7 +4091,10 @@ function getMyDepartmentId() {
 
 function getDepartmentStaffList(departmentId) {
  if (!departmentId) return [];
- return getStaff().filter(s => String(getStaffDepartmentId(s)) === String(departmentId));
+ return getStaff().filter(s =>
+ String(s.role || '') !== 'founder' &&
+ String(getStaffDepartmentId(s)) === String(departmentId)
+ );
 }
 
 function isProcessUnlocked(key) {
@@ -7118,20 +7180,6 @@ function renderFounderMenu() {
  </div>`;
  }
 
- const pendingCount = getPendingAccessRequests().length;
- const staffCount = getStaff().length;
- if (staffCount > 0 || pendingCount > 0) {
- html += `
- <div class="menu-item" onclick="openFounderStaffList()">
- <div class="menu-icon">👥</div>
- <div class="menu-text">
- <div class="menu-title-row"><div class="menu-title">Сотрудники</div>${pendingCount ? `<span class="notify-badge show">${pendingCount}</span>` : ''}</div>
- <div class="menu-desc">${staffCount} ${plural(staffCount, 'сотрудник', 'сотрудника', 'сотрудников')}${pendingCount ? ` · ${pendingCount} ожидает одобрения` : ''}</div>
- </div>
- <span class="menu-arrow">›</span>
- </div>`;
- }
-
  container.innerHTML = html;
 }
 
@@ -7188,6 +7236,7 @@ function renderDepartmentManage() {
  }
  if (titleEl) titleEl.textContent = dep.name;
 
+ const departmentStaff = getDepartmentStaffList(dep.id);
  let html = `<div class="section-label">Процессы</div>`;
 
  if (!dep.processes.length) {
@@ -7214,7 +7263,30 @@ function renderDepartmentManage() {
  html += `
  <button class="btn btn-primary" style="margin-top:8px;" onclick="openDepartmentAddProcess()">+ Добавить процесс</button>
  <div class="divider"></div>
- <div class="section-label">Сотрудники</div>
+ <div class="section-label">Сотрудники${departmentStaff.length ? ` · ${departmentStaff.length}` : ''}</div>`;
+
+ if (departmentStaff.length) {
+ departmentStaff.forEach(s => {
+ html += `
+ <div class="menu-item" style="position:relative;gap:8px;">
+ <div style="flex:1;display:flex;align-items:center;gap:14px;cursor:pointer;min-width:0;" onclick="openStaffView('${s.id}')">
+ <div class="staff-avatar">${escapeHtml((s.name || 'С').charAt(0).toUpperCase())}</div>
+ <div class="menu-text">
+ <div class="menu-title" data-i18n-skip>${escapeHtml(s.name || 'Сотрудник')}</div>
+ <div class="menu-desc">${escapeHtml(s.login || 'Без Telegram-логина')}</div>
+ </div>
+ </div>
+ <button class="btn btn-secondary btn-sm" onclick="openDeleteStaffModal('staff:${s.id}')" style="flex-shrink:0;" aria-label="Удалить сотрудника">✕</button>
+ </div>`;
+ });
+ } else {
+ html += `<div class="empty" style="padding:20px 0;">
+ <div class="empty-icon">👥</div>
+ <div class="empty-title">Сотрудников пока нет</div>
+ </div>`;
+ }
+
+ html += `
  <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px;">
  <div style="font-size:14px;color:var(--text-2);line-height:1.5;margin-bottom:14px;">Отправьте этот код новому сотруднику — он введёт его при регистрации и попадёт именно в это подразделение.</div>
  ${dep.joinCode ? `
@@ -12727,11 +12799,16 @@ function openStaffView(staffId, replaceCurrent = false) {
 }
 
 let staffIdToDelete = null;
+let deleteStaffReturnToDepartment = false;
 
 function openDeleteStaffModal(staffId) {
  const person = findFounderEmployee(staffId);
  if (!person) return;
  staffIdToDelete = person._key || ('staff:' + String(person.id));
+ deleteStaffReturnToDepartment = Boolean(
+ document.getElementById('screen-department-manage') &&
+ document.getElementById('screen-department-manage').classList.contains('active')
+ );
  document.getElementById('delete-staff-sub').textContent = `${person.name || 'Сотрудник'} · ${getStaffRole(person)} будет удалён из системы. Отчеты и история останутся.`;
  openModal('modal-delete-staff');
 }
@@ -12752,7 +12829,12 @@ async function confirmDeleteStaff() {
  staffIdToDelete = null;
  closeModal('modal-delete-staff');
  showToast('Сотрудник удалён ✓');
+ if (deleteStaffReturnToDepartment) {
+ deleteStaffReturnToDepartment = false;
+ renderDepartmentManage();
+ } else {
  goBack();
+ }
  } catch (e) {
  console.error(e);
  showToast('Ошибка удаления сотрудника');
