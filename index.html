@@ -1484,7 +1484,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm" data-i18n-skip></div>
-    <div class="app-version" id="app-version-label">Версия 1.19</div>
+   <div class="app-version" id="app-version-label">Версия 1.029</div>
  </div>
 </div>
 
@@ -3160,12 +3160,12 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.028";
+const APP_VERSION = "1.029";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
  label: APP_VERSION_LABEL,
- updatedAt: "2026-07-29"
+ updatedAt: "2026-07-31"
 };
 
 let db = null;
@@ -3233,15 +3233,39 @@ const appCache = {
  stopList: getDefaultStopList()
 };
 
+// Inspector and Drova are hosted on the same GitHub Pages origin, so raw
+// localStorage keys are shared between them. Every Inspector key is isolated
+// behind this namespace. Deliberately never read legacy unprefixed keys: doing
+// so could import Drova staff/business sessions and upload them to this Firestore.
+const STORAGE_NAMESPACE = 'inspect_uz_';
+const storageKey = key => STORAGE_NAMESPACE + String(key);
+
+const InspectStorage = {
+ getItem: key => window.localStorage.getItem(storageKey(key)),
+ setItem: (key, value) => window.localStorage.setItem(storageKey(key), value),
+ removeItem: key => window.localStorage.removeItem(storageKey(key))
+};
+
+const InspectSessionStorage = {
+ getItem: key => window.sessionStorage.getItem(storageKey(key)),
+ setItem: (key, value) => window.sessionStorage.setItem(storageKey(key), value),
+ removeItem: key => window.sessionStorage.removeItem(storageKey(key))
+};
+
 const LocalDB = {
- get: (key) => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } },
+ get: (key) => {
+ try {
+ const raw = InspectStorage.getItem(key) ?? InspectSessionStorage.getItem(key);
+ return raw === null ? null : JSON.parse(raw);
+ } catch { return null; }
+ },
  set: (key, val) => {
- try { localStorage.setItem(key, JSON.stringify(val)); }
- catch (e) { try { sessionStorage.setItem(key, JSON.stringify(val)); } catch (_) {} }
+ try { InspectStorage.setItem(key, JSON.stringify(val)); }
+ catch (e) { try { InspectSessionStorage.setItem(key, JSON.stringify(val)); } catch (_) {} }
  },
  remove: (key) => {
- try { localStorage.removeItem(key); } catch (_) {}
- try { sessionStorage.removeItem(key); } catch (_) {}
+ try { InspectStorage.removeItem(key); } catch (_) {}
+ try { InspectSessionStorage.removeItem(key); } catch (_) {}
  },
 };
 
@@ -3289,7 +3313,7 @@ function fillTelegramMeta(target) {
 function getAnonymousFeedbackAuditFields() {
  const staff = getCurrentApprovedStaff() || getWaiter() || getCurrentAdminProfile() || getCurrentFounderProfile() || {};
  const tgUser = getTelegramWebAppUser() || {};
- const role = staff.role || localStorage.getItem("currentStaffRole") || localStorage.getItem("founderActiveRole") || "";
+ const role = staff.role || InspectStorage.getItem("currentStaffRole") || InspectStorage.getItem("founderActiveRole") || "";
  const lastScreen = LocalDB.get("lastActiveScreen") || {};
  const auditCreatedAt = new Date().toISOString();
 
@@ -3379,19 +3403,19 @@ function setFounderSession(founderProfile = null) {
  LocalDB.set("founderSession", {
  ok: true,
  passwordToken: getFounderPassword(),
- founderId: founderProfile && founderProfile.id ? String(founderProfile.id) : (localStorage.getItem("currentFounderId") || null),
+ founderId: founderProfile && founderProfile.id ? String(founderProfile.id) : (InspectStorage.getItem("currentFounderId") || null),
  createdAt: new Date().toISOString()
  });
  if (founderProfile && founderProfile.id) {
- localStorage.setItem("currentFounderId", String(founderProfile.id));
+ InspectStorage.setItem("currentFounderId", String(founderProfile.id));
  LocalDB.set("founderProfile", founderProfile);
  }
 }
 
 function clearFounderSession() {
  LocalDB.remove("founderSession");
- localStorage.removeItem("founderActiveRole");
- localStorage.removeItem("currentFounderId");
+ InspectStorage.removeItem("founderActiveRole");
+ InspectStorage.removeItem("currentFounderId");
  LocalDB.remove("founderProfile");
 }
 
@@ -3412,7 +3436,7 @@ function setAdminSession(profile = null) {
  LocalDB.set("adminSession", {
  ok: true,
  passwordToken: getAdminPassword(),
- adminId: profile && profile.id ? String(profile.id) : (localStorage.getItem("currentAdminProfileId") || null),
+ adminId: profile && profile.id ? String(profile.id) : (InspectStorage.getItem("currentAdminProfileId") || null),
  createdAt: new Date().toISOString()
  });
 }
@@ -3432,7 +3456,7 @@ function hasAdminSession() {
  }
 
  if (CLOUD_ENABLED) {
- const id = session.adminId || localStorage.getItem("currentAdminProfileId");
+ const id = session.adminId || InspectStorage.getItem("currentAdminProfileId");
  const profile = id ? getAdminProfiles().find(a => String(a.id) === String(id)) : null;
  if (!id || !profile) {
  clearAdminSession();
@@ -3468,17 +3492,17 @@ async function saveAdminProfile(profile) {
 }
 
 function setCurrentAdminProfile(profile) {
- localStorage.setItem("currentAdminProfileId", String(profile.id));
+ InspectStorage.setItem("currentAdminProfileId", String(profile.id));
  LocalDB.set("adminProfile", profile);
 }
 
 function clearCurrentAdminProfile() {
- localStorage.removeItem("currentAdminProfileId");
+ InspectStorage.removeItem("currentAdminProfileId");
  LocalDB.remove("adminProfile");
 }
 
 function getCurrentAdminProfile() {
- const id = localStorage.getItem("currentAdminProfileId");
+ const id = InspectStorage.getItem("currentAdminProfileId");
  const cloudProfile = id ? getAdminProfiles().find(a => String(a.id) === String(id)) : null;
 
  if (CLOUD_ENABLED) {
@@ -3526,13 +3550,13 @@ async function ensureFounderEmployee(name) {
  if (CLOUD_ENABLED && db) {
  await biz("staff").doc(String(founder.id)).set(founder, { merge: true });
  }
- localStorage.setItem("currentFounderId", String(founder.id));
+ InspectStorage.setItem("currentFounderId", String(founder.id));
  LocalDB.set("founderProfile", founder);
  return founder;
 }
 
 function getCurrentFounderProfile() {
- const id = localStorage.getItem("currentFounderId") || (LocalDB.get("founderSession") || {}).founderId;
+ const id = InspectStorage.getItem("currentFounderId") || (LocalDB.get("founderSession") || {}).founderId;
  const cloud = id ? getStaff().find(s => String(s.id) === String(id) && String(s.role || '') === 'founder') : null;
  return cloud || LocalDB.get("founderProfile") || null;
 }
@@ -3613,7 +3637,7 @@ async function purgeLegacyDrovaEmployeesOnce() {
 
 async function initCloud() {
  if (!CLOUD_ENABLED) {
- console.warn("Firebase config не заполнен. Работаем локально через localStorage.");
+ console.warn("Firebase config не заполнен. Работаем через изолированное localStorage.");
  appCache.staff = LocalDB.get("staff") || [];
  appCache.departments = LocalDB.get("departments") || [];
  appCache.reports = filterRecentPhotoReports(LocalDB.get("reports") || []);
@@ -3646,6 +3670,11 @@ async function initCloud() {
 
  firebase.initializeApp(firebaseConfig);
  db = firebase.firestore();
+
+ // A clean 1.029 install intentionally has no namespaced businessId yet.
+ // Keep Firebase ready for create/join, but do not query a null business or
+ // create shared settings before the user has selected their Inspector business.
+ if (!getCurrentBusinessId()) return;
 
  await loadCloudData();
  await purgeLegacyDrovaEmployeesOnce();
@@ -3891,15 +3920,15 @@ function refreshVisibleData() {
 }
 
 function getCurrentWaiterId() {
- return localStorage.getItem("currentWaiterId");
+ return InspectStorage.getItem("currentWaiterId");
 }
 
 function clearCurrentWaiter() {
- localStorage.removeItem("currentWaiterId");
- localStorage.removeItem("currentStaffId_waiter");
- if (localStorage.getItem("currentStaffRole") === 'waiter') {
- localStorage.removeItem("currentStaffId");
- localStorage.removeItem("currentStaffRole");
+ InspectStorage.removeItem("currentWaiterId");
+ InspectStorage.removeItem("currentStaffId_waiter");
+ if (InspectStorage.getItem("currentStaffRole") === 'waiter') {
+ InspectStorage.removeItem("currentStaffId");
+ InspectStorage.removeItem("currentStaffRole");
  LocalDB.remove("staffProfile");
  }
  LocalDB.remove("waiter");
@@ -3907,7 +3936,7 @@ function clearCurrentWaiter() {
 }
 
 function getWaiter() {
- if (hasFounderSession() && localStorage.getItem("founderActiveRole") === 'waiter') {
+ if (hasFounderSession() && InspectStorage.getItem("founderActiveRole") === 'waiter') {
  return getFounderActor('waiter');
  }
 
@@ -3930,7 +3959,7 @@ function getWaiter() {
 }
 
 function setWaiter(data) {
- localStorage.setItem("currentWaiterId", String(data.id));
+ InspectStorage.setItem("currentWaiterId", String(data.id));
  LocalDB.set("waiter", data);
 
  const idx = appCache.staff.findIndex(s => String(s.id) === String(data.id));
@@ -4182,12 +4211,12 @@ function generateJoinCode() {
 }
 
 function getCurrentBusinessId() {
- return localStorage.getItem('businessId') || null;
+ return InspectStorage.getItem('businessId') || null;
 }
 
 function setCurrentBusinessId(id) {
- if (id) localStorage.setItem('businessId', String(id));
- else localStorage.removeItem('businessId');
+ if (id) InspectStorage.setItem('businessId', String(id));
+ else InspectStorage.removeItem('businessId');
 }
 
 function getCurrentBusiness() {
@@ -4393,48 +4422,48 @@ function clearSavedAccessRequest() {
 
 function setCurrentStaffSession(staff) {
  const role = String(staff.role || 'waiter');
- localStorage.setItem("currentStaffId", String(staff.id));
- localStorage.setItem("currentStaffRole", role);
- localStorage.setItem("currentStaffId_" + role, String(staff.id));
+ InspectStorage.setItem("currentStaffId", String(staff.id));
+ InspectStorage.setItem("currentStaffRole", role);
+ InspectStorage.setItem("currentStaffId_" + role, String(staff.id));
  LocalDB.set("staffProfile", staff);
  LocalDB.set("staffProfile_" + role, staff);
 
  if (role === 'waiter') {
- localStorage.setItem("currentWaiterId", String(staff.id));
+ InspectStorage.setItem("currentWaiterId", String(staff.id));
  LocalDB.set("waiter", staff);
  }
 }
 
 function clearStaffRoleSession(role) {
  if (!role) return;
- localStorage.removeItem("currentStaffId_" + role);
+ InspectStorage.removeItem("currentStaffId_" + role);
  LocalDB.remove("staffProfile_" + role);
- if (String(localStorage.getItem("currentStaffRole")) === String(role)) {
- localStorage.removeItem("currentStaffId");
- localStorage.removeItem("currentStaffRole");
+ if (String(InspectStorage.getItem("currentStaffRole")) === String(role)) {
+ InspectStorage.removeItem("currentStaffId");
+ InspectStorage.removeItem("currentStaffRole");
  LocalDB.remove("staffProfile");
  }
  if (role === 'waiter') {
- localStorage.removeItem("currentWaiterId");
+ InspectStorage.removeItem("currentWaiterId");
  LocalDB.remove("waiter");
  }
 }
 
 function getCurrentApprovedStaffForRole(role) {
  if (hasFounderSession()) {
- const founderRole = localStorage.getItem("founderActiveRole") || role || 'founder';
+ const founderRole = InspectStorage.getItem("founderActiveRole") || role || 'founder';
  return getFounderActor(founderRole);
  }
 
- const roleId = role ? localStorage.getItem("currentStaffId_" + role) : null;
- const fallbackId = localStorage.getItem("currentStaffId") || getCurrentWaiterId();
+ const roleId = role ? InspectStorage.getItem("currentStaffId_" + role) : null;
+ const fallbackId = InspectStorage.getItem("currentStaffId") || getCurrentWaiterId();
  const id = roleId || fallbackId;
  if (!id) return null;
 
  const cloudStaff = getStaff().find(s => String(s.id) === String(id));
  if (CLOUD_ENABLED) {
  if (!cloudStaff) {
- clearStaffRoleSession(role || localStorage.getItem("currentStaffRole"));
+ clearStaffRoleSession(role || InspectStorage.getItem("currentStaffRole"));
  return null;
  }
  return cloudStaff;
@@ -4444,7 +4473,7 @@ function getCurrentApprovedStaffForRole(role) {
 }
 
 function getCurrentApprovedStaff() {
- return getCurrentApprovedStaffForRole(localStorage.getItem("currentStaffRole") || null);
+ return getCurrentApprovedStaffForRole(InspectStorage.getItem("currentStaffRole") || null);
 }
 
 function showRoleMismatch(staff, requestedRole) {
@@ -4455,7 +4484,7 @@ function showRoleMismatch(staff, requestedRole) {
 function openRoleAsFounder(role) {
  if (!EMPLOYEE_ROLES.includes(role)) return;
 
- localStorage.setItem("founderActiveRole", role);
+ InspectStorage.setItem("founderActiveRole", role);
  clearSavedAccessRequest();
 
  if (role === 'waiter') {
@@ -4945,7 +4974,7 @@ async function deleteStaff(staffId) {
 
  const currentWaiterId = getCurrentWaiterId();
  if (String(currentWaiterId) === id) {
- localStorage.removeItem("currentWaiterId");
+ InspectStorage.removeItem("currentWaiterId");
  LocalDB.remove("waiter");
  }
 
@@ -6021,7 +6050,7 @@ async function submitCreateBusiness() {
  try {
  const founderProfile = await ensureFounderEmployee(name);
  setFounderSession(founderProfile);
- localStorage.setItem('founderActiveRole', 'founder');
+ InspectStorage.setItem('founderActiveRole', 'founder');
  // Перезагружаем страницу: все real-time подписки на Firestore (onSnapshot)
  // создаются один раз при старте приложения и «запоминают» businessId,
  // который был известен в тот момент. Раз businessId только что появился,
@@ -6065,7 +6094,7 @@ async function submitFounderRecovery() {
  try {
  const founderProfile = await ensureFounderEmployee(name);
  setFounderSession(founderProfile);
- localStorage.setItem('founderActiveRole', 'founder');
+ InspectStorage.setItem('founderActiveRole', 'founder');
  location.reload();
  } catch (e) {
  console.error(e);
@@ -6150,8 +6179,8 @@ async function submitEmployeeCode() {
  }
 
  enterBusiness(business);
- localStorage.setItem('pendingJoinDepartmentId', String(foundDep.id));
- localStorage.setItem('pendingJoinDepartmentName', foundDep.name || '');
+ InspectStorage.setItem('pendingJoinDepartmentId', String(foundDep.id));
+ InspectStorage.setItem('pendingJoinDepartmentName', foundDep.name || '');
  location.reload();
 }
 
@@ -6167,7 +6196,7 @@ async function submitEmployeeJoinConfirm() {
  }
  err.classList.remove('show');
 
- const depId = localStorage.getItem('pendingJoinDepartmentId');
+ const depId = InspectStorage.getItem('pendingJoinDepartmentId');
  const dep = getDepartment(depId);
  const nowIso = new Date().toISOString();
  const staffMember = fillTelegramMeta({
@@ -6190,8 +6219,8 @@ async function submitEmployeeJoinConfirm() {
  }
 
  setWaiter(staffMember);
- localStorage.removeItem('pendingJoinDepartmentId');
- localStorage.removeItem('pendingJoinDepartmentName');
+ InspectStorage.removeItem('pendingJoinDepartmentId');
+ InspectStorage.removeItem('pendingJoinDepartmentName');
  showToast('Добро пожаловать ✓');
  screenStack = ['screen-home'];
  document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active'));
@@ -6915,7 +6944,7 @@ function enterWaiter() {
 
 function enterFounder() {
  if (hasFounderSession()) {
- localStorage.setItem("founderActiveRole", 'founder');
+ InspectStorage.setItem("founderActiveRole", 'founder');
  goTo('screen-founder-menu');
  renderFounderMenu();
  return;
@@ -9714,7 +9743,7 @@ let activeRepairPhotoSet = [];
 let activeRepairFixedPhotoSet = [];
 
 function getCurrentTechnician() {
- if (hasFounderSession() && localStorage.getItem("founderActiveRole") === 'technician') return getFounderActor('technician');
+ if (hasFounderSession() && InspectStorage.getItem("founderActiveRole") === 'technician') return getFounderActor('technician');
  const current = getCurrentApprovedStaffForRole('technician');
  if (!current || current.role !== 'technician') return null;
  return current;
@@ -9886,7 +9915,7 @@ function renderTechnicianRepairs() {
 
 async function openRepairView(reqId, mode) {
  activeRepairViewId = String(reqId);
- localStorage.setItem('repairViewMode', mode || 'technician');
+ InspectStorage.setItem('repairViewMode', mode || 'technician');
  activeRepairClosePhotos = [];
  const req = getRepairRequests().find(r => String(r.id) === String(reqId));
  if (req && mode === 'founder') {
@@ -9914,7 +9943,7 @@ function renderRepairView() {
  const content = document.getElementById('repair-view-content');
  if (!title || !content) return;
  if (!req) { title.textContent = 'Заявка'; content.innerHTML = `<div class="empty"><div class="empty-icon">🛠️</div><div class="empty-title">Заявка не найдена</div></div>`; return; }
- const mode = localStorage.getItem('repairViewMode') || 'technician';
+ const mode = InspectStorage.getItem('repairViewMode') || 'technician';
  const dateText = req.date ? `${formatDateRu(req.date)}${req.time ? ' · ' + req.time : ''}` : '';
  title.textContent = 'Поломка';
  activeRepairPhotoSet = normalizeRepairPhotoList(req.photos);
@@ -9989,7 +10018,7 @@ let activeBathmasterTab = 'staff';
 let activeOrderSourceRole = 'bathmaster';
 
 function getCurrentMasseur() {
- if (hasFounderSession() && localStorage.getItem("founderActiveRole") === 'masseur') {
+ if (hasFounderSession() && InspectStorage.getItem("founderActiveRole") === 'masseur') {
  return getFounderActor('masseur');
  }
 
@@ -10035,7 +10064,7 @@ function getOrderRoleLabel(sourceRole = activeOrderSourceRole || 'bathmaster') {
 }
 
 function getCurrentBathmaster() {
- if (hasFounderSession() && localStorage.getItem("founderActiveRole") === 'bathmaster') {
+ if (hasFounderSession() && InspectStorage.getItem("founderActiveRole") === 'bathmaster') {
  return getFounderActor('bathmaster');
  }
 
@@ -11741,7 +11770,7 @@ async function deleteAdminProfileById(adminId) {
  appCache.adminProfiles = getAdminProfiles().filter(a => String(a.id) !== id);
  LocalDB.set("adminProfiles", appCache.adminProfiles);
 
- if (String(localStorage.getItem("currentAdminProfileId")) === id) {
+ if (String(InspectStorage.getItem("currentAdminProfileId")) === id) {
  clearAdminSession();
  clearCurrentAdminProfile();
  }
@@ -12142,7 +12171,7 @@ async function checkFounderPwd() {
  try {
  const founderProfile = await ensureFounderEmployee(name);
  setFounderSession(founderProfile);
- localStorage.setItem("founderActiveRole", 'founder');
+ InspectStorage.setItem("founderActiveRole", 'founder');
  screenStack.pop();
  document.getElementById('screen-founder-login').classList.remove('active');
  goTo('screen-founder-menu');
@@ -12721,11 +12750,11 @@ async function saveFounderEmployeeProfile() {
  if (CLOUD_ENABLED && db) {
  await biz("staff").doc(String(employee.id)).set(clean, { merge: true });
  }
- const currentRole = localStorage.getItem("currentStaffRole");
- if (String(localStorage.getItem("currentStaffId_" + clean.role)) === String(clean.id)) {
+ const currentRole = InspectStorage.getItem("currentStaffRole");
+ if (String(InspectStorage.getItem("currentStaffId_" + clean.role)) === String(clean.id)) {
  LocalDB.set("staffProfile_" + clean.role, clean);
  }
- if (currentRole === clean.role && String(localStorage.getItem("currentStaffId")) === String(clean.id)) {
+ if (currentRole === clean.role && String(InspectStorage.getItem("currentStaffId")) === String(clean.id)) {
  LocalDB.set("staffProfile", clean);
  }
  if (clean.role === 'waiter' && String(getCurrentWaiterId()) === String(clean.id)) {
@@ -13026,10 +13055,10 @@ async function init() {
 
  // После перезагрузки, вызванной submitEmployeeCode(), businessId уже
  // проставлен и подразделение известно — остаётся только спросить имя.
- const pendingJoinDepartmentId = localStorage.getItem('pendingJoinDepartmentId');
+ const pendingJoinDepartmentId = InspectStorage.getItem('pendingJoinDepartmentId');
  if (pendingJoinDepartmentId) {
  const depNameEl = document.getElementById('employee-join-dep-name');
- if (depNameEl) depNameEl.textContent = localStorage.getItem('pendingJoinDepartmentName') || 'Подразделение';
+ if (depNameEl) depNameEl.textContent = InspectStorage.getItem('pendingJoinDepartmentName') || 'Подразделение';
  screenStack = ['screen-home', 'screen-employee-join-confirm'];
  document.getElementById('screen-home').classList.remove('active');
  document.getElementById('screen-employee-join-confirm').classList.add('active');
@@ -13061,7 +13090,7 @@ function initTheme() {
  // Три темы на выбор в настройках учредителя: системная (наш бренд, по умолчанию),
  // тёплая (кремовая) и тёмная. Выбор запоминается — теперь это осознанное решение
  // через настройки, а не временный тумблер, поэтому больше не сбрасываем на каждой загрузке.
- const saved = localStorage.getItem('appTheme');
+ const saved = InspectStorage.getItem('appTheme');
  const valid = ['system', 'light', 'dark'];
  applyTheme(valid.includes(saved) ? saved : 'system');
 }
@@ -13071,7 +13100,7 @@ function applyTheme(theme) {
  document.body.classList.remove('light', 'system');
  if (t === 'light') document.body.classList.add('light');
  if (t === 'system') document.body.classList.add('system');
- localStorage.setItem('appTheme', t);
+ InspectStorage.setItem('appTheme', t);
  const select = document.getElementById('theme-select');
  if (select) select.value = t;
  const icon = document.getElementById('theme-toggle-icon');
@@ -13088,7 +13117,7 @@ function applyTheme(theme) {
 
 function toggleTheme() {
  const order = ['system', 'light', 'dark'];
- const current = localStorage.getItem('appTheme') || 'system';
+ const current = InspectStorage.getItem('appTheme') || 'system';
  const next = order[(order.indexOf(current) + 1) % order.length];
  applyTheme(next);
 }
@@ -13151,7 +13180,7 @@ const RU_UZ_DICT = {
 "⛔ Стоп-лист очищен Откройте приложение → своё подразделение → Стоп лист": "⛔ Stop-list tozalandi Ilovani oching → o'z bo'limingiz → Stop-list",
 "Например: срочно проверить стейшн, вынести мусор, подготовить баню...": "Masalan: shoshilinch stansiyani tekshirish, axlatni chiqarish, hammomni tayyorlash...",
 "Удалить черновик этого фотоотчета? Фото из черновика будут сброшены.": "Ushbu foto hisobot qoralamasini o'chirasizmi? Qoralamadagi fotolar bekor qilinadi.",
-"Firebase config не заполнен. Работаем локально через localStorage.": "Firebase konfiguratsiyasi kiritilmagan. localStorage orqali lokal ishlayapmiz.",
+"Firebase config не заполнен. Работаем через изолированное localStorage.": "Firebase konfiguratsiyasi kiritilmagan. Izolyatsiyalangan localStorage orqali ishlayapmiz.",
 "Учредитель увидит, кто закрыл задачу, время и прикрепленные фото.": "Muassis vazifani kim yopganini, vaqtni va biriktirilgan fotolarni ko'radi.",
 "Например: течёт кран, не работает свет, сломалась ручка двери...": "Masalan: kran oqmoqda, yorug'lik ishlamayapti, eshik dastagi singan...",
 "Все фотоотчёты за выбранную дату будут удалены из приложения.": "Tanlangan sanadagi barcha foto hisobotlar ilovadan o'chiriladi.",
@@ -14099,7 +14128,7 @@ function setupLanguageObserver() {
 
 function applyLanguage(lang) {
   currentLang = lang === 'uz' ? 'uz' : 'ru';
-  localStorage.setItem('appLang', currentLang);
+  InspectStorage.setItem('appLang', currentLang);
   document.documentElement.lang = currentLang === 'uz' ? 'uz' : 'ru';
   const btn = document.getElementById('lang-toggle-btn');
   if (btn) btn.textContent = currentLang === 'uz' ? 'RU' : 'UZ';
