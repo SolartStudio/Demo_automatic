@@ -1484,7 +1484,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm" data-i18n-skip></div>
-   <div class="app-version" id="app-version-label">Версия 1.029</div>
+   <div class="app-version" id="app-version-label">Версия 1.030</div>
  </div>
 </div>
 
@@ -3160,7 +3160,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.029";
+const APP_VERSION = "1.030";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
@@ -3203,6 +3203,20 @@ function biz(collectionName) {
  delete: () => ref.doc(id).delete()
  })
  };
+}
+
+// Firestore requires a separate composite index for every query that combines
+// where(businessId) with orderBy(createdAt). The demo project does not need a
+// forest of indexes: fetch the already scoped rows and sort them in the client.
+// This also prevents one missing index from breaking the whole application.
+function rowsFromSnapshot(snapshot, direction = 'asc') {
+ const rows = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ const multiplier = direction === 'desc' ? -1 : 1;
+ return rows.sort((a, b) => {
+ const aTime = Date.parse(a.createdAt || a.updatedAt || 0) || 0;
+ const bTime = Date.parse(b.createdAt || b.updatedAt || 0) || 0;
+ return (aTime - bTime) * multiplier;
+ });
 }
 
 const appCache = {
@@ -3664,20 +3678,33 @@ async function initCloud() {
  appCache.anonymousFeedback = LocalDB.get("anonymousFeedback") || [];
  appCache.kpiContent = LocalDB.get("kpiContent") || getDefaultKpiContent();
  appCache.stopList = LocalDB.get("stopList") || getDefaultStopList();
- await purgeLegacyDrovaEmployeesOnce();
+ // Legacy Drova cleanup is deliberately disabled in 1.030. Storage is already
+ // isolated, and running a destructive cleanup for a new business could delete
+ // legitimate employees when the old marker is absent.
  return;
  }
 
  firebase.initializeApp(firebaseConfig);
  db = firebase.firestore();
 
- // A clean 1.029 install intentionally has no namespaced businessId yet.
+ // A clean 1.030 install intentionally has no namespaced businessId yet.
  // Keep Firebase ready for create/join, but do not query a null business or
  // create shared settings before the user has selected their Inspector business.
  if (!getCurrentBusinessId()) return;
 
+ // Finish writes that were saved locally while the network was unavailable
+ // before downloading the remote snapshot, so fresh local departments are not
+ // visually replaced by an older cloud state.
+ await flushPendingDepartmentWrites();
+
+ // Initial loading is best effort. A failure in a secondary collection must
+ // not prevent the independent real-time listeners below from restoring the
+ // critical departments and staff collections.
+ try {
  await loadCloudData();
- await purgeLegacyDrovaEmployeesOnce();
+ } catch (err) {
+ console.warn('partial cloud preload failed; listeners will continue', err);
+ }
  await cleanupExpiredPhotoReports();
 
  biz("staff").onSnapshot((snapshot) => {
@@ -3689,8 +3716,8 @@ async function initCloud() {
  showToast("Ошибка загрузки сотрудников");
  });
 
- biz("departments").orderBy("createdAt", "asc").onSnapshot((snapshot) => {
- appCache.departments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ biz("departments").onSnapshot((snapshot) => {
+ appCache.departments = rowsFromSnapshot(snapshot, 'asc');
  LocalDB.set("departments", appCache.departments);
  applyDepartmentLabels(getPrimaryDepartment());
  renderHomeGrid();
@@ -3701,8 +3728,8 @@ async function initCloud() {
  showToast("Ошибка загрузки подразделений");
  });
 
- biz("reports").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
- const allReports = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ biz("reports").onSnapshot((snapshot) => {
+ const allReports = rowsFromSnapshot(snapshot, 'desc');
  appCache.reports = filterRecentPhotoReports(allReports);
  LocalDB.set("reports", appCache.reports);
  refreshVisibleData();
@@ -3711,32 +3738,32 @@ async function initCloud() {
  showToast("Ошибка загрузки отчетов");
  });
 
- biz("fines").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
- appCache.fines = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ biz("fines").onSnapshot((snapshot) => {
+ appCache.fines = rowsFromSnapshot(snapshot, 'desc');
  refreshVisibleData();
  }, (err) => {
  console.error("fines snapshot error", err);
  showToast("Ошибка загрузки штрафов");
  });
 
- biz("inventoryRecords").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
- appCache.inventoryRecords = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ biz("inventoryRecords").onSnapshot((snapshot) => {
+ appCache.inventoryRecords = rowsFromSnapshot(snapshot, 'desc');
  refreshVisibleData();
  }, (err) => {
  console.error("inventory snapshot error", err);
  showToast("Ошибка загрузки инвентаризации");
  });
 
- biz("adminStats").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
- appCache.adminStats = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ biz("adminStats").onSnapshot((snapshot) => {
+ appCache.adminStats = rowsFromSnapshot(snapshot, 'desc');
  refreshVisibleData();
  }, (err) => {
  console.error("admin stats snapshot error", err);
  showToast("Ошибка загрузки статистики");
  });
 
- biz("adminProfiles").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
- appCache.adminProfiles = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ biz("adminProfiles").onSnapshot((snapshot) => {
+ appCache.adminProfiles = rowsFromSnapshot(snapshot, 'desc');
  LocalDB.set("adminProfiles", appCache.adminProfiles);
  refreshVisibleData();
  }, (err) => {
@@ -3744,24 +3771,24 @@ async function initCloud() {
  showToast("Ошибка загрузки администраторов");
  });
 
- biz("bathmasterOrders").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
- appCache.bathmasterOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ biz("bathmasterOrders").onSnapshot((snapshot) => {
+ appCache.bathmasterOrders = rowsFromSnapshot(snapshot, 'desc');
  refreshVisibleData();
  }, (err) => {
  console.error("bathmaster orders snapshot error", err);
  showToast("Ошибка загрузки заказов");
  });
 
- biz("repairRequests").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
- appCache.repairRequests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ biz("repairRequests").onSnapshot((snapshot) => {
+ appCache.repairRequests = rowsFromSnapshot(snapshot, 'desc');
  refreshVisibleData();
  }, (err) => {
  console.error("repair requests snapshot error", err);
  showToast("Ошибка загрузки поломок");
  });
 
- biz("cookStaffReports").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
- appCache.cookStaffReports = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ biz("cookStaffReports").onSnapshot((snapshot) => {
+ appCache.cookStaffReports = rowsFromSnapshot(snapshot, 'desc');
  LocalDB.set("cookStaffReports", appCache.cookStaffReports);
  refreshVisibleData();
  }, (err) => {
@@ -3769,8 +3796,8 @@ async function initCloud() {
  showToast("Ошибка загрузки отчетов повара");
  });
 
- biz("adminTrainingReports").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
- appCache.adminTrainingReports = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ biz("adminTrainingReports").onSnapshot((snapshot) => {
+ appCache.adminTrainingReports = rowsFromSnapshot(snapshot, 'desc');
  LocalDB.set("adminTrainingReports", appCache.adminTrainingReports);
  refreshVisibleData();
  }, (err) => {
@@ -3778,8 +3805,8 @@ async function initCloud() {
  showToast("Ошибка загрузки отчетов обучения");
  });
 
- biz("founderTasks").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
- appCache.founderTasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ biz("founderTasks").onSnapshot((snapshot) => {
+ appCache.founderTasks = rowsFromSnapshot(snapshot, 'desc');
  LocalDB.set("founderTasks", appCache.founderTasks);
  LocalDB.set("forgottenItems", appCache.forgottenItems);
  refreshVisibleData();
@@ -3788,8 +3815,8 @@ async function initCloud() {
  showToast("Ошибка загрузки задач");
  });
 
- biz("forgottenItems").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
- appCache.forgottenItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ biz("forgottenItems").onSnapshot((snapshot) => {
+ appCache.forgottenItems = rowsFromSnapshot(snapshot, 'desc');
  LocalDB.set("forgottenItems", appCache.forgottenItems);
  refreshVisibleData();
  }, (err) => {
@@ -3797,8 +3824,8 @@ async function initCloud() {
  showToast("Ошибка загрузки забытых вещей");
  });
 
- biz("anonymousFeedback").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
- appCache.anonymousFeedback = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ biz("anonymousFeedback").onSnapshot((snapshot) => {
+ appCache.anonymousFeedback = rowsFromSnapshot(snapshot, 'desc');
  LocalDB.set("anonymousFeedback", appCache.anonymousFeedback);
  refreshVisibleData();
  }, (err) => {
@@ -3837,41 +3864,41 @@ async function initCloud() {
 async function loadCloudData() {
  const [staffSnap, departmentsSnap, reportsSnap, finesSnap, inventorySnap, accessRequestsSnap, adminStatsSnap, adminProfilesSnap, bathmasterOrdersSnap, repairRequestsSnap, cookStaffReportsSnap, adminTrainingReportsSnap, founderTasksSnap, forgottenItemsSnap, anonymousFeedbackSnap, settingsDoc] = await Promise.all([
  biz("staff").get(),
- biz("departments").orderBy("createdAt", "asc").get(),
- biz("reports").orderBy("createdAt", "desc").get(),
- biz("fines").orderBy("createdAt", "desc").get(),
- biz("inventoryRecords").orderBy("createdAt", "desc").get(),
- biz("accessRequests").orderBy("createdAt", "desc").get(),
- biz("adminStats").orderBy("createdAt", "desc").get(),
- biz("adminProfiles").orderBy("createdAt", "desc").get(),
- biz("bathmasterOrders").orderBy("createdAt", "desc").get(),
- biz("repairRequests").orderBy("createdAt", "desc").get(),
- biz("cookStaffReports").orderBy("createdAt", "desc").get(),
- biz("adminTrainingReports").orderBy("createdAt", "desc").get(),
- biz("founderTasks").orderBy("createdAt", "desc").get(),
- biz("forgottenItems").orderBy("createdAt", "desc").get(),
- biz("anonymousFeedback").orderBy("createdAt", "desc").get(),
+ biz("departments").get(),
+ biz("reports").get(),
+ biz("fines").get(),
+ biz("inventoryRecords").get(),
+ biz("accessRequests").get(),
+ biz("adminStats").get(),
+ biz("adminProfiles").get(),
+ biz("bathmasterOrders").get(),
+ biz("repairRequests").get(),
+ biz("cookStaffReports").get(),
+ biz("adminTrainingReports").get(),
+ biz("founderTasks").get(),
+ biz("forgottenItems").get(),
+ biz("anonymousFeedback").get(),
  db.collection("settings").doc(getCurrentBusinessId()).get()
  ]);
 
  appCache.staff = staffSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
- appCache.departments = departmentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ appCache.departments = rowsFromSnapshot(departmentsSnap, 'asc');
  LocalDB.set("departments", appCache.departments);
  applyDepartmentLabels(getPrimaryDepartment());
- const loadedReports = reportsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ const loadedReports = rowsFromSnapshot(reportsSnap, 'desc');
  appCache.reports = filterRecentPhotoReports(loadedReports);
- appCache.fines = finesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
- appCache.inventoryRecords = inventorySnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
- appCache.accessRequests = accessRequestsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
- appCache.adminStats = adminStatsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
- appCache.adminProfiles = adminProfilesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
- appCache.bathmasterOrders = bathmasterOrdersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
- appCache.repairRequests = repairRequestsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
- appCache.cookStaffReports = cookStaffReportsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
- appCache.adminTrainingReports = adminTrainingReportsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
- appCache.founderTasks = founderTasksSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
- appCache.forgottenItems = forgottenItemsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
- appCache.anonymousFeedback = anonymousFeedbackSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+ appCache.fines = rowsFromSnapshot(finesSnap, 'desc');
+ appCache.inventoryRecords = rowsFromSnapshot(inventorySnap, 'desc');
+ appCache.accessRequests = rowsFromSnapshot(accessRequestsSnap, 'desc');
+ appCache.adminStats = rowsFromSnapshot(adminStatsSnap, 'desc');
+ appCache.adminProfiles = rowsFromSnapshot(adminProfilesSnap, 'desc');
+ appCache.bathmasterOrders = rowsFromSnapshot(bathmasterOrdersSnap, 'desc');
+ appCache.repairRequests = rowsFromSnapshot(repairRequestsSnap, 'desc');
+ appCache.cookStaffReports = rowsFromSnapshot(cookStaffReportsSnap, 'desc');
+ appCache.adminTrainingReports = rowsFromSnapshot(adminTrainingReportsSnap, 'desc');
+ appCache.founderTasks = rowsFromSnapshot(founderTasksSnap, 'desc');
+ appCache.forgottenItems = rowsFromSnapshot(forgottenItemsSnap, 'desc');
+ appCache.anonymousFeedback = rowsFromSnapshot(anonymousFeedbackSnap, 'desc');
  LocalDB.set("staff", appCache.staff);
  LocalDB.set("adminProfiles", appCache.adminProfiles);
  LocalDB.set("founderTasks", appCache.founderTasks);
@@ -3897,8 +3924,8 @@ async function loadCloudData() {
 
  if (!settingsDoc.exists) {
  await db.collection("settings").doc(getCurrentBusinessId()).set({
- founderPassword: "5552",
- adminPassword: "3235",
+ founderPassword: appCache.founderPassword || "5552",
+ adminPassword: appCache.adminPassword || "3235",
  dutyAssignment: null,
  dutyAssignmentsByDate: {},
  kpiContent: appCache.kpiContent || getDefaultKpiContent(),
@@ -4098,14 +4125,48 @@ function getDepartments() {
  });
 }
 
-function setDepartments(arr) {
- appCache.departments = arr;
- LocalDB.set("departments", arr);
- if (CLOUD_ENABLED && db) {
- arr.forEach(d => {
+async function setDepartments(arr) {
+ const businessId = getCurrentBusinessId();
+ const scopedDepartments = (Array.isArray(arr) ? arr : []).map(d =>
+ businessId ? { ...d, businessId: d.businessId || businessId } : { ...d }
+ );
+
+ appCache.departments = scopedDepartments;
+ LocalDB.set("departments", scopedDepartments);
+
+ if (CLOUD_ENABLED && db && businessId) {
+ try {
+ await Promise.all(scopedDepartments.map(d =>
  biz("departments").doc(String(d.id)).set(d, { merge: true })
- .catch(err => console.error("department save error", err));
- });
+ ));
+ LocalDB.remove('pendingDepartmentWrites');
+ } catch (err) {
+ // Keep the exact scoped payload for an automatic retry on the next start.
+ LocalDB.set('pendingDepartmentWrites', scopedDepartments);
+ console.warn('department cloud save deferred', err);
+ showToast('Связь с базой нестабильна — подразделение сохранено локально');
+ }
+ }
+}
+
+async function flushPendingDepartmentWrites() {
+ if (!CLOUD_ENABLED || !db) return;
+ const businessId = getCurrentBusinessId();
+ const pending = LocalDB.get('pendingDepartmentWrites');
+ if (!businessId || !Array.isArray(pending) || !pending.length) return;
+
+ const currentBusinessRows = pending.filter(d => String(d.businessId || '') === String(businessId));
+ if (!currentBusinessRows.length) return;
+
+ try {
+ await Promise.all(currentBusinessRows.map(d =>
+ biz('departments').doc(String(d.id)).set(d, { merge: true })
+ ));
+ const remaining = pending.filter(d => String(d.businessId || '') !== String(businessId));
+ if (remaining.length) LocalDB.set('pendingDepartmentWrites', remaining);
+ else LocalDB.remove('pendingDepartmentWrites');
+ } catch (err) {
+ console.warn('pending department sync failed', err);
  }
 }
 
@@ -4187,7 +4248,7 @@ async function createDepartment(name, logoText) {
  };
 
  const arr = [...getDepartments(), dep];
- setDepartments(arr);
+ await setDepartments(arr);
  applyDepartmentLabels(dep);
  return dep;
 }
@@ -4254,7 +4315,14 @@ async function createBusiness(founderName, companyName, password) {
 
  if (CLOUD_ENABLED && db) {
  try {
- await db.collection('businesses').doc(businessId).set(business);
+ await Promise.all([
+ db.collection('businesses').doc(businessId).set(business),
+ db.collection('settings').doc(businessId).set({
+ founderPassword: cleanPassword,
+ adminPassword: appCache.adminPassword || '3235',
+ updatedAt: new Date().toISOString()
+ }, { merge: true })
+ ]);
  } catch (err) {
  console.error('createBusiness error', err);
  return { error: 'Не удалось сохранить бизнес. Проверьте соединение.' };
@@ -4293,8 +4361,12 @@ function enterBusiness(business) {
  appCache.business = business;
  setCurrentBusinessId(business.id);
  LocalDB.set('business', business);
+ // Employee entry by department code intentionally uses only businessId and
+ // must not depend on (or cache) the founder password.
+ if (business.founderPassword) {
  appCache.founderPassword = business.founderPassword;
  LocalDB.set('founderPassword', business.founderPassword);
+ }
 }
 
 async function updateDepartment(id, patch) {
@@ -4302,7 +4374,7 @@ async function updateDepartment(id, patch) {
  const idx = arr.findIndex(d => String(d.id) === String(id));
  if (idx === -1) return null;
  arr[idx] = { ...arr[idx], ...patch, updatedAt: new Date().toISOString() };
- setDepartments(arr);
+ await setDepartments(arr);
  applyDepartmentLabels(getPrimaryDepartment());
  return arr[idx];
 }
@@ -4362,7 +4434,7 @@ async function deleteDepartment(id) {
  }
 
  const arr = getDepartments().filter(d => String(d.id) !== String(id));
- setDepartments(arr);
+ await setDepartments(arr);
  if (CLOUD_ENABLED && db) {
  await biz("departments").doc(String(id)).delete().catch(err => console.error("department delete error", err));
  }
@@ -6172,13 +6244,24 @@ async function submitEmployeeCode() {
  console.error('submitEmployeeCode business lookup error', e);
  }
 
+ // The department document already contains the authoritative businessId.
+ // A missing/offline businesses document must not block a valid employee code.
  if (!business) {
- err.textContent = 'Не удалось найти компанию по этому коду';
- err.classList.add('show');
- return;
+ business = {
+ id: String(foundDep.businessId),
+ companyName: foundDep.companyName || '',
+ joinedByDepartmentCode: true
+ };
  }
 
  enterBusiness(business);
+ const cachedDeps = LocalDB.get('departments') || [];
+ const pendingDepartment = { ...foundDep, businessId: String(foundDep.businessId) };
+ const nextDeps = cachedDeps.filter(d => String(d.id) !== String(foundDep.id));
+ nextDeps.push(pendingDepartment);
+ appCache.departments = nextDeps;
+ LocalDB.set('departments', nextDeps);
+ LocalDB.set('pendingJoinDepartment', pendingDepartment);
  InspectStorage.setItem('pendingJoinDepartmentId', String(foundDep.id));
  InspectStorage.setItem('pendingJoinDepartmentName', foundDep.name || '');
  location.reload();
@@ -6197,15 +6280,25 @@ async function submitEmployeeJoinConfirm() {
  err.classList.remove('show');
 
  const depId = InspectStorage.getItem('pendingJoinDepartmentId');
- const dep = getDepartment(depId);
+ const pendingDepartment = LocalDB.get('pendingJoinDepartment');
+ const dep = getDepartment(depId) || (
+ pendingDepartment && String(pendingDepartment.id) === String(depId)
+ ? pendingDepartment
+ : null
+ );
+ if (!depId) {
+ err.textContent = 'Код подразделения потерян. Введите его ещё раз';
+ err.classList.add('show');
+ return;
+ }
  const nowIso = new Date().toISOString();
  const staffMember = fillTelegramMeta({
  id: 'staff_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
  login: 'employee',
  name: name,
  role: 'waiter',
- departmentId: dep ? dep.id : null,
- roleLabel: dep ? dep.name : getRoleLabel('waiter'),
+ departmentId: String(depId),
+ roleLabel: dep ? dep.name : (InspectStorage.getItem('pendingJoinDepartmentName') || getRoleLabel('waiter')),
  approvedAt: nowIso,
  createdAt: nowIso,
  updatedAt: nowIso
@@ -6221,6 +6314,7 @@ async function submitEmployeeJoinConfirm() {
  setWaiter(staffMember);
  InspectStorage.removeItem('pendingJoinDepartmentId');
  InspectStorage.removeItem('pendingJoinDepartmentName');
+ LocalDB.remove('pendingJoinDepartment');
  showToast('Добро пожаловать ✓');
  screenStack = ['screen-home'];
  document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active'));
