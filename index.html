@@ -1530,7 +1530,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm" data-i18n-skip></div>
- <div class="app-version" id="app-version-label">Версия 1.047</div>
+<div class="app-version" id="app-version-label">Версия 1.054</div>
  </div>
 </div>
 
@@ -1674,6 +1674,7 @@
  <span>🌅</span>
  <span id="duty-banner-text">Вы дежурный завтра</span>
  </div>
+ <div id="payroll-shift-control" style="display:none;margin-bottom:18px;"></div>
  <div class="section-label">Меню</div>
  <div id="waiter-menu-dynamic"></div>
 </div>
@@ -1915,14 +1916,6 @@
  </div>
  <span class="menu-arrow">›</span>
  </div>
- <div class="menu-item" onclick="goTo('screen-duty')">
- <div class="menu-icon">🌅</div>
- <div class="menu-text">
- <div class="menu-title">Дежурный на завтра</div>
- <div class="menu-desc">Назначение на смену</div>
- </div>
- <span class="menu-arrow">›</span>
- </div>
  <div class="menu-item" onclick="openAdminWip('Сертификаты')">
  <div class="menu-icon">📜</div>
  <div class="menu-text">
@@ -1946,14 +1939,6 @@
  <div class="menu-desc">Звонки, Telegram и брони</div>
  </div>
  <span class="role-wip">Тестирование</span>
- </div>
- <div class="menu-item" onclick="openAdminTrainingReport()">
- <div class="menu-icon">🎓</div>
- <div class="menu-text">
- <div class="menu-title">Обучение</div>
- <div class="menu-desc">Отчет по обучению официантов</div>
- </div>
- <span class="menu-arrow">›</span>
  </div>
  <div class="menu-item" onclick="openAdminKpi()">
  <div class="menu-icon">📈</div>
@@ -2352,6 +2337,24 @@
  <div class="content content-padded" id="generic-process-list-content"></div>
 </div>
 
+<!-- ===== SCREEN: FOUNDER PAYROLL STAFF LIST ===== -->
+<div class="screen" id="screen-founder-payroll-list">
+ <div class="header">
+ <button class="back-btn" onclick="goBack()">←</button>
+ <span class="header-title" id="founder-payroll-list-title" data-i18n-skip>Рассчитать зарплату</span>
+ </div>
+ <div class="content content-padded" id="founder-payroll-list-content"></div>
+</div>
+
+<!-- ===== SCREEN: FOUNDER PAYROLL EMPLOYEE CALCULATION ===== -->
+<div class="screen" id="screen-founder-payroll-detail">
+ <div class="header">
+ <button class="back-btn" onclick="goBack()">←</button>
+ <span class="header-title" id="founder-payroll-detail-title" data-i18n-skip>Расчёт зарплаты</span>
+ </div>
+ <div class="content content-padded" id="founder-payroll-detail-content"></div>
+</div>
+
 <!-- ===== SCREEN: FOUNDER DEPARTMENT STATISTICS ===== -->
 <div class="screen" id="screen-founder-department-statistics">
  <div class="header">
@@ -2393,11 +2396,6 @@
  </div>
  <div class="content content-padded">
  <div id="dep-add-process-list"></div>
- <div class="divider"></div>
- <div class="field">
- <label>Свой процесс</label>
- <input type="text" id="dep-add-process-custom" placeholder="Например: Кассовая смена">
- </div>
  <button class="btn btn-primary" style="margin-top: 8px;" onclick="submitAddProcesses()">Добавить выбранное</button>
  </div>
 </div>
@@ -2619,14 +2617,6 @@
  </div>
  <span class="menu-arrow">›</span>
  </div>
- <div class="menu-item" onclick="openBathmasterWip('Обучение')">
- <div class="menu-icon">🎓</div>
- <div class="menu-text">
- <div class="menu-title">Обучение</div>
- <div class="menu-desc">Раздел в разработке</div>
- </div>
- <span class="menu-arrow">›</span>
- </div>
  </div>
  <div class="footer">
  <span class="logo-sm">(ваш логотип)</span>
@@ -2643,12 +2633,22 @@
  <div class="section-label">Сообщение управлению</div>
  <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
  <div style="font-size:14px;color:var(--text-2);line-height:1.5;margin-bottom:12px;">
- Напишите, что заканчивается и что нужно купить. Управление увидит имя, дату, время и текст.
+ Напишите, что нужно от управления: вода, вино, фрукты, расходники или другие позиции. Управление увидит имя, дату, время, текст и прикреплённые фото.
  </div>
  <div class="field">
  <label>Что нужно заказать</label>
- <textarea id="bathmaster-order-text" placeholder="Например: закончился веник, нужно 20 штук; мало одноразовых тапочек; купить масло..."></textarea>
+ <textarea id="bathmaster-order-text" placeholder="Например: 10 бутылок воды, 3 ящика фруктов и красное вино..."></textarea>
  <div class="error-msg" id="bathmaster-order-error">Напишите, что нужно заказать</div>
+ </div>
+ <div class="photo-section" style="margin-bottom:14px;">
+ <div class="photo-section-header"><span class="photo-section-title">Фото <span style="font-weight:500;color:var(--text-3);">(по желанию)</span></span><span class="photo-count" id="department-order-photo-count">0 / 5</span></div>
+ <div class="photo-body">
+ <div class="photo-grid" id="department-order-photo-grid" style="display:none;"></div>
+ <div id="department-order-add-btn" class="photo-actions" style="display:grid;gap:8px;">
+ <button type="button" class="add-photo-btn" onclick="openCameraModal('departmentOrder')"><span>📷</span><span>Сделать фото</span></button>
+ <button type="button" class="add-photo-btn" onclick="openGalleryInput('departmentOrder')"><span>🖼️</span><span>Выбрать из галереи</span></button>
+ </div>
+ </div>
  </div>
  <button class="btn btn-primary" onclick="submitBathmasterOrder()">Отправить</button>
  </div>
@@ -2831,7 +2831,7 @@
  <div class="header"><button class="back-btn" onclick="goBack()">←</button><span class="header-title" id="repair-create-title">Поломки</span></div>
  <div class="content content-padded"><div class="section-label">Заявка на ремонт</div><div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
  <div class="field"><label>Описание поломки</label><textarea id="repair-create-text" placeholder="Например: течёт кран, не работает свет, сломалась ручка двери..."></textarea><div class="error-msg" id="repair-create-error">Напишите, что сломалось</div></div>
- <div class="photo-section" style="margin-bottom:0;"><div class="photo-section-header"><span class="photo-section-title">Фото</span><span class="photo-count" id="repair-create-photo-count">0 / 3</span></div><div class="photo-body"><div class="photo-grid" id="repair-create-photo-grid" style="display:none;"></div><div id="repair-create-add-btn" class="photo-actions" style="display:grid;gap:8px;"><button type="button" class="add-photo-btn" onclick="openCameraModal('repairCreate')"><span>📷</span><span>Сделать фото</span></button><button type="button" class="add-photo-btn" onclick="openGalleryInput('repairCreate')"><span>🖼️</span><span>Выбрать из галереи</span></button></div></div></div>
+ <div class="photo-section" style="margin-bottom:0;"><div class="photo-section-header"><span class="photo-section-title">Фото · обязательно</span><span class="photo-count" id="repair-create-photo-count">0 / 3</span></div><div class="photo-body"><div class="photo-grid" id="repair-create-photo-grid" style="display:none;"></div><div id="repair-create-add-btn" class="photo-actions" style="display:grid;gap:8px;"><button type="button" class="add-photo-btn" onclick="openCameraModal('repairCreate')"><span>📷</span><span>Сделать фото</span></button><button type="button" class="add-photo-btn" onclick="openGalleryInput('repairCreate')"><span>🖼️</span><span>Выбрать из галереи</span></button></div><div class="error-msg" id="repair-create-photo-error">Добавьте хотя бы одно фото поломки</div></div></div>
  </div>
  <div class="section-label">История заявок</div>
  <div id="repair-create-history"></div>
@@ -2995,12 +2995,10 @@
  <div class="tab active" id="tab-shifts" onclick="switchTab('shifts')">Смены <span class="notify-badge" id="badge-tab-shifts">0</span></div>
  <div class="tab" id="tab-staff" onclick="switchTab('staff')">Сотрудники</div>
  <div class="tab" id="tab-inventory" onclick="switchTab('inventory')">Инвентаризация <span class="notify-badge" id="badge-tab-inventory">0</span></div>
- <div class="tab" id="tab-training" onclick="switchTab('training')">Обучение <span class="notify-badge" id="badge-tab-training">0</span></div>
  </div>
  <div id="panel-shifts"></div>
  <div id="panel-staff" style="display:none;"></div>
  <div id="panel-inventory" style="display:none;"></div>
- <div id="panel-training" style="display:none;"></div>
  </div>
 </div>
 
@@ -3184,6 +3182,18 @@
 
 <!-- ===== MODAL: REPAIR CONFIRM ===== -->
 <div class="modal-overlay" id="modal-repair-confirm"><div class="modal"><div class="modal-title">Отправить заявку?</div><div class="modal-sub">Проверьте текст и фото. Техник увидит заявку после отправки.</div><div class="modal-actions"><button class="btn btn-primary" onclick="confirmRepairRequest()">Да, отправить</button><button class="btn btn-secondary" onclick="closeModal('modal-repair-confirm')">Нет, вернуться</button></div></div></div>
+
+<!-- ===== MODAL: CREATE TECHNICIAN DEPARTMENT FOR REPAIRS ===== -->
+<div class="modal-overlay" id="modal-create-technician-department">
+ <div class="modal">
+ <div class="modal-title">Создать подразделение «Техник»?</div>
+ <div class="modal-sub">Для добавления процесса «Поломки» создайте подразделение «Техник».</div>
+ <div class="modal-actions">
+ <button class="btn btn-primary" onclick="confirmTechnicianDepartmentCreation()">Да, создать</button>
+ <button class="btn btn-secondary" onclick="cancelTechnicianDepartmentCreation()">Нет, вернуться</button>
+ </div>
+ </div>
+</div>
 
 <!-- ===== MODAL: REPAIR CLOSE CONFIRM ===== -->
 <div class="modal-overlay" id="modal-repair-close-confirm"><div class="modal"><div class="modal-title">Закрыть заявку?</div><div class="modal-sub">Заявка будет отмечена как отремонтированная. Фото после ремонта можно прикрепить при необходимости.</div><div class="modal-actions"><button class="btn btn-primary" onclick="confirmCloseRepairRequest()">Да, закрыть</button><button class="btn btn-secondary" onclick="closeModal('modal-repair-close-confirm')">Нет, вернуться</button></div></div></div>
@@ -3406,7 +3416,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.047";
+const APP_VERSION = "1.054";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
@@ -3485,6 +3495,8 @@ const appCache = {
  founderPassword: "5552",
  adminPassword: "3235",
  fines: [],
+ payrollShifts: [],
+ payrollRuns: [],
  inventoryDraft: null,
  photoReportDrafts: [],
  inventoryRecords: [],
@@ -4017,8 +4029,10 @@ async function ensureFounderEmployee(name) {
  const cleanName = String(name || '').trim() || 'Управление';
  const existing = findFounderProfileByName(cleanName);
  const now = new Date().toISOString();
- const founder = fillTelegramMeta(existing ? { ...existing, name: cleanName, role: 'founder', roleLabel: 'Управление', updatedAt: now } : {
+ const businessId = String(getCurrentBusinessId() || '');
+ const founder = fillTelegramMeta(existing ? { ...existing, businessId, name: cleanName, role: 'founder', roleLabel: 'Управление', updatedAt: now } : {
  id: 'founder_' + Date.now(),
+ businessId,
  login: 'founder',
  name: cleanName,
  role: 'founder',
@@ -4043,7 +4057,9 @@ async function ensureFounderEmployee(name) {
 function getCurrentFounderProfile() {
  const id = InspectStorage.getItem("currentFounderId") || (LocalDB.get("founderSession") || {}).founderId;
  const cloud = id ? getStaff().find(s => String(s.id) === String(id) && String(s.role || '') === 'founder') : null;
- return cloud || LocalDB.get("founderProfile") || null;
+ const cached = LocalDB.get("founderProfile") || null;
+ const profile = cloud || cached;
+ return isNotificationPersonInCurrentBusiness(profile) ? profile : null;
 }
 
 
@@ -4144,7 +4160,8 @@ async function initCloud() {
  if (!CLOUD_ENABLED) {
  console.warn("Firebase config не заполнен. Работаем через изолированное localStorage.");
  appCache.staff = LocalDB.get("staff") || [];
- appCache.departments = LocalDB.get("departments") || [];
+ appCache.departments = (LocalDB.get("departments") || []).map(stripRetiredDepartmentProcesses);
+ LocalDB.set("departments", appCache.departments);
  appCache.reports = filterRecentPhotoReports(LocalDB.get("reports") || []);
  LocalDB.set("reports", appCache.reports);
  appCache.dutyAssignment = LocalDB.get("dutyAssignment") || null;
@@ -4152,6 +4169,8 @@ async function initCloud() {
  appCache.founderPassword = LocalDB.get("founderPassword") || "5552";
  appCache.adminPassword = LocalDB.get("adminPassword") || "3235";
  appCache.fines = LocalDB.get("fines") || [];
+ appCache.payrollShifts = LocalDB.get("payrollShifts") || [];
+ appCache.payrollRuns = LocalDB.get("payrollRuns") || [];
  appCache.inventoryDraft = LocalDB.get("inventoryDraft") || null;
  appCache.photoReportDrafts = LocalDB.get("photoReportDrafts") || [];
  appCache.inventoryRecords = LocalDB.get("inventoryRecords") || [];
@@ -4190,6 +4209,7 @@ async function initCloud() {
  await flushPendingDepartmentWrites();
  await flushPendingDepartmentStatisticsWrites();
  await flushPendingFineWrites();
+ await flushPendingPayrollWrites();
 
  // Initial loading is best effort. A failure in a secondary collection must
  // not prevent the independent real-time listeners below from restoring the
@@ -4214,8 +4234,11 @@ async function initCloud() {
  });
 
  biz("departments").onSnapshot((snapshot) => {
- appCache.departments = rowsFromSnapshot(snapshot, 'asc');
+ const remoteDepartments = rowsFromSnapshot(snapshot, 'asc');
+ appCache.departments = remoteDepartments.map(stripRetiredDepartmentProcesses);
  LocalDB.set("departments", appCache.departments);
+ syncRetiredDepartmentProcesses(remoteDepartments, appCache.departments)
+ .catch(err => console.warn('retired department process sync deferred', err));
  applyDepartmentLabels(getPrimaryDepartment());
  renderHomeGrid();
  renderFounderMenu();
@@ -4246,6 +4269,28 @@ async function initCloud() {
  }, (err) => {
  console.error("fines snapshot error", err);
  showToast("Ошибка загрузки штрафов");
+ });
+
+ biz("payrollShifts").onSnapshot((snapshot) => {
+ const remoteRows = rowsFromSnapshot(snapshot, 'desc');
+ const pendingRows = LocalDB.get(PENDING_PAYROLL_SHIFT_WRITES_KEY);
+ const pending = Array.isArray(pendingRows) ? pendingRows : [];
+ const pendingIds = new Set(pending.map(item => String(item.id)));
+ appCache.payrollShifts = [...pending, ...remoteRows.filter(item => !pendingIds.has(String(item.id)))];
+ LocalDB.set('payrollShifts', appCache.payrollShifts);
+ refreshVisibleData();
+ }, (err) => {
+ console.error("payroll shifts snapshot error", err);
+ showToast("Ошибка загрузки смен");
+ });
+
+ biz("payrollRuns").onSnapshot((snapshot) => {
+ appCache.payrollRuns = rowsFromSnapshot(snapshot, 'desc');
+ LocalDB.set('payrollRuns', appCache.payrollRuns);
+ refreshVisibleData();
+ }, (err) => {
+ console.error("payroll runs snapshot error", err);
+ showToast("Ошибка загрузки выплат");
  });
 
  biz("inventoryRecords").onSnapshot((snapshot) => {
@@ -4368,11 +4413,13 @@ async function initCloud() {
 }
 
 async function loadCloudData() {
- const [staffSnap, departmentsSnap, reportsSnap, finesSnap, inventorySnap, accessRequestsSnap, adminStatsSnap, adminProfilesSnap, bathmasterOrdersSnap, repairRequestsSnap, cookStaffReportsSnap, adminTrainingReportsSnap, founderTasksSnap, forgottenItemsSnap, anonymousFeedbackSnap, settingsDoc] = await Promise.all([
+ const [staffSnap, departmentsSnap, reportsSnap, finesSnap, payrollShiftsSnap, payrollRunsSnap, inventorySnap, accessRequestsSnap, adminStatsSnap, adminProfilesSnap, bathmasterOrdersSnap, repairRequestsSnap, cookStaffReportsSnap, adminTrainingReportsSnap, founderTasksSnap, forgottenItemsSnap, anonymousFeedbackSnap, settingsDoc] = await Promise.all([
  biz("staff").get(),
  biz("departments").get(),
  biz("reports").get(),
  biz("fines").get(),
+ biz("payrollShifts").get(),
+ biz("payrollRuns").get(),
  biz("inventoryRecords").get(),
  biz("accessRequests").get(),
  biz("adminStats").get(),
@@ -4389,7 +4436,7 @@ async function loadCloudData() {
 
  appCache.staff = staffSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
  staffCloudState = 'loaded';
- appCache.departments = rowsFromSnapshot(departmentsSnap, 'asc');
+ appCache.departments = rowsFromSnapshot(departmentsSnap, 'asc').map(stripRetiredDepartmentProcesses);
  LocalDB.set("departments", appCache.departments);
  applyDepartmentLabels(getPrimaryDepartment());
  const loadedReports = rowsFromSnapshot(reportsSnap, 'desc');
@@ -4399,6 +4446,12 @@ async function loadCloudData() {
  const pendingFines = Array.isArray(pendingFineRows) ? pendingFineRows : [];
  const pendingFineIds = new Set(pendingFines.map(item => String(item.id)));
  appCache.fines = [...pendingFines, ...loadedFines.filter(item => !pendingFineIds.has(String(item.id)))];
+ const loadedPayrollShifts = rowsFromSnapshot(payrollShiftsSnap, 'desc');
+ const pendingPayrollShiftRows = LocalDB.get(PENDING_PAYROLL_SHIFT_WRITES_KEY);
+ const pendingPayrollShifts = Array.isArray(pendingPayrollShiftRows) ? pendingPayrollShiftRows : [];
+ const pendingPayrollShiftIds = new Set(pendingPayrollShifts.map(item => String(item.id)));
+ appCache.payrollShifts = [...pendingPayrollShifts, ...loadedPayrollShifts.filter(item => !pendingPayrollShiftIds.has(String(item.id)))];
+ appCache.payrollRuns = rowsFromSnapshot(payrollRunsSnap, 'desc');
  appCache.inventoryRecords = rowsFromSnapshot(inventorySnap, 'desc');
  appCache.accessRequests = rowsFromSnapshot(accessRequestsSnap, 'desc');
  const loadedAdminStatsRows = rowsFromSnapshot(adminStatsSnap, 'desc');
@@ -4413,6 +4466,8 @@ async function loadCloudData() {
  appCache.forgottenItems = rowsFromSnapshot(forgottenItemsSnap, 'desc');
  appCache.anonymousFeedback = sanitizeAnonymousFeedbackList(rowsFromSnapshot(anonymousFeedbackSnap, 'desc'));
  LocalDB.set("staff", appCache.staff);
+ LocalDB.set("payrollShifts", appCache.payrollShifts);
+ LocalDB.set("payrollRuns", appCache.payrollRuns);
  LocalDB.set("departmentStatistics", appCache.departmentStatistics);
  LocalDB.set("adminProfiles", appCache.adminProfiles);
  LocalDB.set("founderTasks", appCache.founderTasks);
@@ -4615,11 +4670,92 @@ const PROCESS_CATALOG = [
  { key: 'statistics', label: 'Статистика', icon: '📈' },
  { key: 'fines', label: 'Штрафы', icon: '💸' },
  { key: 'feedback', label: 'Жалобы и предложения', icon: '💬' },
- { key: 'training', label: 'Обучение', icon: '🎓' },
- { key: 'duty', label: 'Назначить дежурным', icon: '🌅' },
  { key: 'payroll', label: 'Рассчитать зарплату', icon: '💰' },
+ { key: 'repair', label: 'Поломки', icon: '🛠️' },
  { key: 'order', label: 'Сделать заказ', icon: '🛒' }
 ];
+
+function getManagementProcessLabel(process) {
+ if (!process) return 'Процесс';
+ return process.key === 'order' ? 'Заказы от сотрудников' : process.label;
+}
+
+function isTechnicianDepartment(department) {
+ if (!department) return false;
+ const name = String(department.name || '').trim().toLowerCase();
+ return Boolean(
+ department.systemType === 'technician' ||
+ department.isTechnicianDepartment === true ||
+ name === 'техник' ||
+ name === 'техники'
+ );
+}
+
+function getTechnicianDepartment() {
+ return getDepartments().find(isTechnicianDepartment) || null;
+}
+
+function buildDepartmentProcess(processKey) {
+ const catalogItem = getCatalogProcess(processKey);
+ return catalogItem
+ ? { key: catalogItem.key, label: catalogItem.label, icon: catalogItem.icon, custom: false }
+ : null;
+}
+
+async function createTechnicianDepartmentForRepairs() {
+ const existing = getTechnicianDepartment();
+ if (existing) return existing;
+ const repairProcess = buildDepartmentProcess('repair');
+ const technicianDepartment = {
+ id: generateDepartmentId(),
+ name: 'Техник',
+ logoText: '',
+ systemType: 'technician',
+ isTechnicianDepartment: true,
+ processes: repairProcess ? [repairProcess] : [],
+ photoReportConfig: { mode: 'batch', categories: [] },
+ inventoryConfig: { items: [] },
+ statisticsConfig: { metrics: [] },
+ finesConfig: { employeeVisible: true },
+ createdAt: new Date().toISOString()
+ };
+ await setDepartments([...getDepartments(), technicianDepartment]);
+ renderHomeGrid();
+ renderFounderMenu();
+ return technicianDepartment;
+}
+
+// «Обучение» и прежний отдельный процесс «Назначить дежурным» больше не
+// участвуют в конструкторе. Дежурство назначается только из карточки сотрудника.
+const RETIRED_DEPARTMENT_PROCESS_KEYS = new Set(['training', 'duty']);
+
+function stripRetiredDepartmentProcesses(department) {
+ const source = Array.isArray(department && department.processes) ? department.processes : [];
+ const processes = source.filter(item => {
+ const key = typeof item === 'string' ? item : item && item.key;
+ return !RETIRED_DEPARTMENT_PROCESS_KEYS.has(String(key || ''));
+ });
+ return processes.length === source.length ? department : { ...department, processes };
+}
+
+async function syncRetiredDepartmentProcesses(remoteDepartments, cleanedDepartments) {
+ if (!CLOUD_ENABLED || !db) return;
+ const changed = (remoteDepartments || []).map((department, index) => ({
+ before: department,
+ after: cleanedDepartments[index]
+ })).filter(pair =>
+ Array.isArray(pair.before && pair.before.processes) &&
+ Array.isArray(pair.after && pair.after.processes) &&
+ pair.before.processes.length !== pair.after.processes.length
+ );
+ if (!changed.length) return;
+ await Promise.all(changed.map(pair =>
+ biz('departments').doc(String(pair.after.id)).set({
+ processes: pair.after.processes,
+ updatedAt: new Date().toISOString()
+ }, { merge: true })
+ ));
+}
 
 const INVENTORY_UNITS = [
  { value: 'шт.', label: 'штук' },
@@ -4741,7 +4877,10 @@ async function refreshInventoryDepartment(departmentId) {
 function getDepartments() {
  return (appCache.departments || []).map(dep => {
  const seen = new Set();
- const processes = (Array.isArray(dep.processes) ? dep.processes : []).map(item => {
+ const processes = (Array.isArray(dep.processes) ? dep.processes : []).filter(item => {
+ const key = typeof item === 'string' ? item : item && item.key;
+ return !RETIRED_DEPARTMENT_PROCESS_KEYS.has(String(key || ''));
+ }).map(item => {
  const key = typeof item === 'string' ? item : item && item.key;
  if (!key || seen.has(key)) return null;
  seen.add(key);
@@ -4769,7 +4908,7 @@ function getDepartments() {
 
 async function setDepartments(arr) {
  const businessId = getCurrentBusinessId();
- const scopedDepartments = (Array.isArray(arr) ? arr : []).map(d =>
+ const scopedDepartments = (Array.isArray(arr) ? arr : []).map(stripRetiredDepartmentProcesses).map(d =>
  businessId ? { ...d, businessId: d.businessId || businessId } : { ...d }
  );
 
@@ -4951,7 +5090,7 @@ function clearBusinessContextForSwitch(nextBusinessId) {
  cacheTelegramEmployeeBinding(null);
 
  const arrayKeys = [
- 'staff', 'departments', 'reports', 'fines', 'inventoryRecords', 'departmentStatistics',
+ 'staff', 'departments', 'reports', 'fines', 'payrollShifts', 'payrollRuns', 'pendingPayrollShiftWrites', 'inventoryRecords', 'departmentStatistics',
  'accessRequests', 'adminStats', 'adminProfiles', 'bathmasterOrders',
  'repairRequests', 'cookStaffReports', 'adminTrainingReports',
  'founderTasks', 'forgottenItems', 'anonymousFeedback'
@@ -4960,6 +5099,8 @@ function clearBusinessContextForSwitch(nextBusinessId) {
  appCache.staff = [];
  appCache.departments = [];
  appCache.reports = [];
+ appCache.payrollShifts = [];
+ appCache.payrollRuns = [];
  appCache.departmentStatistics = [];
  appCache.accessRequests = [];
  appCache.adminProfiles = [];
@@ -4996,8 +5137,12 @@ async function createBusiness(founderName, companyName, password) {
  // Свежий бизнес — своя, пустая песочница данных.
  appCache.departments = [];
  appCache.staff = [];
+ appCache.payrollShifts = [];
+ appCache.payrollRuns = [];
  LocalDB.set('departments', []);
  LocalDB.set('staff', []);
+ LocalDB.set('payrollShifts', []);
+ LocalDB.set('payrollRuns', []);
 
  if (CLOUD_ENABLED && db) {
  try {
@@ -5100,6 +5245,17 @@ async function removeProcessFromDepartment(id, processKey) {
 async function deleteDepartment(id) {
  const dep = getDepartment(id);
  if (!dep) return;
+
+ if (isTechnicianDepartment(dep)) {
+ const repairsUsedElsewhere = getDepartments().some(other =>
+ String(other.id) !== String(dep.id) &&
+ (other.processes || []).some(process => process.key === 'repair')
+ );
+ if (repairsUsedElsewhere) {
+ showToast('Нельзя удалить «Техник», пока «Поломки» подключены в других подразделениях');
+ return;
+ }
+ }
 
  // Удаляем только сотрудников и заявки выбранного подразделения.
  // Соседние подразделения не должны затрагиваться.
@@ -5647,6 +5803,44 @@ function getDutyAssignmentForDate(dateKey) {
  return current && String(current.targetDate || '') === String(dateKey) ? current : null;
 }
 
+function getDutyAssignmentEmployeeKey(assignment) {
+ if (!assignment) return '';
+ if (assignment.employeeKey) return String(assignment.employeeKey);
+ return assignment.staffId ? `staff:${String(assignment.staffId)}` : '';
+}
+
+function dutyAssignmentMatchesEmployee(assignment, employee) {
+ if (!assignment || !employee) return false;
+ const employeeKey = String(employee._key || (`staff:${String(employee.id || '')}`));
+ const assignmentKey = getDutyAssignmentEmployeeKey(assignment);
+ if (assignmentKey) return assignmentKey === employeeKey;
+ return String(assignment.staffId || '') === String(employee.id || '');
+}
+
+function getDutyAssignmentsForEmployee(employee) {
+ if (!employee) return [];
+ const byDate = getDutyAssignmentsByDate();
+ const rows = Object.keys(byDate || {}).map(dateKey => ({
+  ...byDate[dateKey],
+  targetDate: (byDate[dateKey] && byDate[dateKey].targetDate) || dateKey
+ })).filter(item => dutyAssignmentMatchesEmployee(item, employee));
+
+ const current = getDutyAssignment();
+ if (current && dutyAssignmentMatchesEmployee(current, employee) &&
+     !rows.some(item => String(item.targetDate || '') === String(current.targetDate || ''))) {
+  rows.push(current);
+ }
+
+ return rows.sort((a, b) => String(b.targetDate || '').localeCompare(String(a.targetDate || '')));
+}
+
+function getUpcomingDutyAssignmentForEmployee(employee) {
+ const today = toDateKey(new Date());
+ return getDutyAssignmentsForEmployee(employee)
+  .filter(item => String(item.targetDate || '') >= today)
+  .sort((a, b) => String(a.targetDate || '').localeCompare(String(b.targetDate || '')))[0] || null;
+}
+
 function getFounderPassword() {
  return appCache.founderPassword || "5552";
 }
@@ -5881,6 +6075,655 @@ async function archivePaidPayrollFines(staffId, payrollRunId, paidAt = new Date(
  }
  refreshVisibleData();
  return archiveRows;
+}
+
+// ============================================================
+// PAYROLL — employee shifts, individual rates and salary payouts.
+// The process tile is management-only. Employees receive a compact shift
+// control above their ordinary department processes instead.
+// ============================================================
+const PENDING_PAYROLL_SHIFT_WRITES_KEY = 'pendingPayrollShiftWrites';
+let activePayrollDepartmentId = null;
+let activePayrollStaffId = null;
+const payrollFineDecisionByStaff = {};
+let payrollActionInProgress = false;
+
+function getPayrollShifts() {
+ return Array.isArray(appCache.payrollShifts) ? appCache.payrollShifts : [];
+}
+
+function getPayrollRuns() {
+ return Array.isArray(appCache.payrollRuns) ? appCache.payrollRuns : [];
+}
+
+function departmentHasPayroll(department) {
+ return Boolean(department && (department.processes || []).some(process => String(process.key) === 'payroll'));
+}
+
+function normalizePayrollConfig(config) {
+ const mode = String(config && config.mode || 'hourly') === 'shift' ? 'shift' : 'hourly';
+ const rate = Math.max(0, Number(config && config.rate) || 0);
+ return {
+ mode,
+ rate,
+ updatedAt: config && config.updatedAt ? config.updatedAt : null
+ };
+}
+
+function getEmployeePayrollConfig(staff) {
+ return normalizePayrollConfig(staff && staff.payrollConfig);
+}
+
+function setPendingPayrollShiftWrite(shift) {
+ const current = LocalDB.get(PENDING_PAYROLL_SHIFT_WRITES_KEY);
+ const rows = Array.isArray(current) ? current : [];
+ LocalDB.set(PENDING_PAYROLL_SHIFT_WRITES_KEY, [shift, ...rows.filter(item => String(item.id) !== String(shift.id))]);
+}
+
+function removePendingPayrollShiftWrite(shiftId) {
+ const current = LocalDB.get(PENDING_PAYROLL_SHIFT_WRITES_KEY);
+ if (!Array.isArray(current)) return;
+ const rows = current.filter(item => String(item.id) !== String(shiftId));
+ if (rows.length) LocalDB.set(PENDING_PAYROLL_SHIFT_WRITES_KEY, rows);
+ else LocalDB.remove(PENDING_PAYROLL_SHIFT_WRITES_KEY);
+}
+
+async function flushPendingPayrollWrites() {
+ if (!CLOUD_ENABLED || !db || !getCurrentBusinessId()) return;
+ const current = LocalDB.get(PENDING_PAYROLL_SHIFT_WRITES_KEY);
+ const rows = Array.isArray(current) ? current : [];
+ for (const shift of rows) {
+ try {
+ await biz('payrollShifts').doc(String(shift.id)).set(shift, { merge: true });
+ removePendingPayrollShiftWrite(shift.id);
+ } catch (error) {
+ console.warn('pending payroll shift sync failed', error);
+ break;
+ }
+ }
+}
+
+async function savePayrollShift(shift) {
+ const scoped = { ...shift, businessId: getCurrentBusinessId() };
+ appCache.payrollShifts = [scoped, ...getPayrollShifts().filter(item => String(item.id) !== String(scoped.id))];
+ LocalDB.set('payrollShifts', appCache.payrollShifts);
+ setPendingPayrollShiftWrite(scoped);
+
+ if (CLOUD_ENABLED && db) {
+ try {
+ await biz('payrollShifts').doc(String(scoped.id)).set(scoped, { merge: true });
+ removePendingPayrollShiftWrite(scoped.id);
+ return { queued: false };
+ } catch (error) {
+ console.error('payroll shift save error', error);
+ return { queued: true };
+ }
+ }
+ removePendingPayrollShiftWrite(scoped.id);
+ return { queued: false };
+}
+
+async function refreshPayrollShiftsFromCloud() {
+ if (!CLOUD_ENABLED || !db || !getCurrentBusinessId()) return;
+ try {
+ const snapshot = await biz('payrollShifts').get();
+ const remoteRows = rowsFromSnapshot(snapshot, 'desc');
+ const pendingRows = LocalDB.get(PENDING_PAYROLL_SHIFT_WRITES_KEY);
+ const pending = Array.isArray(pendingRows) ? pendingRows : [];
+ const pendingIds = new Set(pending.map(item => String(item.id)));
+ appCache.payrollShifts = [...pending, ...remoteRows.filter(item => !pendingIds.has(String(item.id)))];
+ LocalDB.set('payrollShifts', appCache.payrollShifts);
+ } catch (error) {
+ console.warn('payroll shifts refresh deferred', error);
+ }
+}
+
+function getEmployeePayrollShifts(staffId, departmentId = null) {
+ return getPayrollShifts().filter(shift =>
+ String(shift.staffId || '') === String(staffId || '') &&
+ (!departmentId || String(shift.departmentId || '') === String(departmentId))
+ );
+}
+
+function getActivePayrollShift(staffId, departmentId = null) {
+ return getEmployeePayrollShifts(staffId, departmentId)
+ .filter(shift => String(shift.status || '') === 'open' && !shift.closedAt)
+ .sort((a, b) => String(b.openedAt || '').localeCompare(String(a.openedAt || '')))[0] || null;
+}
+
+function getUnpaidClosedPayrollShifts(staffId, departmentId = null) {
+ return getEmployeePayrollShifts(staffId, departmentId)
+ .filter(shift =>
+ String(shift.status || '') === 'closed' &&
+ Boolean(shift.closedAt) &&
+ !shift.payrollRunId &&
+ !shift.paidAt
+ )
+ .sort((a, b) => String(a.openedAt || '').localeCompare(String(b.openedAt || '')));
+}
+
+function getLatestPayrollShift(staffId, departmentId = null) {
+ return getEmployeePayrollShifts(staffId, departmentId)
+ .sort((a, b) => String(b.openedAt || '').localeCompare(String(a.openedAt || '')))[0] || null;
+}
+
+function getPayrollShiftMinutes(shift) {
+ const stored = Number(shift && shift.durationMinutes);
+ if (Number.isFinite(stored) && stored >= 0) return stored;
+ const opened = Date.parse(shift && shift.openedAt || '');
+ const closed = Date.parse(shift && shift.closedAt || '');
+ if (!opened || !closed || closed < opened) return 0;
+ return Math.max(1, Math.round((closed - opened) / 60000));
+}
+
+function getPayrollClosedMinutes(shifts) {
+ return (Array.isArray(shifts) ? shifts : []).reduce((sum, shift) => sum + getPayrollShiftMinutes(shift), 0);
+}
+
+function calculatePayrollGross(config, shifts) {
+ const normalized = normalizePayrollConfig(config);
+ const rows = Array.isArray(shifts) ? shifts : [];
+ if (!normalized.rate || !rows.length) return 0;
+ if (normalized.mode === 'shift') return Math.round(rows.length * normalized.rate);
+ return Math.round((getPayrollClosedMinutes(rows) / 60) * normalized.rate);
+}
+
+function formatPayrollMoney(value) {
+ return `${Math.max(0, Math.round(Number(value) || 0)).toLocaleString('ru-RU')} сум`;
+}
+
+function formatPayrollDuration(minutes) {
+ const total = Math.max(0, Math.round(Number(minutes) || 0));
+ const hours = Math.floor(total / 60);
+ const rest = total % 60;
+ if (!hours) return `${rest} мин`;
+ return `${hours} ч ${rest} мин`;
+}
+
+function formatPayrollDateTime(value) {
+ if (!value) return '—';
+ const date = new Date(value);
+ return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString('ru-RU');
+}
+
+function renderPayrollShiftControl() {
+ const control = document.getElementById('payroll-shift-control');
+ if (!control) return;
+ const sessionStaff = getWaiter();
+ const department = getDepartment(getMyDepartmentId()) || getPrimaryDepartment();
+ const isRealEmployee = Boolean(sessionStaff && !sessionStaff.isFounderSession && !sessionStaff.isFounderDepartmentPreview);
+ if (!isRealEmployee || !departmentHasPayroll(department)) {
+ control.style.display = 'none';
+ control.innerHTML = '';
+ return;
+ }
+
+ const active = getActivePayrollShift(sessionStaff.id, department.id);
+ const latest = getLatestPayrollShift(sessionStaff.id, department.id);
+ let stateTitle = 'Открыть смену';
+ let stateSub = 'Нажмите, когда приступили к работе';
+ let background = 'var(--surface)';
+ let border = 'var(--border)';
+ let buttonBackground = 'var(--accent)';
+
+ if (active) {
+ const elapsedMinutes = Math.max(0, Math.floor((Date.now() - (Date.parse(active.openedAt) || Date.now())) / 60000));
+ stateTitle = 'Смена открыта';
+ stateSub = `С ${formatPayrollDateTime(active.openedAt)} · ${formatPayrollDuration(elapsedMinutes)}`;
+ background = 'rgba(47, 207, 127, 0.12)';
+ border = '#2fcf7f';
+ buttonBackground = '#2fcf7f';
+ } else if (latest && latest.closedAt) {
+ stateTitle = 'Смена закрыта';
+ stateSub = `${formatPayrollDateTime(latest.closedAt)} · нажмите, чтобы открыть новую`;
+ background = 'rgba(47, 140, 255, 0.12)';
+ border = '#2f8cff';
+ buttonBackground = '#2f8cff';
+ }
+
+ control.style.display = 'block';
+ control.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:${background};border:1px solid ${border};border-radius:var(--radius);padding:14px 14px 14px 16px;">
+ <div style="min-width:0;">
+ <div style="font-size:15px;font-weight:800;color:var(--text);">Учёт смены</div>
+ <div style="font-size:12px;color:var(--text-2);line-height:1.4;margin-top:3px;">${escapeHtml(stateSub)}</div>
+ </div>
+ <button class="btn btn-sm" style="width:auto;flex-shrink:0;background:${buttonBackground};color:#fff;border:none;" onclick="toggleEmployeePayrollShift()">${escapeHtml(stateTitle)}</button>
+ </div>`;
+}
+
+async function toggleEmployeePayrollShift() {
+ if (payrollActionInProgress) return;
+ const sessionStaff = getWaiter();
+ const department = getDepartment(getMyDepartmentId()) || getPrimaryDepartment();
+ const person = sessionStaff ? getStaff().find(item => String(item.id) === String(sessionStaff.id)) : null;
+ if (!person || person.isFounderSession || !department || !departmentHasPayroll(department)) {
+ showToast('Учёт смены недоступен');
+ return;
+ }
+
+ payrollActionInProgress = true;
+ try {
+ await refreshPayrollShiftsFromCloud();
+ let active = getActivePayrollShift(person.id, department.id);
+ const isClosing = Boolean(active);
+ const question = isClosing
+ ? 'Закрыть смену? Вы уверены? После закрытия время попадёт в расчёт зарплаты.'
+ : 'Открыть смену? Вы уверены? С этого момента начнётся учёт рабочего времени.';
+ if (!window.confirm(question)) return;
+
+ await refreshPayrollShiftsFromCloud();
+ active = getActivePayrollShift(person.id, department.id);
+ if (isClosing && !active) {
+ showToast('Смена уже закрыта на другом устройстве');
+ return;
+ }
+ if (!isClosing && active) {
+ showToast('Смена уже открыта');
+ renderPayrollShiftControl();
+ return;
+ }
+
+ const now = new Date();
+ if (active) {
+ const openedAtMs = Date.parse(active.openedAt) || now.getTime();
+ const closed = {
+ ...active,
+ status: 'closed',
+ closedAt: now.toISOString(),
+ durationMinutes: Math.max(1, Math.round((now.getTime() - openedAtMs) / 60000)),
+ updatedAt: now.toISOString()
+ };
+ const result = await savePayrollShift(closed);
+ showToast(result.queued ? 'Смена закрыта и синхронизируется при восстановлении связи' : 'Смена закрыта ✓');
+ } else {
+ const opened = {
+ id: `payroll_shift_${String(person.id)}_${now.getTime().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
+ businessId: getCurrentBusinessId(),
+ departmentId: String(department.id),
+ departmentName: department.name || '',
+ staffId: String(person.id),
+ staffName: person.name || 'Сотрудник',
+ status: 'open',
+ openedAt: now.toISOString(),
+ closedAt: null,
+ durationMinutes: null,
+ payrollRunId: null,
+ paidAt: null,
+ createdAt: now.toISOString(),
+ updatedAt: now.toISOString()
+ };
+ const result = await savePayrollShift(opened);
+ showToast(result.queued ? 'Смена открыта и синхронизируется при восстановлении связи' : 'Смена открыта ✓');
+ }
+ renderPayrollShiftControl();
+ updateUnreadBadges();
+ } finally {
+ payrollActionInProgress = false;
+ }
+}
+
+function openFounderPayroll(departmentId) {
+ const department = requireFounderDepartmentAccess(departmentId);
+ if (!department) return;
+ if (!departmentHasPayroll(department)) {
+ showToast('Процесс не добавлен в подразделение');
+ return;
+ }
+ activePayrollDepartmentId = String(department.id);
+ activePayrollStaffId = null;
+ markDepartmentProcessRead(department.id, 'payroll');
+ renderFounderPayrollList();
+ goTo('screen-founder-payroll-list');
+}
+
+function renderFounderPayrollList() {
+ const department = getDepartment(activePayrollDepartmentId || activeManagedDepartmentId);
+ const title = document.getElementById('founder-payroll-list-title');
+ const content = document.getElementById('founder-payroll-list-content');
+ if (!content) return;
+ if (!department || !hasFounderSession()) {
+ if (title) title.textContent = 'Рассчитать зарплату';
+ content.innerHTML = `<div class="empty" style="padding:50px 0;"><div class="empty-icon">🔒</div><div class="empty-title">Нет доступа</div></div>`;
+ return;
+ }
+ activePayrollDepartmentId = String(department.id);
+ if (title) title.textContent = `Зарплата · ${department.name}`;
+ const staff = getDepartmentStaffList(department.id);
+ if (!staff.length) {
+ content.innerHTML = `<div class="empty" style="padding:50px 0;"><div class="empty-icon">👥</div><div class="empty-title">Сотрудников пока нет</div><div class="empty-sub">Добавьте сотрудников в подразделение</div></div>`;
+ return;
+ }
+
+ content.innerHTML = `<div class="doc-placeholder" style="margin-bottom:18px;">Здесь находятся отдельные расчётные карточки. Они не связаны с профилем сотрудника и не видны сотрудникам.</div>` + staff.map(person => {
+ const config = getEmployeePayrollConfig(person);
+ const shifts = getUnpaidClosedPayrollShifts(person.id, department.id);
+ const active = getActivePayrollShift(person.id, department.id);
+ const gross = calculatePayrollGross(config, shifts);
+ const fines = getPendingPayrollFineAmount(person.id, department.id);
+ const lastRun = getPayrollRuns().filter(run =>
+ String(run.staffId || '') === String(person.id) &&
+ String(run.departmentId || '') === String(department.id)
+ ).sort((a, b) => String(b.paidAt || b.createdAt || '').localeCompare(String(a.paidAt || a.createdAt || '')))[0];
+ const configText = config.rate
+ ? `${config.mode === 'hourly' ? 'Почасовая' : 'За смену'} · ${formatPayrollMoney(config.rate)}${config.mode === 'hourly' ? '/час' : ''}`
+ : 'Оплата ещё не настроена';
+ return `<div class="card" style="cursor:default;">
+ <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
+ <div style="min-width:0;">
+ <div class="card-title" data-i18n-skip>${escapeHtml(person.name || 'Сотрудник')}</div>
+ <div class="card-sub">${escapeHtml(configText)}</div>
+ </div>
+ ${active ? '<span style="font-size:11px;font-weight:800;color:#2fcf7f;background:rgba(47,207,127,.12);padding:6px 9px;border-radius:999px;white-space:nowrap;">Смена открыта</span>' : ''}
+ </div>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;">
+ <div class="inventory-status" style="margin:0;"><div style="font-size:12px;color:var(--text-3);">Текущий расчёт</div><div style="font-size:18px;font-weight:800;margin-top:3px;">${formatPayrollMoney(gross)}</div></div>
+ <div class="inventory-status" style="margin:0;"><div style="font-size:12px;color:var(--text-3);">Штрафы периода</div><div style="font-size:18px;font-weight:800;margin-top:3px;color:${fines ? 'var(--danger)' : 'var(--text)'};">${formatPayrollMoney(fines)}</div></div>
+ </div>
+ <div style="font-size:12px;color:var(--text-3);margin-top:12px;">${shifts.length} ${plural(shifts.length, 'закрытая смена', 'закрытые смены', 'закрытых смен')}${lastRun ? ` · последняя выплата ${escapeHtml(formatPayrollDateTime(lastRun.paidAt || lastRun.createdAt))}` : ''}</div>
+ <button class="btn btn-primary" style="margin-top:14px;" onclick="openFounderPayrollEmployee('${escapeHtml(String(person.id))}')">Рассчитать</button>
+ </div>`;
+ }).join('');
+}
+
+function openFounderPayrollEmployee(staffId) {
+ const department = requireFounderDepartmentAccess(activePayrollDepartmentId);
+ if (!department) return;
+ const person = getDepartmentStaffList(department.id).find(item => String(item.id) === String(staffId));
+ if (!person) {
+ showToast('Сотрудник не найден');
+ return;
+ }
+ activePayrollStaffId = String(person.id);
+ if (!payrollFineDecisionByStaff[activePayrollStaffId]) payrollFineDecisionByStaff[activePayrollStaffId] = 'include';
+ renderFounderPayrollDetail();
+ goTo('screen-founder-payroll-detail');
+}
+
+function getActivePayrollEmployee() {
+ const department = getDepartment(activePayrollDepartmentId);
+ if (!department) return null;
+ return getDepartmentStaffList(department.id).find(item => String(item.id) === String(activePayrollStaffId)) || null;
+}
+
+function renderFounderPayrollDetail() {
+ const department = getDepartment(activePayrollDepartmentId);
+ const person = getActivePayrollEmployee();
+ const title = document.getElementById('founder-payroll-detail-title');
+ const content = document.getElementById('founder-payroll-detail-content');
+ if (!content) return;
+ if (!department || !person || !hasFounderSession()) {
+ if (title) title.textContent = 'Расчёт зарплаты';
+ content.innerHTML = `<div class="empty" style="padding:50px 0;"><div class="empty-icon">🔒</div><div class="empty-title">Нет доступа</div></div>`;
+ return;
+ }
+ if (title) title.textContent = `Зарплата · ${person.name || 'Сотрудник'}`;
+
+ const config = getEmployeePayrollConfig(person);
+ const shifts = getUnpaidClosedPayrollShifts(person.id, department.id);
+ const active = getActivePayrollShift(person.id, department.id);
+ const minutes = getPayrollClosedMinutes(shifts);
+ const gross = calculatePayrollGross(config, shifts);
+ const fines = getPendingPayrollFinesForEmployee(person.id, department.id)
+ .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+ const fineTotal = fines.reduce((sum, fine) => sum + Math.max(0, Number(fine.amount) || 0), 0);
+ const decision = payrollFineDecisionByStaff[String(person.id)] || 'include';
+ const lastRuns = getPayrollRuns().filter(run =>
+ String(run.staffId || '') === String(person.id) &&
+ String(run.departmentId || '') === String(department.id)
+ ).sort((a, b) => String(b.paidAt || b.createdAt || '').localeCompare(String(a.paidAt || a.createdAt || ''))).slice(0, 5);
+ const canPay = Boolean(config.rate > 0 && shifts.length && !active);
+
+ content.innerHTML = `
+ <div class="section-label">Настройки оплаты</div>
+ <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:20px;">
+ <div class="field">
+ <label>Способ расчёта</label>
+ <select id="payroll-pay-mode" onchange="updatePayrollRateLabel();renderPayrollCalculationTotals();">
+ <option value="hourly"${config.mode === 'hourly' ? ' selected' : ''}>Почасовая зарплата</option>
+ <option value="shift"${config.mode === 'shift' ? ' selected' : ''}>Оплата за смену</option>
+ </select>
+ </div>
+ <div class="field" style="margin-bottom:14px;">
+ <label id="payroll-rate-label">${config.mode === 'hourly' ? 'Стоимость одного часа' : 'Стоимость одной смены'}</label>
+ <input type="number" id="payroll-rate" min="0" step="1" inputmode="numeric" value="${config.rate || ''}" placeholder="Например: 50000" oninput="renderPayrollCalculationTotals()">
+ </div>
+ <button class="btn btn-secondary" onclick="savePayrollSettings()">Сохранить настройки</button>
+ </div>
+
+ <div class="section-label">Текущий период</div>
+ ${active ? `<div class="doc-placeholder" style="margin-bottom:14px;border-color:#2fcf7f;"><b style="color:#2fcf7f;">Смена сейчас открыта</b><br>С ${escapeHtml(formatPayrollDateTime(active.openedAt))}. Закройте её перед выплатой — тогда время попадёт в итоговый расчёт.</div>` : ''}
+ <div class="stat-row">
+ <div class="stat-box"><div class="stat-val">${shifts.length}</div><div class="stat-lbl">Смен</div></div>
+ <div class="stat-box"><div class="stat-val">${escapeHtml(formatPayrollDuration(minutes))}</div><div class="stat-lbl">Времени</div></div>
+ <div class="stat-box"><div class="stat-val" id="payroll-gross-value">${formatPayrollMoney(gross)}</div><div class="stat-lbl">Начислено</div></div>
+ </div>
+
+ <div class="section-label">Закрытые смены</div>
+ ${shifts.length ? shifts.map(shift => `<div class="card" style="cursor:default;">
+ <div class="card-title">${escapeHtml(formatPayrollDateTime(shift.openedAt))}</div>
+ <div class="card-sub">Закрыта ${escapeHtml(formatPayrollDateTime(shift.closedAt))} · ${escapeHtml(formatPayrollDuration(getPayrollShiftMinutes(shift)))}</div>
+ </div>`).join('') : `<div class="empty" style="padding:26px 0;"><div class="empty-icon">🕒</div><div class="empty-title">Закрытых смен пока нет</div><div class="empty-sub">Расчёт появится после закрытия первой смены</div></div>`}
+
+ <div class="divider"></div>
+ <div class="section-label">Штрафы периода</div>
+ ${fines.length ? fines.map(fine => renderDepartmentFineCard(fine)).join('') : `<div class="empty" style="padding:24px 0;"><div class="empty-icon">✅</div><div class="empty-title">Штрафов нет</div></div>`}
+ ${fines.length ? `<div style="display:grid;gap:10px;margin:14px 0 20px;">
+ <label class="menu-item" style="cursor:pointer;margin:0;">
+ <input type="radio" name="payroll-fine-decision" value="include"${decision === 'include' ? ' checked' : ''} onchange="setPayrollFineDecision('include')" style="width:20px;height:20px;accent-color:var(--accent);flex-shrink:0;">
+ <div class="menu-text"><div class="menu-title">Учесть штрафы</div><div class="menu-desc">Удержать ${formatPayrollMoney(fineTotal)} из зарплаты</div></div>
+ </label>
+ <label class="menu-item" style="cursor:pointer;margin:0;">
+ <input type="radio" name="payroll-fine-decision" value="forgive"${decision === 'forgive' ? ' checked' : ''} onchange="setPayrollFineDecision('forgive')" style="width:20px;height:20px;accent-color:var(--accent);flex-shrink:0;">
+ <div class="menu-text"><div class="menu-title">Простить штрафы</div><div class="menu-desc">Не удерживать их из этой выплаты</div></div>
+ </label>
+ </div>` : ''}
+
+ <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-top:18px;">
+ <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:10px;"><span style="color:var(--text-2);">Начислено</span><b id="payroll-summary-gross">${formatPayrollMoney(gross)}</b></div>
+ <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:14px;"><span style="color:var(--text-2);">Удержание штрафов</span><b id="payroll-summary-fines" style="color:var(--danger);">${decision === 'include' ? '− ' + formatPayrollMoney(fineTotal) : formatPayrollMoney(0)}</b></div>
+ <div style="height:1px;background:var(--border);margin-bottom:14px;"></div>
+ <div style="display:flex;justify-content:space-between;gap:12px;align-items:end;"><span style="font-size:16px;font-weight:700;">К выдаче</span><b id="payroll-summary-final" style="font-size:26px;color:var(--accent);">${formatPayrollMoney(Math.max(0, gross - (decision === 'include' ? fineTotal : 0)))}</b></div>
+ <button class="btn btn-primary" id="payroll-pay-button" style="margin-top:18px;" onclick="issuePayroll()"${canPay ? '' : ' disabled'}>Выдать зарплату</button>
+ ${!config.rate ? '<div style="font-size:12px;color:var(--text-3);line-height:1.45;margin-top:10px;">Сначала сохраните стоимость часа или смены.</div>' : ''}
+ ${config.rate && !shifts.length ? '<div style="font-size:12px;color:var(--text-3);line-height:1.45;margin-top:10px;">Для выплаты нужна хотя бы одна закрытая смена.</div>' : ''}
+ ${active ? '<div style="font-size:12px;color:var(--text-3);line-height:1.45;margin-top:10px;">Нельзя выдать зарплату, пока смена открыта.</div>' : ''}
+ </div>
+
+ ${lastRuns.length ? `<div class="divider"></div><div class="section-label">История выплат</div>${lastRuns.map(run => `<div class="card" style="cursor:default;">
+ <div class="card-title">${formatPayrollMoney(run.finalAmount)}</div>
+ <div class="card-sub">${escapeHtml(formatPayrollDateTime(run.paidAt || run.createdAt))} · ${run.shiftCount || 0} ${plural(Number(run.shiftCount || 0), 'смена', 'смены', 'смен')}</div>
+ <div style="font-size:13px;color:var(--text-2);margin-top:8px;">Начислено ${formatPayrollMoney(run.grossAmount)}${Number(run.fineAmount || 0) ? ` · штрафы ${run.fineDecision === 'forgive' ? 'прощены' : 'учтены'}: ${formatPayrollMoney(run.fineAmount)}` : ''}</div>
+ </div>`).join('')}` : ''}`;
+ renderPayrollCalculationTotals();
+}
+
+function updatePayrollRateLabel() {
+ const mode = document.getElementById('payroll-pay-mode')?.value || 'hourly';
+ const label = document.getElementById('payroll-rate-label');
+ if (label) label.textContent = mode === 'shift' ? 'Стоимость одной смены' : 'Стоимость одного часа';
+}
+
+function setPayrollFineDecision(decision) {
+ if (!activePayrollStaffId) return;
+ payrollFineDecisionByStaff[String(activePayrollStaffId)] = decision === 'forgive' ? 'forgive' : 'include';
+ renderPayrollCalculationTotals();
+}
+
+function renderPayrollCalculationTotals() {
+ const department = getDepartment(activePayrollDepartmentId);
+ const person = getActivePayrollEmployee();
+ if (!department || !person) return;
+ const mode = document.getElementById('payroll-pay-mode')?.value || getEmployeePayrollConfig(person).mode;
+ const rateInput = document.getElementById('payroll-rate');
+ const rate = rateInput ? Math.max(0, Number(rateInput.value) || 0) : getEmployeePayrollConfig(person).rate;
+ const shifts = getUnpaidClosedPayrollShifts(person.id, department.id);
+ const gross = calculatePayrollGross({ mode, rate }, shifts);
+ const fineTotal = getPendingPayrollFineAmount(person.id, department.id);
+ const decision = payrollFineDecisionByStaff[String(person.id)] || 'include';
+ const deduction = decision === 'include' ? fineTotal : 0;
+ const finalAmount = Math.max(0, gross - deduction);
+ const grossValue = document.getElementById('payroll-gross-value');
+ const summaryGross = document.getElementById('payroll-summary-gross');
+ const summaryFines = document.getElementById('payroll-summary-fines');
+ const summaryFinal = document.getElementById('payroll-summary-final');
+ if (grossValue) grossValue.textContent = formatPayrollMoney(gross);
+ if (summaryGross) summaryGross.textContent = formatPayrollMoney(gross);
+ if (summaryFines) summaryFines.textContent = deduction ? `− ${formatPayrollMoney(deduction)}` : formatPayrollMoney(0);
+ if (summaryFinal) summaryFinal.textContent = formatPayrollMoney(finalAmount);
+}
+
+async function savePayrollSettings() {
+ if (!hasFounderSession() || isEmployeeWorkspaceActive()) {
+ showToast('Настройки зарплаты доступны только управлению');
+ return;
+ }
+ const person = getActivePayrollEmployee();
+ const mode = document.getElementById('payroll-pay-mode')?.value === 'shift' ? 'shift' : 'hourly';
+ const rate = Math.max(0, Number(document.getElementById('payroll-rate')?.value) || 0);
+ if (!person || !rate) {
+ showToast('Укажите стоимость больше нуля');
+ return;
+ }
+ const now = new Date().toISOString();
+ const payrollConfig = { mode, rate, updatedAt: now };
+ appCache.staff = getStaff().map(item => String(item.id) === String(person.id) ? { ...item, payrollConfig, updatedAt: now } : item);
+ LocalDB.set('staff', appCache.staff);
+ try {
+ if (CLOUD_ENABLED && db) {
+ await biz('staff').doc(String(person.id)).set({ payrollConfig, updatedAt: now }, { merge: true });
+ }
+ showToast('Настройки зарплаты сохранены ✓');
+ renderFounderPayrollDetail();
+ } catch (error) {
+ console.error('payroll settings save error', error);
+ showToast('Настройки сохранены локально и синхронизируются позже');
+ }
+}
+
+async function issuePayroll() {
+ if (payrollActionInProgress) return;
+ if (!hasFounderSession() || isEmployeeWorkspaceActive()) {
+ showToast('Выдать зарплату может только управление');
+ return;
+ }
+ const department = getDepartment(activePayrollDepartmentId);
+ const person = getActivePayrollEmployee();
+ if (!department || !person) return;
+ await refreshPayrollShiftsFromCloud();
+ const active = getActivePayrollShift(person.id, department.id);
+ const shifts = getUnpaidClosedPayrollShifts(person.id, department.id);
+ const config = getEmployeePayrollConfig(person);
+ if (active) {
+ showToast('Сначала сотрудник должен закрыть смену');
+ renderFounderPayrollDetail();
+ return;
+ }
+ if (!config.rate) {
+ showToast('Сначала сохраните настройки оплаты');
+ return;
+ }
+ if (!shifts.length) {
+ showToast('Нет закрытых смен для выплаты');
+ return;
+ }
+
+ const fineDecision = payrollFineDecisionByStaff[String(person.id)] === 'forgive' ? 'forgive' : 'include';
+ const activeFines = getPendingPayrollFinesForEmployee(person.id, department.id);
+ const fineAmount = activeFines.reduce((sum, fine) => sum + Math.max(0, Number(fine.amount) || 0), 0);
+ const grossAmount = calculatePayrollGross(config, shifts);
+ const finalAmount = Math.max(0, grossAmount - (fineDecision === 'include' ? fineAmount : 0));
+ const confirmation = `Выдать ${person.name || 'сотруднику'} ${formatPayrollMoney(finalAmount)}?\n\nПосле подтверждения текущие смены и штрафы будут закрыты в этом расчётном периоде.`;
+ if (!window.confirm(confirmation)) return;
+
+ payrollActionInProgress = true;
+ try {
+ const now = new Date().toISOString();
+ const runId = `payroll_${String(person.id)}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+ const paidShifts = shifts.map(shift => ({
+ ...shift,
+ status: 'paid',
+ payrollRunId: runId,
+ paidAt: now,
+ updatedAt: now
+ }));
+ const archivedFines = activeFines.map(fine => ({
+ ...fine,
+ payrollStatus: 'settled',
+ payrollRunId: runId,
+ payrollSettledAt: now,
+ archivedAt: now,
+ payrollDecision: fineDecision,
+ salaryImpactApplied: fineDecision === 'include' ? -Math.abs(Number(fine.amount) || 0) : 0
+ }));
+ const run = {
+ id: runId,
+ businessId: getCurrentBusinessId(),
+ departmentId: String(department.id),
+ departmentName: department.name || '',
+ staffId: String(person.id),
+ staffName: person.name || 'Сотрудник',
+ mode: config.mode,
+ rate: config.rate,
+ shiftCount: paidShifts.length,
+ workedMinutes: getPayrollClosedMinutes(paidShifts),
+ shiftIds: paidShifts.map(shift => String(shift.id)),
+ fineIds: archivedFines.map(fine => String(fine.id)),
+ grossAmount,
+ fineAmount,
+ fineDecision,
+ finalAmount,
+ paidAt: now,
+ createdAt: now,
+ createdBy: 'founder'
+ };
+ const previousFineHistory = Array.isArray(person.fineHistory) ? person.fineHistory : [];
+ const updatedFineHistory = [...archivedFines, ...previousFineHistory];
+
+ if (CLOUD_ENABLED && db) {
+ const businessId = getCurrentBusinessId();
+ const batch = db.batch();
+ paidShifts.forEach(shift => batch.set(db.collection('payrollShifts').doc(String(shift.id)), { ...shift, businessId }, { merge: true }));
+ batch.set(db.collection('payrollRuns').doc(runId), { ...run, businessId }, { merge: true });
+ batch.set(db.collection('staff').doc(String(person.id)), {
+ businessId,
+ fineHistory: updatedFineHistory,
+ payrollLastPaidAt: now,
+ payrollLastRunId: runId,
+ updatedAt: now
+ }, { merge: true });
+ archivedFines.forEach(fine => batch.delete(db.collection('fines').doc(String(fine.id))));
+ await batch.commit();
+ }
+
+ const paidIds = new Set(paidShifts.map(shift => String(shift.id)));
+ appCache.payrollShifts = getPayrollShifts().map(shift => paidIds.has(String(shift.id))
+ ? paidShifts.find(item => String(item.id) === String(shift.id))
+ : shift);
+ appCache.payrollRuns = [run, ...getPayrollRuns().filter(item => String(item.id) !== runId)];
+ const fineIds = new Set(archivedFines.map(fine => String(fine.id)));
+ appCache.fines = getFines().filter(fine => !fineIds.has(String(fine.id)));
+ appCache.staff = getStaff().map(item => String(item.id) === String(person.id) ? {
+ ...item,
+ fineHistory: updatedFineHistory,
+ payrollLastPaidAt: now,
+ payrollLastRunId: runId,
+ updatedAt: now
+ } : item);
+ paidShifts.forEach(shift => removePendingPayrollShiftWrite(shift.id));
+ archivedFines.forEach(fine => removePendingFineWrite(fine.id));
+ LocalDB.set('payrollShifts', appCache.payrollShifts);
+ LocalDB.set('payrollRuns', appCache.payrollRuns);
+ LocalDB.set('fines', appCache.fines);
+ LocalDB.set('staff', appCache.staff);
+ markDepartmentProcessRead(department.id, 'payroll');
+ showToast(`Зарплата выдана: ${formatPayrollMoney(finalAmount)} ✓`);
+ renderFounderPayrollDetail();
+ } catch (error) {
+ console.error('payroll issue error', error);
+ showToast('Не удалось выдать зарплату. Данные периода не сброшены.');
+ } finally {
+ payrollActionInProgress = false;
+ }
 }
 
 
@@ -6422,6 +7265,7 @@ function sanitizeAnonymousFeedbackItem(item) {
  targetName: type === 'complaint' ? String(source.targetName || '') : '',
  targetRole: type === 'complaint' ? String(source.targetRole || '') : '',
  targetRoleLabel: type === 'complaint' ? String(source.targetRoleLabel || '') : '',
+ departmentId: String(source.departmentId || ''),
  date: String(source.date || ''),
  time: String(source.time || ''),
  createdAt: String(source.createdAt || new Date().toISOString())
@@ -6549,6 +7393,89 @@ function getFounderUnreadCount(kind, items, idGetter, timeGetter) {
  return (items || []).filter(item => isFounderItemUnread(kind, idGetter(item), timeGetter(item))).length;
 }
 
+function departmentProcessReadKey(departmentId, processKey) {
+ return `departmentProcess_${String(departmentId || '')}_${String(processKey || '')}`;
+}
+
+function getDepartmentProcessActivityTime(item, processKey) {
+ if (processKey === 'tasks') return getTimeMs(item && item.closedAt);
+ if (processKey === 'repair') return getTimeMs(item && (item.repairedAt || item.createdAt));
+ if (processKey === 'payroll') return getTimeMs(item && (item.closedAt || item.openedAt));
+ return getTimeMs(item && (item.submittedAt || item.createdAt || item.updatedAt));
+}
+
+function getDepartmentProcessActivities(departmentId, processKey) {
+ const departmentKey = String(departmentId || '');
+ if (!departmentKey) return [];
+ const departmentStaffIds = new Set(getDepartmentStaffList(departmentKey).map(staff => String(staff.id)));
+
+ if (processKey === 'photoReport') {
+ return getReports().filter(report => String(report.departmentId || '') === departmentKey);
+ }
+ if (processKey === 'inventory') {
+ return getInventoryRecords().filter(record => String(record.departmentId || '') === departmentKey);
+ }
+ if (processKey === 'statistics') {
+ return getDepartmentStatisticsEntries(departmentKey);
+ }
+ if (processKey === 'order') {
+ return getBathmasterOrders().filter(order =>
+ String(order.departmentId || '') === departmentKey ||
+ String(order.sourceRole || '') === departmentKey
+ );
+ }
+ if (processKey === 'repair') {
+ const department = getDepartment(departmentKey);
+ if (isTechnicianDepartment(department)) return getRepairRequests();
+ return getRepairRequests().filter(request =>
+ String(request.departmentId || request.sourceRole || '') === departmentKey
+ );
+ }
+ if (processKey === 'feedback') {
+ return getAnonymousFeedback().filter(item =>
+ String(item.departmentId || '') === departmentKey ||
+ (!item.departmentId && item.targetId && departmentStaffIds.has(String(item.targetId)))
+ );
+ }
+ if (processKey === 'tasks') {
+ return getFounderTasks().filter(task =>
+ String(getTaskDepartmentId(task) || '') === departmentKey &&
+ String(task.status || '') === 'closed' &&
+ Boolean(task.closedAt)
+ );
+ }
+ if (processKey === 'payroll') {
+ return getPayrollShifts().filter(shift =>
+ String(shift.departmentId || '') === departmentKey
+ );
+ }
+ return [];
+}
+
+function getDepartmentProcessUnreadCount(departmentId, processKey) {
+ const marker = getReadMarker(departmentProcessReadKey(departmentId, processKey));
+ return getDepartmentProcessActivities(departmentId, processKey)
+ .filter(item => getDepartmentProcessActivityTime(item, processKey) > marker)
+ .length;
+}
+
+function getDepartmentUnreadActivityCount(department) {
+ if (!department || !Array.isArray(department.processes)) return 0;
+ return department.processes.reduce((total, process) =>
+ total + getDepartmentProcessUnreadCount(department.id, process.key), 0);
+}
+
+function markDepartmentProcessRead(departmentId, processKey) {
+ setReadMarker(departmentProcessReadKey(departmentId, processKey));
+}
+
+function departmentUnreadBadgeHtml(count, label = 'Новых записей') {
+ const total = Number(count || 0);
+ if (!total) return '';
+ const text = total > 99 ? '99+' : String(total);
+ return `<span class="notify-badge show" aria-label="${escapeHtml(label)}: ${text}">${text}</span>`;
+}
+
 function getStopListReadKeyForCurrentWaiter() {
  const waiter = getWaiter();
  return waiter && waiter.id ? `waiterStopList_${waiter.id}` : 'waiterStopList';
@@ -6571,7 +7498,7 @@ function getUnreadCounts() {
  const adminStatsUnread = getFounderUnreadCount('adminStats', getAdminStats(), r => r.id, r => r.createdAt);
  const bathmasterOrdersUnread = getFounderUnreadCount('bathmasterOrder', getBathmasterOrders().filter(r => String(r.sourceRole || 'bathmaster') === 'bathmaster'), r => r.id, r => r.createdAt);
  const masseurOrdersUnread = getFounderUnreadCount('masseurOrder', getBathmasterOrders().filter(r => String(r.sourceRole || '') === 'masseur'), r => r.id, r => r.createdAt);
- const repairUnreadForFounder = getFounderUnreadCount('repair', getRepairRequests(), r => r.id, r => r.createdAt);
+ const repairUnreadForFounder = getFounderUnreadCount('repair', getRepairRequests(), r => r.id, r => r.repairedAt || r.createdAt);
  const feedbackUnread = getFounderUnreadCount('feedback', getAnonymousFeedback(), r => r.id, r => r.createdAt);
  const repairUnreadForTechnician = getRepairRequests().filter(r => r.status === 'new').length;
  const cookReportsUnread = getFounderUnreadCount('cookStaffReport', getCookStaffReports(), r => r.id, r => r.createdAt);
@@ -6706,11 +7633,16 @@ function getPhotoDisplaySrc(photo) {
 
 
 async function notifyTelegramUsers(telegramIds, textValue, options = {}) {
+ const businessId = String(getCurrentBusinessId() || '').trim();
+ const allowedIds = new Set(getBusinessScopedNotificationTelegramIds());
  const ids = (telegramIds || [])
  .map(v => String(v || '').trim())
- .filter(Boolean);
+ .filter(id => Boolean(id) && allowedIds.has(id));
 
- if (!ids.length || !textValue || !TELEGRAM_PHOTO_ENABLED) {
+ // Notifications are never sent without a verified active-business context.
+ // This intentionally skips sending while the scoped staff list is still loading,
+ // instead of risking delivery to an identity left in another business's cache.
+ if (!businessId || !ids.length || !textValue || !TELEGRAM_PHOTO_ENABLED) {
  return { ok: false, sent: 0, skipped: true };
  }
 
@@ -6721,6 +7653,7 @@ async function notifyTelegramUsers(telegramIds, textValue, options = {}) {
  : buildMiniAppDeepLink(startParam);
 
  const payload = {
+ businessId,
  telegramIds: ids,
  text: textValue
  };
@@ -6779,13 +7712,27 @@ function notifyTelegramUsersWithLink(telegramIds, textValue, startParam, buttonT
 function getTelegramIdsForRole(role) {
  const roleKey = String(role || '');
  const staffIds = getStaff()
- .filter(s => String(s.role || '') === roleKey)
+ .filter(s => isNotificationPersonInCurrentBusiness(s) && String(s.role || '') === roleKey)
  .map(s => s.telegramId || s.chatId || s.telegramID);
  const adminIds = roleKey === 'admin'
- ? getAdminProfiles().map(a => a.telegramId || a.chatId || a.telegramID)
+ ? getAdminProfiles()
+ .filter(isNotificationPersonInCurrentBusiness)
+ .map(a => a.telegramId || a.chatId || a.telegramID)
  : [];
  return [...staffIds, ...adminIds]
  .map(v => String(v || '').trim())
+ .filter(Boolean);
+}
+
+function isNotificationPersonInCurrentBusiness(person) {
+ const businessId = String(getCurrentBusinessId() || '').trim();
+ return Boolean(person && businessId && String(person.businessId || '').trim() === businessId);
+}
+
+function getBusinessScopedNotificationTelegramIds() {
+ return [...getStaff(), ...getAdminProfiles()]
+ .filter(isNotificationPersonInCurrentBusiness)
+ .map(person => getTelegramIdForStaff(person))
  .filter(Boolean);
 }
 
@@ -6794,7 +7741,7 @@ function getFounderTelegramIds() {
  const current = getCurrentFounderProfile();
  // Никогда не подставляем Telegram ID текущего WebApp-пользователя без
  // подтвержденной сессии учредителя: на телефоне сотрудника это его ID.
- const currentId = current && String(current.role || '') === 'founder'
+ const currentId = current && isNotificationPersonInCurrentBusiness(current) && String(current.role || '') === 'founder'
  ? getTelegramIdForStaff(current)
  : (hasFounderSession() ? getTelegramWebAppChatId() : '');
  if (currentId) ids.push(currentId);
@@ -6824,16 +7771,18 @@ function notifyFounderOnly(textValue, options = {}) {
 }
 
 function notifyStaffMember(staff, textValue, options = {}) {
+ if (!isNotificationPersonInCurrentBusiness(staff)) {
+ return Promise.resolve({ ok:false, sent:0, skipped:true, reason:'business-mismatch' });
+ }
  const id = getTelegramIdForStaff(staff);
  return id ? notifyTelegramUsers([id], textValue, options) : Promise.resolve({ ok:false, sent:0, skipped:true });
 }
 
 
 // ============================================================
-// TECHNICIAN REPAIR REMINDERS — Telegram bot notifications
-// Напоминания о незакрытых поломках уходят в того же бота через /notify.
-// Важно: из HTML это сработает только когда Mini App открыт в 08:00 или 12:00.
-// Для гарантированной отправки при закрытом приложении нужен Cloudflare Worker Cron.
+// REPAIR ESCALATIONS — notifications only for management.
+// The client checks every minute while at least one business user has the Mini App
+// open. The persistent log prevents duplicate one-hour and 24-hour alerts.
 // ============================================================
 let technicianRepairReminderTimer = null;
 let technicianRepairReminderBusy = false;
@@ -6858,48 +7807,51 @@ function isRepairWaitingForTechnician(req) {
  return !!req && String(req.status || 'new') !== 'repaired';
 }
 
-function buildTechnicianRepairReminderText(req) {
+function buildRepairEscalationText(req, type) {
  const taskText = String(req && req.text ? req.text : 'Без описания').trim();
- const fromText = `${req && req.sourceRoleLabel ? req.sourceRoleLabel : 'Сотрудник'}${req && req.staffName ? ' · ' + req.staffName : ''}`;
- return `🛠️ Задача: ${taskText}\nОт: ${fromText}\nОжидает выполнения`;
+ const fromText = `${req && (req.departmentName || req.sourceRoleLabel) ? (req.departmentName || req.sourceRoleLabel) : 'Подразделение'}${req && req.staffName ? ' · ' + req.staffName : ''}`;
+ if (type === 'unrepaired_24h') {
+ return `🚨 Поломка не устранена.\nПрошло более 24 часов.\n\nОт: ${fromText}\n${taskText}`;
+ }
+ return `⚠️ Техник не ознакомился с поломкой.\nЗадача создана более часа назад.\n\nОт: ${fromText}\n${taskText}`;
 }
 
-function pruneTechnicianRepairReminderLog(log, todayKey) {
+function pruneTechnicianRepairReminderLog(log) {
+ const activeIds = new Set(getRepairRequests().map(request => String(request.id || '')));
  const next = {};
  Object.keys(log || {}).forEach(key => {
- if (key.startsWith(todayKey + '_')) next[key] = log[key];
+ const requestId = key.split('::')[0];
+ if (activeIds.has(requestId)) next[key] = log[key];
  });
  return next;
 }
 
-async function runTechnicianRepairReminderCheck(forceSlot = null) {
+async function runTechnicianRepairReminderCheck() {
  if (technicianRepairReminderBusy) return;
  if (!TELEGRAM_PHOTO_ENABLED) return;
-
  const now = new Date();
- const hour = now.getHours();
- const slot = forceSlot || (hour === 8 ? '08' : (hour === 12 ? '12' : ''));
- if (!slot) return;
-
- const technicianIds = getTelegramIdsForRole('technician');
- if (!technicianIds.length) return;
-
+ const founderIds = getFounderTelegramIds();
+ if (!founderIds.length) return;
  const waiting = getRepairRequests().filter(isRepairWaitingForTechnician);
  if (!waiting.length) return;
 
  technicianRepairReminderBusy = true;
  try {
- const todayKey = toDateKey(now);
- let log = pruneTechnicianRepairReminderLog(getTechnicianRepairReminderLog(), todayKey);
+ let log = pruneTechnicianRepairReminderLog(getTechnicianRepairReminderLog());
  let changed = false;
 
  for (const req of waiting) {
  const reqId = String(req.id || '');
  if (!reqId) continue;
- const key = `${todayKey}_${slot}_${reqId}`;
+ const ageMs = getRepairAgeMs(req, now.getTime());
+ let type = '';
+ if (ageMs >= 24 * 60 * 60 * 1000) type = 'unrepaired_24h';
+ else if (ageMs >= 60 * 60 * 1000 && String(req.status || 'new') === 'new' && !req.technicianReadAt) type = 'unread_1h';
+ if (!type) continue;
+ const key = `${reqId}::${type}`;
  if (log[key]) continue;
 
- const result = await notifyTelegramUsers(technicianIds, buildTechnicianRepairReminderText(req), { startParam: 'technician_repairs', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+ const result = await notifyTelegramUsers(founderIds, buildRepairEscalationText(req, type), { startParam: 'founder_repairs', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
  if (result && result.ok !== false) {
  log[key] = new Date().toISOString();
  changed = true;
@@ -7564,6 +8516,8 @@ function refreshScreen(id) {
  if (id === 'screen-founder-menu') renderFounderMenu();
  if (id === 'screen-department-manage') renderDepartmentManage();
  if (id === 'screen-generic-process-list') renderGenericProcessList();
+ if (id === 'screen-founder-payroll-list') renderFounderPayrollList();
+ if (id === 'screen-founder-payroll-detail') renderFounderPayrollDetail();
  if (id === 'screen-founder-department-statistics') renderFounderDepartmentStatistics();
  if (id === 'screen-staff-department-statistics') renderStaffDepartmentStatistics();
  if (id === 'screen-department-add-process') renderAddProcessList();
@@ -7691,6 +8645,9 @@ function addLocalPhotoToCameraTarget(localPhoto) {
  }
  if (cameraTarget === 'anonymousFeedback') {
  return addAnonymousFeedbackPhoto(localPhoto);
+ }
+ if (cameraTarget === 'departmentOrder') {
+ return addDepartmentOrderPhoto(localPhoto);
  }
  if (cameraTarget === 'cookStaffReport') {
  return addCookStaffReportPhoto(localPhoto);
@@ -8257,22 +9214,22 @@ function renderWaiterMenu() {
  const dep = getDepartment(getMyDepartmentId()) || getPrimaryDepartment();
  const roleLabelEl = document.getElementById('waiter-menu-role-label');
  if (roleLabelEl) roleLabelEl.textContent = dep ? dep.name : 'Сотрудник';
+ renderPayrollShiftControl();
  renderDepartmentStaffMenu();
 
- // Duty banner
- const duty = getDutyAssignment();
+ // Ближайшее назначение из карточки сотрудника. Оно остаётся видно в
+ // приложении даже если Telegram-уведомление не дошло или было закрыто.
+ const duty = getUpcomingDutyAssignmentForEmployee({ ...w, _key: `staff:${String(w.id)}` });
  const banner = document.getElementById('duty-banner');
- const activeShiftDate = getNextShiftDateKey();
 
  if (
  duty &&
- String(duty.staffId) === String(w.id) &&
- (!duty.targetDate || duty.targetDate === activeShiftDate)
+ String(duty.staffId) === String(w.id)
  ) {
- const target = duty.targetDate ? ` (${formatDateRu(duty.targetDate)})` : '';
- const tasks = duty.tasks ? `\n\nСписок задач:\n${duty.tasks}` : '';
+ const target = duty.targetDate ? formatDateRu(duty.targetDate) : 'выбранную дату';
+ const tasks = duty.tasks ? `\n\nВам необходимо:\n${duty.tasks}` : '';
  document.getElementById('duty-banner-text').textContent =
- `Здравствуйте, ${w.name}!\n\nЗавтра вы назначены дежурным${target}!${tasks}`;
+ `Здравствуйте, ${w.name}!\n\nВы назначены дежурным на ${target}.${tasks}`;
  banner.style.display = 'flex';
  banner.style.whiteSpace = 'pre-line';
  banner.style.alignItems = 'flex-start';
@@ -8290,17 +9247,20 @@ function renderDepartmentStaffMenu() {
  const dep = getDepartment(myDepId) || getPrimaryDepartment();
  const visibleProcesses = dep && Array.isArray(dep.processes)
  ? dep.processes.filter(process =>
+ process.key !== 'payroll' && (
  process.key !== 'fines' ||
  hasFounderSession() ||
  normalizeDepartmentFinesConfig(dep.finesConfig).employeeVisible
  )
+ )
  : [];
 
  if (!dep || !visibleProcesses.length) {
+ const payrollOnly = Boolean(dep && departmentHasPayroll(dep));
  container.innerHTML = `<div class="empty" style="padding:32px 0;">
  <div class="empty-icon">🗂️</div>
- <div class="empty-title">Процессы ещё не настроены</div>
- <div class="empty-sub">Управление добавит их в разделе подразделения</div>
+ <div class="empty-title">${payrollOnly ? 'Других процессов пока нет' : 'Процессы ещё не настроены'}</div>
+ <div class="empty-sub">${payrollOnly ? 'Учёт смены доступен выше' : 'Управление добавит их в разделе подразделения'}</div>
  </div>`;
  return;
  }
@@ -8308,8 +9268,12 @@ function renderDepartmentStaffMenu() {
  container.innerHTML = visibleProcesses.map(p => {
  const clickAttr = `onclick="openStaffProcess('${p.key}')"`;
  const unreadTasks = p.key === 'tasks' ? getUnreadTasksForRole(dep.id).length : 0;
- const unreadBadge = unreadTasks
- ? `<span class="notify-badge show" aria-label="Непросмотренных задач: ${unreadTasks}">${unreadTasks > 99 ? '99+' : unreadTasks}</span>`
+ const unreadRepairs = p.key === 'repair' && isTechnicianDepartment(dep)
+ ? getRepairRequests().filter(request => String(request.status || 'new') === 'new').length
+ : 0;
+ const unreadCount = unreadTasks || unreadRepairs;
+ const unreadBadge = unreadCount
+ ? `<span class="notify-badge show" aria-label="Новых записей: ${unreadCount}">${unreadCount > 99 ? '99+' : unreadCount}</span>`
  : '';
  return `
  <div class="menu-item" ${clickAttr}>
@@ -8352,7 +9316,11 @@ function openProcessLockedStub(label, isCustom, suffix) {
 // процессы. Новые процессы автоматически наследуют это правило.
 // ============================================================
 function getDepartmentProcessAccess(key) {
- const founderAccess = hasFounderSession();
+ // A management session may coexist on the same device with an employee
+ // session. The active employee workspace must never inherit management
+ // permissions, otherwise the employee fines tile opens the creation form.
+ const employeeWorkspaceActive = isEmployeeWorkspaceActive();
+ const founderAccess = hasFounderSession() && !employeeWorkspaceActive;
  let staff = null;
  let departmentId = '';
 
@@ -8374,9 +9342,9 @@ function getDepartmentProcessAccess(key) {
  (department.processes || []).some(process => String(process.key) === String(key))
  );
  const employeeVisibilityAllowed = Boolean(
- key !== 'fines' ||
- founderAccess ||
- (department && normalizeDepartmentFinesConfig(department.finesConfig).employeeVisible)
+ (key !== 'payroll' || founderAccess) &&
+ (key !== 'fines' || founderAccess ||
+ (department && normalizeDepartmentFinesConfig(department.finesConfig).employeeVisible))
  );
  const processEnabled = processAdded && employeeVisibilityAllowed;
  const employeeOwnDepartment = Boolean(
@@ -8413,6 +9381,16 @@ function requireDepartmentProcessAccess(key) {
  return null;
 }
 
+function isEmployeeWorkspaceActive() {
+ const stack = Array.isArray(screenStack) ? screenStack.map(String) : [];
+ const employeeIndex = Math.max(stack.lastIndexOf('screen-waiter-menu'), stack.lastIndexOf('screen-waiter-register'));
+ const managementIndex = Math.max(stack.lastIndexOf('screen-founder-menu'), stack.lastIndexOf('screen-department-manage'));
+ return Boolean(
+  document.getElementById('screen-waiter-menu')?.classList.contains('active') ||
+  employeeIndex > managementIndex
+ );
+}
+
 function requireFounderDepartmentAccess(departmentId) {
  if (!hasFounderSession()) {
  showToast('Этот раздел доступен только управлению');
@@ -8441,9 +9419,11 @@ function openStaffProcess(key) {
  else openMyFines();
  return;
  case 'feedback': openAnonymousFeedback(); return;
- case 'training': openAdminTrainingReport(); return;
- case 'duty': openMyDutyStatus(); return;
  case 'order': openBathmasterOrder(getMyDepartmentId() || 'bathmaster'); return;
+ case 'repair':
+ if (isTechnicianDepartment(access.department)) openTechnicianRepairs();
+ else openRepairCreate(access.departmentId);
+ return;
  default: openEmptyProcessPlaceholder(key); return;
  }
 }
@@ -8468,13 +9448,17 @@ function openEmptyProcessPlaceholder(key) {
 function openFounderProcessResults(departmentId, key) {
  const department = requireFounderDepartmentAccess(departmentId);
  if (!department) return;
+ markDepartmentProcessRead(department.id, key);
  if (key === 'photoReport') { openDepartmentPhotoResults(); return; }
  if (key === 'tasks') { openFounderTaskDepartment(department.id); return; }
- if (key === 'duty') { goTo('screen-duty'); return; }
- if (key === 'payroll') { showToast('Раздел в разработке'); return; }
+ if (key === 'payroll') { openFounderPayroll(department.id); return; }
  if (key === 'statistics') { openFounderDepartmentStatistics(department.id); return; }
  if (key === 'fines') { openFounderDepartmentFines(department.id); return; }
  if (key === 'feedback') { openFounderAnonymousFeedback(); return; }
+ if (key === 'repair') { openFounderRepairs(); return; }
+ if (key === 'order') {
+ markDepartmentOrdersStatusRead(department.id).catch(err => console.warn('department orders read status deferred', err));
+ }
  activeGenericProcessDeptId = String(department.id);
  activeGenericProcessKey = key;
  renderGenericProcessList();
@@ -8492,6 +9476,10 @@ function openFounderProcessSettings(departmentId, key) {
  openDepartmentFinesSettings(department.id);
  return;
  }
+ if (key === 'payroll') {
+ openFounderPayroll(department.id);
+ return;
+ }
  showToast('У этого процесса пока нет отдельных настроек — использует общие параметры');
 }
 
@@ -8501,7 +9489,7 @@ function renderGenericProcessList() {
  const proc = getCatalogProcess(key);
  const titleEl = document.getElementById('generic-process-list-title');
  const el = document.getElementById('generic-process-list-content');
- if (titleEl) titleEl.textContent = (proc ? proc.label : 'Процесс') + (dep ? ' · ' + dep.name : '');
+ if (titleEl) titleEl.textContent = getManagementProcessLabel(proc) + (dep ? ' · ' + dep.name : '');
  if (!el) return;
 
  if (key === 'fines' && !hasFounderSession()) {
@@ -8522,9 +9510,10 @@ function renderGenericProcessList() {
  const deptStaffIds = new Set(getDepartmentStaffList(activeGenericProcessDeptId).map(s => String(s.id)));
  let items = [];
  if (key === 'order') {
- items = getBathmasterOrders().filter(o => String(o.sourceRole || '') === String(activeGenericProcessDeptId));
- } else if (key === 'training') {
- items = getAdminTrainingReports().filter(r => deptStaffIds.has(String(r.adminId)));
+ items = getBathmasterOrders().filter(o =>
+ String(o.departmentId || '') === String(activeGenericProcessDeptId) ||
+ String(o.sourceRole || '') === String(activeGenericProcessDeptId)
+ );
  } else if (key === 'statistics') {
  items = getAdminStats().filter(r => deptStaffIds.has(String(r.adminId)));
  } else if (key === 'fines') {
@@ -8549,10 +9538,17 @@ function renderGenericProcessList() {
  const name = item.staffName || item.adminName || item.name || item.targetName || 'Сотрудник';
  const text = item.text || item.staffText || item.reason || '';
  const amount = (key === 'fines' && item.amount) ? ` · <b>${Number(item.amount).toLocaleString('ru-RU')}</b>` : '';
+ const orderStatus = key === 'order'
+ ? ` · <span style="color:${getBathmasterOrderStatusColor(item)};font-weight:700;">${getBathmasterOrderStatusText(item)}</span>`
+ : '';
+ const photosHtml = (item.photos || []).length
+ ? `<div class="report-photo-grid" style="margin-top:12px;">${(item.photos || []).slice(0,5).map(photo => `<div class="report-photo-thumb" onclick="openFullscreen('${getPhotoDisplaySrc(photo)}')"><img src="${getPhotoDisplaySrc(photo)}" alt=""></div>`).join('')}</div>`
+ : '';
  return `<div class="card" style="cursor:default;">
  <div class="card-title" data-i18n-skip>${escapeHtml(String(name))}</div>
- <div class="card-sub">${escapeHtml(dateText)}${amount}</div>
+ <div class="card-sub">${escapeHtml(dateText)}${amount}${orderStatus}</div>
  ${text ? `<div style="font-size:15px;line-height:1.55;margin-top:12px;white-space:pre-line;" data-i18n-skip>${escapeHtml(String(text))}</div>` : ''}
+ ${photosHtml}
  </div>`;
  }).join('');
 }
@@ -9099,11 +10095,12 @@ function renderFounderMenu() {
 
  departments.forEach(dep => {
  const count = dep.processes ? dep.processes.length : 0;
+ const unreadCount = getDepartmentUnreadActivityCount(dep);
  html += `
  <div class="menu-item" onclick="openDepartmentManage('${dep.id}')">
  <div class="menu-icon">🏷️</div>
  <div class="menu-text">
- <div class="menu-title" data-i18n-skip>${escapeHtml(dep.name)}</div>
+ <div class="menu-title-row"><div class="menu-title" data-i18n-skip>${escapeHtml(dep.name)}</div>${departmentUnreadBadgeHtml(unreadCount, 'Новых активностей')}</div>
  <div class="menu-desc">${count ? plural(count, 'процесс', 'процесса', 'процессов') : 'Процессы ещё не добавлены'} · настроить</div>
  </div>
  <span class="menu-arrow">›</span>
@@ -9200,11 +10197,12 @@ function renderDepartmentManage() {
  } else {
  dep.processes.forEach(p => {
  const openAttr = `onclick="openFounderProcessResults('${dep.id}', '${p.key}')"`;
+ const unreadCount = getDepartmentProcessUnreadCount(dep.id, p.key);
  html += `
  <div class="menu-item" ${openAttr}>
  <div class="menu-icon">${p.icon}</div>
  <div class="menu-text">
- <div class="menu-title"${p.custom ? ' data-i18n-skip' : ''}>${escapeHtml(p.label)}</div>
+ <div class="menu-title-row"><div class="menu-title"${p.custom ? ' data-i18n-skip' : ''}>${escapeHtml(getManagementProcessLabel(p))}</div>${departmentUnreadBadgeHtml(unreadCount)}</div>
  <div class="menu-desc">Отчёты и результаты процесса</div>
  </div>
  <span class="menu-arrow">›</span>
@@ -9265,7 +10263,7 @@ function renderDepartmentManage() {
  <div style="flex:1;display:flex;align-items:center;gap:14px;cursor:pointer;min-width:0;" ${openAttr}>
  <div class="menu-icon">${p.icon}</div>
  <div class="menu-text">
- <div class="menu-title"${p.custom ? ' data-i18n-skip' : ''}>${escapeHtml(p.label)}</div>
+ <div class="menu-title"${p.custom ? ' data-i18n-skip' : ''}>${escapeHtml(getManagementProcessLabel(p))}</div>
  <div class="menu-desc">Параметры процесса</div>
  </div>
  </div>
@@ -9352,9 +10350,8 @@ async function saveDepartmentSettings() {
 }
 
 function openDepartmentAddProcess() {
+ pendingDepartmentProcessSubmission = null;
  renderAddProcessList();
- const customEl = document.getElementById('dep-add-process-custom');
- if (customEl) customEl.value = '';
  goTo('screen-department-add-process');
 }
 
@@ -9370,7 +10367,6 @@ function renderAddProcessList() {
  listEl.innerHTML = `<div class="empty" style="padding:16px 0;">
  <div class="empty-icon">✅</div>
  <div class="empty-title">Все готовые процессы уже добавлены</div>
- <div class="empty-sub">Можно создать свой процесс ниже</div>
  </div>`;
  return;
  }
@@ -9380,28 +10376,75 @@ function renderAddProcessList() {
  <input type="checkbox" value="${p.key}" class="dep-process-checkbox" style="width:20px;height:20px;margin-right:12px;accent-color:var(--accent);flex-shrink:0;">
  <div class="menu-icon">${p.icon}</div>
  <div class="menu-text">
- <div class="menu-title">${escapeHtml(p.label)}</div>
+ <div class="menu-title">${escapeHtml(getManagementProcessLabel(p))}</div>
  <div class="menu-desc">${isProcessUnlocked(p.key) ? 'Активно' : 'Доступно в полной версии'}</div>
  </div>
  </label>`).join('');
 }
+
+let pendingDepartmentProcessSubmission = null;
 
 async function submitAddProcesses() {
  const dep = getDepartment(activeManagedDepartmentId);
  if (!dep) return;
 
  const checked = Array.from(document.querySelectorAll('.dep-process-checkbox:checked')).map(el => el.value).filter(isProcessUnlocked);
- const customInput = document.getElementById('dep-add-process-custom');
- const customRaw = customInput ? customInput.value.trim() : '';
- const customLabels = customRaw ? [customRaw] : [];
 
- if (!checked.length && !customLabels.length) {
+ if (!checked.length) {
  showToast('Выберите хотя бы один процесс');
  return;
  }
 
- await addProcessesToDepartment(dep.id, checked, customLabels);
- showToast('Процессы добавлены ✓');
+ if (checked.includes('repair') && !getTechnicianDepartment()) {
+ pendingDepartmentProcessSubmission = {
+ departmentId: String(dep.id),
+ processKeys: [...checked]
+ };
+ openModal('modal-create-technician-department');
+ return;
+ }
+
+ await finishDepartmentProcessSubmission(String(dep.id), checked, null, false);
+}
+
+function cancelTechnicianDepartmentCreation() {
+ pendingDepartmentProcessSubmission = null;
+ closeModal('modal-create-technician-department');
+ showToast('Процесс «Поломки» не добавлен');
+}
+
+async function confirmTechnicianDepartmentCreation() {
+ const pending = pendingDepartmentProcessSubmission;
+ pendingDepartmentProcessSubmission = null;
+ closeModal('modal-create-technician-department');
+ if (!pending) return;
+
+ try {
+ const technicianDepartment = await createTechnicianDepartmentForRepairs();
+ if (!technicianDepartment) throw new Error('TECHNICIAN_DEPARTMENT_NOT_CREATED');
+ await finishDepartmentProcessSubmission(pending.departmentId, pending.processKeys, technicianDepartment, true);
+ } catch (err) {
+ console.error('technician department creation error', err);
+ showToast('Не удалось создать подразделение «Техник»');
+ }
+}
+
+async function finishDepartmentProcessSubmission(departmentId, processKeys, technicianDepartment = null, technicianCreated = false) {
+ const keys = Array.isArray(processKeys) ? processKeys.filter(isProcessUnlocked) : [];
+ if (!keys.length) return;
+
+ if (keys.includes('repair')) {
+ const technician = technicianDepartment || getTechnicianDepartment();
+ if (!technician) throw new Error('TECHNICIAN_DEPARTMENT_REQUIRED');
+ if (!(technician.processes || []).some(process => process.key === 'repair')) {
+ const updatedTechnician = await addProcessesToDepartment(technician.id, ['repair'], []);
+ if (!updatedTechnician) throw new Error('TECHNICIAN_REPAIR_PROCESS_NOT_ADDED');
+ }
+ }
+
+ const updatedDepartment = await addProcessesToDepartment(departmentId, keys, []);
+ if (!updatedDepartment) throw new Error('DEPARTMENT_PROCESSES_NOT_ADDED');
+ showToast(technicianCreated ? 'Подразделение «Техник» создано, процесс добавлен ✓' : 'Процессы добавлены ✓');
  goBack();
  renderDepartmentManage();
 }
@@ -9409,6 +10452,27 @@ async function submitAddProcesses() {
 function removeDepartmentProcessConfirm(key) {
  const dep = getDepartment(activeManagedDepartmentId);
  if (!dep) return;
+ if (key === 'payroll') {
+ const activeShiftCount = getPayrollShifts().filter(shift =>
+ String(shift.departmentId || '') === String(dep.id) &&
+ String(shift.status || '') === 'open' &&
+ !shift.closedAt
+ ).length;
+ if (activeShiftCount) {
+ showToast(`Сначала закройте ${activeShiftCount} ${plural(activeShiftCount, 'активную смену', 'активные смены', 'активных смен')}`);
+ return;
+ }
+ }
+ if (key === 'repair' && isTechnicianDepartment(dep)) {
+ const usedByOtherDepartments = getDepartments().some(other =>
+ String(other.id) !== String(dep.id) &&
+ (other.processes || []).some(process => process.key === 'repair')
+ );
+ if (usedByOtherDepartments) {
+ showToast('Сначала удалите «Поломки» из остальных подразделений');
+ return;
+ }
+ }
  const proc = dep.processes.find(p => p.key === key);
  const ok = window.confirm(`Удалить процесс «${proc ? proc.label : ''}» из подразделения?`);
  if (!ok) return;
@@ -12654,6 +13718,9 @@ let activeRepairPhotoSet = [];
 let activeRepairFixedPhotoSet = [];
 
 function getCurrentTechnician() {
+ const waiter = getWaiter();
+ const waiterDepartment = waiter ? getDepartment(getStaffDepartmentId(waiter)) : null;
+ if (waiter && isTechnicianDepartment(waiterDepartment)) return waiter;
  if (hasFounderSession() && InspectStorage.getItem("founderActiveRole") === 'technician') return getFounderActor('technician');
  const current = getCurrentApprovedStaffForRole('technician');
  if (!current || current.role !== 'technician') return null;
@@ -12664,7 +13731,38 @@ function getRepairActor(sourceRole) {
  if (sourceRole === 'bathmaster') return getCurrentBathmaster();
  if (sourceRole === 'masseur') return getCurrentMasseur();
  if (sourceRole === 'cook') return getCook();
- return getWaiter();
+ const waiter = getWaiter();
+ const department = getDepartment(sourceRole);
+ if (department) {
+ return waiter && String(getStaffDepartmentId(waiter) || '') === String(department.id)
+ ? waiter
+ : null;
+ }
+ return waiter;
+}
+
+function getRepairSourceLabel(sourceRole, actor = null) {
+ const department = getDepartment(sourceRole || (actor && getStaffDepartmentId(actor)));
+ return department ? department.name : getRoleLabel(sourceRole);
+}
+
+function getRepairTechnicians() {
+ const technicianDepartment = getTechnicianDepartment();
+ const departmentStaff = technicianDepartment ? getDepartmentStaffList(technicianDepartment.id) : [];
+ const legacyTechnicians = getStaff().filter(person => String(person.role || '') === 'technician');
+ const unique = new Map();
+ [...departmentStaff, ...legacyTechnicians]
+ .filter(isNotificationPersonInCurrentBusiness)
+ .forEach(person => unique.set(String(person.id || getTelegramIdForStaff(person)), person));
+ return [...unique.values()];
+}
+
+function getRepairTechnicianTelegramIds() {
+ return [...new Set(getRepairTechnicians().map(getTelegramIdForStaff).filter(Boolean))];
+}
+
+function notifyRepairTechnicians(textValue, options = {}) {
+ return notifyTelegramUsers(getRepairTechnicianTelegramIds(), textValue, options);
 }
 
 function renderTechnicianMenu() {
@@ -12693,9 +13791,11 @@ function openRepairCreate(sourceRole) {
  const title = document.getElementById('repair-create-title');
  const text = document.getElementById('repair-create-text');
  const err = document.getElementById('repair-create-error');
- if (title) title.textContent = `Поломки · ${getRoleLabel(sourceRole)}`;
+ const photoErr = document.getElementById('repair-create-photo-error');
+ if (title) title.textContent = `Поломки · ${getRepairSourceLabel(sourceRole, actor)}`;
  if (text) text.value = '';
  if (err) err.classList.remove('show');
+ if (photoErr) photoErr.classList.remove('show');
  renderRepairCreatePhotos();
  renderRepairHistoryForCurrentActor();
  goTo('screen-repair-create');
@@ -12705,7 +13805,9 @@ function renderRepairCreatePhotos() {
  const grid = document.getElementById('repair-create-photo-grid');
  const count = document.getElementById('repair-create-photo-count');
  const addBtn = document.getElementById('repair-create-add-btn');
+ const photoErr = document.getElementById('repair-create-photo-error');
  if (!grid || !count || !addBtn) return;
+ if (photoErr && activeRepairPhotos.length) photoErr.classList.remove('show');
  count.textContent = `${activeRepairPhotos.length} / 3`;
  grid.style.display = activeRepairPhotos.length ? 'grid' : 'none';
  addBtn.classList.toggle('hidden', activeRepairPhotos.length >= 3);
@@ -12726,8 +13828,15 @@ function removeRepairPhoto(index) { activeRepairPhotos.splice(index, 1); renderR
 function submitRepairRequest() {
  const textValue = (document.getElementById('repair-create-text')?.value || '').trim();
  const err = document.getElementById('repair-create-error');
- if (!textValue) { if (err) err.classList.add('show'); return; }
- if (err) err.classList.remove('show');
+ const photoErr = document.getElementById('repair-create-photo-error');
+ const textMissing = !textValue;
+ const photoMissing = !activeRepairPhotos.length;
+ if (err) err.classList.toggle('show', textMissing);
+ if (photoErr) photoErr.classList.toggle('show', photoMissing);
+ if (textMissing || photoMissing) {
+ showToast(textMissing && photoMissing ? 'Добавьте описание и фото поломки' : (textMissing ? 'Добавьте описание поломки' : 'Добавьте фото поломки'));
+ return;
+ }
  openModal('modal-repair-confirm');
 }
 
@@ -12744,18 +13853,40 @@ async function confirmRepairRequest() {
  closeModal('modal-repair-confirm');
  const actor = getRepairActor(activeRepairSourceRole);
  const textValue = (document.getElementById('repair-create-text')?.value || '').trim();
- if (!actor || !textValue) { showToast('Нет данных для заявки'); return; }
+ if (!actor || !textValue || !activeRepairPhotos.length) { showToast('Для заявки нужны описание и фото'); return; }
  try {
- showToast(activeRepairPhotos.length ? 'Отправляем фото...' : 'Отправляем заявку...');
+ showToast('Отправляем фото...');
  const photos = await uploadRepairPhotos(activeRepairPhotos, 'repair');
  const now = new Date();
- const req = { id: Date.now(), sourceRole: activeRepairSourceRole, sourceRoleLabel: getRoleLabel(activeRepairSourceRole), staffId: actor.id, staffName: actor.name || getRoleLabel(activeRepairSourceRole), staffLogin: actor.login || '', text: textValue, photos, fixedPhotos: [], status: 'new', date: toDateKey(now), time: now.toTimeString().slice(0, 5), createdAt: now.toISOString(), technicianReadAt: null, repairedAt: null };
+ const department = getDepartment(activeRepairSourceRole) || getDepartment(getStaffDepartmentId(actor));
+ const sourceLabel = getRepairSourceLabel(activeRepairSourceRole, actor);
+ const technicianDepartment = getTechnicianDepartment();
+ const req = {
+ id: 'repair_' + now.getTime().toString(36) + '_' + Math.random().toString(36).slice(2, 8),
+ businessId: getCurrentBusinessId(),
+ departmentId: department ? String(department.id) : String(getStaffDepartmentId(actor) || ''),
+ departmentName: department ? department.name : sourceLabel,
+ technicianDepartmentId: technicianDepartment ? String(technicianDepartment.id) : '',
+ sourceRole: activeRepairSourceRole,
+ sourceRoleLabel: sourceLabel,
+ staffId: actor.id,
+ staffName: actor.name || 'Сотрудник',
+ staffLogin: actor.login || '',
+ text: textValue,
+ photos,
+ fixedPhotos: [],
+ resolutionText: '',
+ status: 'new',
+ date: toDateKey(now),
+ time: now.toTimeString().slice(0, 5),
+ createdAt: now.toISOString(),
+ updatedAt: now.toISOString(),
+ technicianReadAt: null,
+ repairedAt: null
+ };
  await saveRepairRequest(req);
- notifyRole('technician', `🛠️ Задача: ${req.text}\nОт: ${req.sourceRoleLabel} · ${req.staffName}\nОжидает выполнения`, { startParam: 'technician_repairs', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
- if (req.sourceRole === 'cook') {
- notifyRole('cook', `🛠️ Новая заявка на ремонт от повара\n\n${req.staffName}: ${req.text}`);
- }
- notifyFounders(`🛠️ Новая заявка на ремонт\n\n${req.sourceRoleLabel}: ${req.staffName}\n${req.text}`, { startParam: 'founder_repairs', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+ notifyRepairTechnicians(`🛠️ Создана заявка на ремонт\n\nОт: ${req.sourceRoleLabel} · ${req.staffName}\n${req.text}`, { startParam: 'technician_repairs', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+ notifyFounderOnly(`🛠️ Создана заявка на ремонт\n\nОт: ${req.sourceRoleLabel} · ${req.staffName}\n${req.text}`, { startParam: 'founder_repairs', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
  activeRepairPhotos = [];
  document.getElementById('repair-create-text').value = '';
  renderRepairCreatePhotos();
@@ -12810,7 +13941,11 @@ function renderRepairHistoryForCurrentActor() {
 }
 
 
-function openTechnicianRepairs() { renderTechnicianRepairs(); goTo('screen-technician-repairs'); }
+function openTechnicianRepairs() {
+ if (!getCurrentTechnician()) { showToast('Доступно только подразделению «Техник»'); return; }
+ renderTechnicianRepairs();
+ goTo('screen-technician-repairs');
+}
 
 function renderTechnicianRepairs() {
  const list = document.getElementById('technician-repairs-list');
@@ -12825,17 +13960,29 @@ function renderTechnicianRepairs() {
 }
 
 async function openRepairView(reqId, mode) {
- activeRepairViewId = String(reqId);
- InspectStorage.setItem('repairViewMode', mode || 'technician');
- activeRepairClosePhotos = [];
  const req = getRepairRequests().find(r => String(r.id) === String(reqId));
- if (req && mode === 'founder') {
+ const viewMode = mode || 'technician';
+ if (!req) { showToast('Заявка не найдена'); return; }
+ if (viewMode === 'founder' && !hasFounderSession()) { showToast('Доступно только управлению'); return; }
+ if (viewMode === 'technician' && !getCurrentTechnician()) { showToast('Доступно только подразделению «Техник»'); return; }
+ if (viewMode === 'staff') {
+ const actor = getRepairActor(req.sourceRole);
+ if (!actor || String(req.staffId || '') !== String(actor.id || '')) { showToast('Можно просматривать только свои заявки'); return; }
+ }
+ activeRepairViewId = String(reqId);
+ InspectStorage.setItem('repairViewMode', viewMode);
+ activeRepairClosePhotos = [];
+ if (viewMode === 'founder') {
  markFounderItemRead('repair', reqId);
  updateUnreadBadges();
  }
- if (req && mode === 'technician' && req.status === 'new') {
+ if (viewMode === 'technician' && req.status === 'new') {
+ const technician = getCurrentTechnician();
  req.status = 'read_by_technician';
  req.technicianReadAt = new Date().toISOString();
+ req.updatedAt = req.technicianReadAt;
+ req.technicianId = technician ? technician.id : req.technicianId;
+ req.technicianName = technician ? (technician.name || 'Техник') : req.technicianName;
  await updateRepairRequest(req);
  }
  renderRepairView();
@@ -12861,8 +14008,9 @@ function renderRepairView() {
  activeRepairFixedPhotoSet = normalizeRepairPhotoList(req.fixedPhotos);
  const photosHtml = activeRepairPhotoSet.length ? `<div class="section-label">Фото поломки</div><div class="report-photo-grid" style="margin-bottom:16px;">${activeRepairPhotoSet.map((photo, idx) => `<div class="report-photo-thumb" onclick="openRepairPhoto('main', ${idx})"><img src="${getPhotoDisplaySrc(photo)}" alt=""></div>`).join('')}</div>` : `<div class="doc-placeholder">Фото поломки не прикрепляли.</div>`;
  const fixedPhotosHtml = activeRepairFixedPhotoSet.length ? `<div class="section-label">Фото после ремонта</div><div class="report-photo-grid" style="margin-bottom:16px;">${activeRepairFixedPhotoSet.map((photo, idx) => `<div class="report-photo-thumb" onclick="openRepairPhoto('fixed', ${idx})"><img src="${getPhotoDisplaySrc(photo)}" alt=""></div>`).join('')}</div>` : '';
- const closeBlock = mode === 'technician' && req.status !== 'repaired' ? `<div class="section-label">Закрытие заявки</div><div class="photo-section"><div class="photo-section-header"><span class="photo-section-title">Фото после починки</span><span class="photo-count" id="repair-close-photo-count">0 / 3</span></div><div class="photo-body"><div class="photo-grid" id="repair-close-photo-grid" style="display:none;"></div><div id="repair-close-add-btn" class="photo-actions"><button type="button" class="add-photo-btn" onclick="openCameraModal('repairClose')"><span>📷</span><span>Сделать фото</span></button></div></div></div><button class="btn btn-primary" onclick="closeRepairRequestWithPhoto()">Закрыть заявку</button>` : '';
- content.innerHTML = `<div class="inventory-status"><div style="font-size:13px;color:var(--text-3);margin-bottom:6px;">От кого</div><div style="font-size:18px;font-weight:700;margin-bottom:12px;">${escapeHtml(req.staffName || '—')}${req.staffLogin ? ' · ' + escapeHtml(req.staffLogin) : ''}</div><div style="font-size:13px;color:var(--text-3);margin-bottom:6px;">Подразделение</div><div style="font-size:16px;font-weight:600;margin-bottom:12px;">${escapeHtml(req.sourceRoleLabel || '—')}</div><div style="font-size:13px;color:var(--text-3);margin-bottom:6px;">Дата</div><div style="font-size:16px;font-weight:600;margin-bottom:12px;">${escapeHtml(dateText)}</div><div style="font-size:13px;color:var(--text-3);margin-bottom:6px;">Статус</div><div style="font-size:16px;font-weight:800;color:${getRepairStatusColor(req)};">${getRepairStatusText(req)}</div></div><div class="section-label">Описание</div><div class="doc-placeholder" style="white-space:pre-line;color:var(--text);">${escapeHtml(req.text || '')}</div>${photosHtml}${fixedPhotosHtml}${closeBlock}`;
+ const resolutionHtml = req.resolutionText ? `<div class="section-label">Комментарий техника</div><div class="doc-placeholder" style="white-space:pre-line;color:var(--text);">${escapeHtml(req.resolutionText)}</div>` : '';
+ const closeBlock = mode === 'technician' && req.status !== 'repaired' ? `<div class="section-label">Закрытие заявки</div><div class="field"><label>Комментарий о ремонте · по желанию</label><textarea id="repair-close-text" placeholder="Что было сделано"></textarea></div><div class="photo-section"><div class="photo-section-header"><span class="photo-section-title">Фото после починки · по желанию</span><span class="photo-count" id="repair-close-photo-count">0 / 3</span></div><div class="photo-body"><div class="photo-grid" id="repair-close-photo-grid" style="display:none;"></div><div id="repair-close-add-btn" class="photo-actions"><button type="button" class="add-photo-btn" onclick="openCameraModal('repairClose')"><span>📷</span><span>Сделать фото</span></button></div></div></div><button class="btn btn-primary" onclick="closeRepairRequestWithPhoto()">Отремонтировано · закрыть</button>` : '';
+ content.innerHTML = `<div class="inventory-status"><div style="font-size:13px;color:var(--text-3);margin-bottom:6px;">От кого</div><div style="font-size:18px;font-weight:700;margin-bottom:12px;">${escapeHtml(req.staffName || '—')}${req.staffLogin ? ' · ' + escapeHtml(req.staffLogin) : ''}</div><div style="font-size:13px;color:var(--text-3);margin-bottom:6px;">Подразделение</div><div style="font-size:16px;font-weight:600;margin-bottom:12px;">${escapeHtml(req.departmentName || req.sourceRoleLabel || '—')}</div><div style="font-size:13px;color:var(--text-3);margin-bottom:6px;">Дата</div><div style="font-size:16px;font-weight:600;margin-bottom:12px;">${escapeHtml(dateText)}</div><div style="font-size:13px;color:var(--text-3);margin-bottom:6px;">Статус</div><div style="font-size:16px;font-weight:800;color:${getRepairStatusColor(req)};">${getRepairStatusText(req)}</div></div><div class="section-label">Описание</div><div class="doc-placeholder" style="white-space:pre-line;color:var(--text);">${escapeHtml(req.text || '')}</div>${photosHtml}${resolutionHtml}${fixedPhotosHtml}${closeBlock}`;
  if (mode === 'technician' && req.status !== 'repaired') renderRepairClosePhotos();
 }
 
@@ -12897,29 +14045,61 @@ async function confirmCloseRepairRequest() {
  try {
  showToast(activeRepairClosePhotos.length ? 'Отправляем фото...' : 'Закрываем заявку...');
  const photos = await uploadRepairPhotos(activeRepairClosePhotos, 'repairFixed');
+ const resolutionText = (document.getElementById('repair-close-text')?.value || '').trim();
  req.fixedPhotos = photos;
+ req.resolutionText = resolutionText;
  req.status = 'repaired';
  req.repairedAt = new Date().toISOString();
+ req.updatedAt = req.repairedAt;
  req.technicianId = tech.id;
  req.technicianName = tech.name || 'Техник';
  await updateRepairRequest(req);
- if (req.sourceRole === 'cook') {
- notifyRole('cook', `✅ Ремонт закрыт\n\n${req.technicianName} закрыл заявку повара: ${req.text || ''}`);
- }
- notifyFounders(`✅ Ремонт закрыт\n\n${req.technicianName} закрыл заявку: ${req.text || ''}`);
+ const closeText = `✅ Заявка на ремонт закрыта\n\nТехник: ${req.technicianName}\nОт: ${req.departmentName || req.sourceRoleLabel || 'Подразделение'} · ${req.staffName || 'Сотрудник'}\n${req.text || ''}${resolutionText ? '\n\nКомментарий: ' + resolutionText : ''}`;
+ notifyRepairTechnicians(closeText, { startParam: 'technician_repairs', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+ notifyFounderOnly(closeText, { startParam: 'founder_repairs', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
  activeRepairClosePhotos = [];
  showToast('Заявка закрыта ✓');
  renderRepairView();
  } catch (e) { console.error(e); showToast('Ошибка закрытия заявки'); }
 }
 
-function openFounderRepairs() { markFounderItemsRead('repair', getRepairRequests(), r => r.id); renderFounderRepairs(); goTo('screen-founder-repairs'); }
+function getRepairAgeMs(request, now = Date.now()) {
+ const createdAt = getTimeMs(request && request.createdAt);
+ return createdAt ? Math.max(0, now - createdAt) : 0;
+}
+
+function getFounderRepairWarningHtml(request) {
+ if (!request || request.status === 'repaired') return '';
+ const ageMs = getRepairAgeMs(request);
+ if (ageMs >= 24 * 60 * 60 * 1000) {
+ return `<div class="doc-placeholder" style="margin-top:12px;color:var(--danger);">🚨 Поломка не устранена. Прошло более 24 часов.</div>`;
+ }
+ if (String(request.status || 'new') === 'new' && !request.technicianReadAt && ageMs >= 60 * 60 * 1000) {
+ return `<div class="doc-placeholder" style="margin-top:12px;color:var(--accent);">⚠️ Техник не ознакомился с поломкой. Задача создана более часа назад.</div>`;
+ }
+ return '';
+}
+
+function markAllDepartmentRepairsRead() {
+ getDepartments()
+ .filter(department => (department.processes || []).some(process => process.key === 'repair'))
+ .forEach(department => LocalDB.set('readMarker_' + departmentProcessReadKey(department.id, 'repair'), Date.now()));
+}
+
+function openFounderRepairs() {
+ if (!hasFounderSession()) { showToast('Доступно только управлению'); return; }
+ markFounderItemsRead('repair', getRepairRequests(), request => request.id);
+ markAllDepartmentRepairsRead();
+ renderFounderRepairs();
+ updateUnreadBadges();
+ goTo('screen-founder-repairs');
+}
 function renderFounderRepairs() {
  const list = document.getElementById('founder-repairs-list');
  if (!list) return;
  const items = getRepairRequests().slice().sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
  if (!items.length) { list.innerHTML = `<div class="empty"><div class="empty-icon">🛠️</div><div class="empty-title">Поломок пока нет</div><div class="empty-sub">Заявки от официантов, пармастеров, массажистов и поваров появятся здесь</div></div>`; return; }
- list.innerHTML = items.map(req => { const dateText = req.date ? `${formatDateRu(req.date)}${req.time ? ' · ' + req.time : ''}` : ''; return `<div class="shift-card" onclick="openRepairView('${req.id}', 'founder')"><div class="shift-date">${escapeHtml(req.staffName || 'Сотрудник')}${unreadDotHtml(isFounderItemUnread('repair', req.id, req.createdAt))}</div><div class="shift-meta">${escapeHtml(req.sourceRoleLabel || '')} · ${escapeHtml(dateText)} · <span style="color:${getRepairStatusColor(req)};font-weight:700;">${getRepairStatusText(req)}</span></div><div style="font-size:14px;line-height:1.45;margin-top:10px;color:var(--text-2);">${escapeHtml((req.text || '').slice(0, 120))}</div></div>`; }).join('');
+ list.innerHTML = items.map(req => { const dateText = req.date ? `${formatDateRu(req.date)}${req.time ? ' · ' + req.time : ''}` : ''; return `<div class="shift-card" onclick="openRepairView('${req.id}', 'founder')"><div class="shift-date">${escapeHtml(req.staffName || 'Сотрудник')}${unreadDotHtml(isFounderItemUnread('repair', req.id, req.repairedAt || req.createdAt))}</div><div class="shift-meta">${escapeHtml(req.departmentName || req.sourceRoleLabel || '')} · ${escapeHtml(dateText)} · <span style="color:${getRepairStatusColor(req)};font-weight:700;">${getRepairStatusText(req)}</span></div><div style="font-size:14px;line-height:1.45;margin-top:10px;color:var(--text-2);">${escapeHtml((req.text || '').slice(0, 120))}</div>${getFounderRepairWarningHtml(req)}</div>`; }).join('');
 }
 
 // ============================================================
@@ -12927,6 +14107,39 @@ function renderFounderRepairs() {
 // ============================================================
 let activeBathmasterTab = 'staff';
 let activeOrderSourceRole = 'bathmaster';
+let activeDepartmentOrderPhotos = [];
+
+function renderDepartmentOrderPhotos() {
+ const grid = document.getElementById('department-order-photo-grid');
+ const count = document.getElementById('department-order-photo-count');
+ const addBtn = document.getElementById('department-order-add-btn');
+ if (!grid || !count || !addBtn) return;
+ count.textContent = `${activeDepartmentOrderPhotos.length} / 5`;
+ grid.style.display = activeDepartmentOrderPhotos.length ? 'grid' : 'none';
+ addBtn.classList.toggle('hidden', activeDepartmentOrderPhotos.length >= 5);
+ grid.innerHTML = activeDepartmentOrderPhotos.map((photo, index) => `
+ <div class="photo-thumb" onclick="openFullscreen('${photo.preview_url}')">
+ <img src="${photo.preview_url}" alt="">
+ <button class="remove-photo" onclick="event.stopPropagation(); removeDepartmentOrderPhoto(${index})">✕</button>
+ </div>`).join('');
+}
+
+function addDepartmentOrderPhoto(localPhoto) {
+ if (activeDepartmentOrderPhotos.length >= 5) {
+ showToast('Лимит фото: 5');
+ return false;
+ }
+ activeDepartmentOrderPhotos.push(localPhoto);
+ renderDepartmentOrderPhotos();
+ return true;
+}
+
+function removeDepartmentOrderPhoto(index) {
+ const photo = activeDepartmentOrderPhotos[index];
+ if (photo && photo.type === 'local' && photo.preview_url) URL.revokeObjectURL(photo.preview_url);
+ activeDepartmentOrderPhotos.splice(index, 1);
+ renderDepartmentOrderPhotos();
+}
 
 function getCurrentMasseur() {
  if (hasFounderSession() && InspectStorage.getItem("founderActiveRole") === 'masseur') {
@@ -13004,15 +14217,19 @@ function renderBathmasterMenu() {
 
 function openBathmasterOrder(sourceRole = 'bathmaster') {
  activeOrderSourceRole = sourceRole;
+ activeDepartmentOrderPhotos = [];
  const actor = getOrderActor(sourceRole);
  if (!actor) { showToast('Сначала войдите в подразделение'); return; }
  const header = document.querySelector('#screen-bathmaster-order .header-title');
  const field = document.getElementById('bathmaster-order-text');
  const err = document.getElementById('bathmaster-order-error');
- if (header) header.textContent = sourceRole === 'masseur' ? 'Заказать · Массажист' : 'Заказать';
+ if (header) header.textContent = getDepartment(sourceRole)
+ ? `Сделать заказ · ${getOrderRoleLabel(sourceRole)}`
+ : (sourceRole === 'masseur' ? 'Сделать заказ · Массажист' : 'Сделать заказ');
  if (field) field.value = '';
  if (err) err.classList.remove('show');
  renderBathmasterOrderHistory();
+ renderDepartmentOrderPhotos();
  goTo('screen-bathmaster-order');
 }
 
@@ -13027,6 +14244,7 @@ function getBathmasterOrderStatusColor(order) {
 function renderBathmasterOrderHistory() {
  const el = document.getElementById('bathmaster-order-history');
  if (!el) return;
+ renderDepartmentOrderPhotos();
 
  const currentOrderRole = activeOrderSourceRole || 'bathmaster';
  const orders = getBathmasterOrders()
@@ -13034,18 +14252,33 @@ function renderBathmasterOrderHistory() {
  .slice()
  .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
  if (!orders.length) {
- el.innerHTML = `<div class="empty" style="padding:32px 0;"><div class="empty-icon">🧾</div><div class="empty-title">История пустая</div><div class="empty-sub">Здесь появятся заказы пармастеров</div></div>`;
+ el.innerHTML = `<div class="empty" style="padding:32px 0;"><div class="empty-icon">🧾</div><div class="empty-title">История пустая</div><div class="empty-sub">Здесь появятся отправленные заказы</div></div>`;
  return;
  }
 
  el.innerHTML = orders.map(o => {
  const dateText = o.date ? `${formatDateRu(o.date)}${o.time ? ' · ' + o.time : ''}` : (o.createdAt ? new Date(o.createdAt).toLocaleString('ru-RU') : '');
- return `<div class="card" onclick="markFounderOrderRead('bathmasterOrder', '${o.id}', 'bathmaster')">
- <div class="card-title">${escapeHtml(o.staffName || 'Пармастер')}${o.staffLogin ? ' · ' + escapeHtml(o.staffLogin) : ''}${unreadDotHtml(isFounderItemUnread('bathmasterOrder', o.id, o.createdAt))}</div>
+ const photosHtml = (o.photos || []).length ? `<div class="report-photo-grid" style="margin-top:12px;">${(o.photos || []).slice(0,5).map(photo => `<div class="report-photo-thumb" onclick="openFullscreen('${getPhotoDisplaySrc(photo)}')"><img src="${getPhotoDisplaySrc(photo)}" alt=""></div>`).join('')}</div>` : '';
+ return `<div class="card" style="cursor:default;">
+ <div class="card-title">${escapeHtml(o.staffName || 'Сотрудник')}${o.staffLogin ? ' · ' + escapeHtml(o.staffLogin) : ''}</div>
  <div class="card-sub">${escapeHtml(dateText)} · <span style="color:${getBathmasterOrderStatusColor(o)};font-weight:700;">${getBathmasterOrderStatusText(o)}</span></div>
  <div style="font-size:15px;line-height:1.55;margin-top:12px;white-space:pre-line;">${escapeHtml(o.text || '')}</div>
+ ${photosHtml}
  </div>`;
  }).join('');
+}
+
+async function markDepartmentOrdersStatusRead(departmentId) {
+ const unread = getBathmasterOrders().filter(order =>
+ (String(order.departmentId || '') === String(departmentId) || String(order.sourceRole || '') === String(departmentId)) &&
+ String(order.status || 'new') !== 'read'
+ );
+ if (!unread.length) return;
+ await Promise.all(unread.map(order => saveBathmasterOrder({
+ ...order,
+ status: 'read',
+ readAt: order.readAt || new Date().toISOString()
+ })));
 }
 
 async function markBathmasterOrdersStatusRead(sourceRole = 'bathmaster') {
@@ -13085,7 +14318,7 @@ async function submitBathmasterOrder() {
  const order = {
  id: Date.now(),
  staffId: bm.id,
- staffName: bm.name || 'Пармастер',
+ staffName: bm.name || 'Сотрудник',
  staffLogin: bm.login || '',
  sourceRole,
  sourceRoleLabel: getOrderRoleLabel(sourceRole),
@@ -13098,9 +14331,14 @@ async function submitBathmasterOrder() {
  };
 
  try {
+ showToast(activeDepartmentOrderPhotos.length ? 'Отправляем фото...' : 'Отправляем заказ...');
+ const photos = await uploadTaskPhotos(activeDepartmentOrderPhotos, 'departmentOrder');
+ order.departmentId = getDepartment(sourceRole) ? String(sourceRole) : String(bm.departmentId || '');
+ order.photos = photos;
  await saveBathmasterOrder(order);
  notifyFounders(`🧾 Новый заказ от ${order.sourceRoleLabel}\n\n${order.staffName}: ${order.text}`);
  document.getElementById('bathmaster-order-text').value = '';
+ activeDepartmentOrderPhotos = [];
  renderBathmasterOrderHistory();
  showToast('Заявка отправлена ✓');
  } catch (e) {
@@ -14414,7 +15652,7 @@ function renderFounderFines() {
 
 async function addFounderFine() {
  if (founderFineSaving) return;
- if (!hasFounderSession()) {
+ if (!hasFounderSession() || isEmployeeWorkspaceActive()) {
  showToast('Назначать штрафы может только управление');
  return;
  }
@@ -14610,7 +15848,11 @@ async function confirmDeleteDepartmentPhotoDate() {
  closeModal('modal-delete-photo-date');
  pendingDeleteDepartmentPhotoDate = '';
  if (!date) return;
- const toDelete = getReports().filter(r => String(r.date || '') === String(date) && !!r.departmentId);
+ const departmentId = String(activeManagedDepartmentId || '');
+ const toDelete = getReports().filter(r =>
+ String(r.date || '') === String(date) &&
+ String(r.departmentId || '') === departmentId
+ );
  if (!toDelete.length) return;
  const ids = new Set(toDelete.map(r => String(r.id)));
  appCache.reports = getReports().filter(r => !ids.has(String(r.id)));
@@ -14633,7 +15875,8 @@ function openDepartmentPhotoResults() {
 }
 
 function renderDepartmentPhotoResults() {
- const reports = getReports();
+ const departmentId = String(activeManagedDepartmentId || '');
+ const reports = getReports().filter(report => String(report.departmentId || '') === departmentId);
  const el = document.getElementById('department-photo-results-list');
  if (!el) return;
  el.innerHTML = '';
@@ -14996,6 +16239,7 @@ async function submitAnonymousFeedback() {
  type: isComplaint ? 'complaint' : 'suggestion',
  text: textValue,
  photos,
+ departmentId: String(getStaffDepartmentId(actor) || actor.departmentId || ''),
  targetKey: target ? String(target._key || ('staff:' + String(target.id))) : '',
  targetId: target ? String(target.id || '') : '',
  targetName: target ? String(target.name || '') : '',
@@ -15125,6 +16369,11 @@ async function endAnonymousFeedbackSwipe(event, feedbackId) {
 
 function openFounderAnonymousFeedback() {
  activeFounderAnonymousTab = 'complaint';
+ getDepartments().forEach(department => {
+ if ((department.processes || []).some(process => process.key === 'feedback')) {
+ markDepartmentProcessRead(department.id, 'feedback');
+ }
+ });
  markFounderItemsRead('feedback', getAnonymousFeedback(), item => item.id);
  renderFounderAnonymousFeedback();
  goTo('screen-founder-anonymous-feedback');
@@ -15922,7 +17171,23 @@ function openStaffView(staffId, replaceCurrent = false) {
  <div class="divider"></div>`;
 
  if (s._employeeType === 'staff') {
- html += `<div class="section-label">Активность</div>
+ const nextDutyDate = getNextShiftDateKey();
+ const upcomingDuty = getUpcomingDutyAssignmentForEmployee(s);
+ html += `<div class="section-label">Дежурство</div>
+ <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:18px;">
+ ${upcomingDuty ? `<div class="doc-placeholder" style="margin-bottom:14px;"><b style="color:var(--text);">Назначен на ${escapeHtml(formatDateRu(upcomingDuty.targetDate))}</b>${upcomingDuty.tasks ? `<br>${escapeHtml(upcomingDuty.tasks)}` : ''}</div>` : ''}
+ <div class="field">
+ <label>Дата дежурства</label>
+ <input type="date" id="employee-duty-date" min="${escapeHtml(toDateKey(new Date()))}" value="${escapeHtml(upcomingDuty?.targetDate || nextDutyDate)}">
+ </div>
+ <div class="field">
+ <label>Отдельные задачи <span style="font-weight:500;color:var(--text-3);">(по желанию)</span></label>
+ <textarea id="employee-duty-tasks" placeholder="Например: проверить воду, цветы и закрытие террасы">${escapeHtml(upcomingDuty?.tasks || '')}</textarea>
+ </div>
+ <button class="btn btn-primary" onclick="assignDutyFromEmployeeProfile()">Назначить дежурным</button>
+ </div>
+ <div class="divider"></div>
+ <div class="section-label">Активность</div>
  <div class="inventory-status">
  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
  <div><div style="font-size:13px;color:var(--text-3);margin-bottom:4px;">Поломки</div><div style="font-size:20px;font-weight:700;color:var(--accent);">${repairRequests.length}</div></div>
@@ -15950,11 +17215,12 @@ function openStaffView(staffId, replaceCurrent = false) {
  html += `<div class="divider"></div><div class="section-label">История штрафов после выплаты зарплаты</div>`;
  fineHistory.forEach(f => {
  const settled = f.payrollSettledAt ? new Date(f.payrollSettledAt).toLocaleString('ru-RU') : '';
+ const payrollDecisionText = f.payrollDecision === 'forgive' ? 'прощён' : 'учтён';
  const historyPhoto = f.photo || (Array.isArray(f.photos) ? f.photos[0] : null);
  const historyPhotoSrc = getPhotoDisplaySrc(historyPhoto);
  html += `<div class="card" style="cursor:default;">
  <div class="card-title">${(Number(f.amount) || 0).toLocaleString('ru-RU')} сум</div>
- <div class="card-sub">${escapeHtml(getFineDateTimeText(f))}${settled ? ' · учтён ' + escapeHtml(settled) : ''}</div>
+ <div class="card-sub">${escapeHtml(getFineDateTimeText(f))}${settled ? ` · ${payrollDecisionText} ${escapeHtml(settled)}` : ''}</div>
  ${f.reason ? `<div style="font-size:14px;line-height:1.5;margin-top:10px;white-space:pre-line;">${escapeHtml(f.reason)}</div>` : ''}
  ${historyPhotoSrc ? `<div class="report-photo-grid" style="margin-top:14px;"><div class="report-photo-thumb" onclick="openFullscreen('${historyPhotoSrc}')"><img src="${historyPhotoSrc}" alt="Фото штрафа"></div></div>` : ''}
  </div>`;
@@ -15968,6 +17234,63 @@ function openStaffView(staffId, replaceCurrent = false) {
 
  document.getElementById('staff-view-content').innerHTML = html;
  if (!replaceCurrent) goTo('screen-staff-view');
+}
+
+async function assignDutyFromEmployeeProfile() {
+ if (!hasFounderSession()) {
+  showToast('Назначать дежурного может только управление');
+  return;
+ }
+ const employee = findFounderEmployee(activeEmployeeProfileKey);
+ const targetDate = String(document.getElementById('employee-duty-date')?.value || '');
+ const tasks = String(document.getElementById('employee-duty-tasks')?.value || '').trim();
+ if (!employee || employee._employeeType !== 'staff') {
+  showToast('Сотрудник не найден');
+  return;
+ }
+ if (!targetDate) {
+  showToast('Выберите дату дежурства');
+  return;
+ }
+ if (targetDate < toDateKey(new Date())) {
+  showToast('Нельзя назначить дежурство на прошедшую дату');
+  return;
+ }
+
+ const now = new Date().toISOString();
+ const assignment = {
+  id: `duty_${targetDate}_${String(employee.id)}`,
+  employeeKey: employee._key || `staff:${String(employee.id)}`,
+  staffId: String(employee.id),
+  staffName: employee.name || 'Сотрудник',
+  departmentId: String(getStaffDepartmentId(employee) || ''),
+  departmentName: getDepartment(getStaffDepartmentId(employee))?.name || getStaffRole(employee),
+  targetDate,
+  tasks,
+  createdAt: now,
+  updatedAt: now,
+  createdBy: 'founder',
+  notificationType: 'dutyAssignment'
+ };
+
+ try {
+  setDutyAssignment(assignment);
+  await setDutyAssignmentForDate(targetDate, assignment);
+  const dutyCount = Number(employee.dutyCount || 0) + 1;
+  appCache.staff = getStaff().map(item => String(item.id) === String(employee.id) ? { ...item, dutyCount, updatedAt: now } : item);
+  LocalDB.set('staff', appCache.staff);
+  if (CLOUD_ENABLED && db) {
+   await biz('staff').doc(String(employee.id)).set({ dutyCount, updatedAt: now }, { merge: true });
+  }
+  const taskText = tasks ? `\n\nВам необходимо:\n${tasks}` : '';
+  notifyStaffMember(employee, `🌅 Вы назначены дежурным\n\nДата: ${formatDateRu(targetDate)}${taskText}`);
+  notifyFounders(`🌅 Назначен дежурный\n\n${employee.name || 'Сотрудник'} · ${formatDateRu(targetDate)}${tasks ? `\n\nЗадачи:\n${tasks}` : ''}`);
+  showToast(`${employee.name || 'Сотрудник'} назначен(а) дежурным ✓`);
+  openStaffView(activeEmployeeProfileKey, true);
+ } catch (error) {
+  console.error('employee profile duty save error', error);
+  showToast('Не удалось сохранить назначение');
+ }
 }
 
 let staffIdToDelete = null;
@@ -16117,6 +17440,8 @@ async function init() {
  appCache.founderPassword = LocalDB.get("founderPassword") || appCache.founderPassword || "5552";
  appCache.adminPassword = LocalDB.get("adminPassword") || appCache.adminPassword || "3235";
  appCache.fines = LocalDB.get("fines") || appCache.fines || [];
+ appCache.payrollShifts = LocalDB.get("payrollShifts") || appCache.payrollShifts || [];
+ appCache.payrollRuns = LocalDB.get("payrollRuns") || appCache.payrollRuns || [];
  appCache.inventoryDraft = LocalDB.get("inventoryDraft") || appCache.inventoryDraft || null;
  appCache.inventoryRecords = LocalDB.get("inventoryRecords") || appCache.inventoryRecords || [];
  appCache.departmentStatistics = LocalDB.get("departmentStatistics") || appCache.departmentStatistics || [];
@@ -16260,6 +17585,20 @@ function toggleTheme() {
 // разблокированные процессы и подразделения.
 // ============================================================
 const RU_UZ_DICT = {
+"Для добавления процесса «Поломки» создайте подразделение «Техник».": "«Nosozliklar» jarayonini qo'shish uchun «Texnik» bo'limini yarating.",
+"Создать подразделение «Техник» сейчас?": "«Texnik» bo'limini hozir yaratasizmi?",
+"Техник не ознакомился с поломкой.": "Texnik nosozlik bilan tanishmadi.",
+"Задача создана более часа назад.": "Vazifa bir soatdan ko'proq vaqt oldin yaratilgan.",
+"Поломка не устранена.": "Nosozlik bartaraf etilmadi.",
+"Прошло более 24 часов.": "24 soatdan ko'proq vaqt o'tdi.",
+"Заказы от сотрудников": "Xodimlardan buyurtmalar",
+"Фото · обязательно": "Foto · majburiy",
+"Добавьте хотя бы одно фото поломки": "Nosozlikning kamida bitta fotosini qo'shing",
+"Комментарий о ремонте · по желанию": "Ta'mirlash izohi · ixtiyoriy",
+"Фото после починки · по желанию": "Ta'mirdan keyingi foto · ixtiyoriy",
+"Отремонтировано · закрыть": "Ta'mirlandi · yopish",
+"🛠️ Создана заявка на ремонт": "🛠️ Ta'mirlash arizasi yaratildi",
+"✅ Заявка на ремонт закрыта": "✅ Ta'mirlash arizasi yopildi",
 "Управление увидит только текст, выбранного сотрудника в жалобе и фото. Имя отправителя и Telegram ID не сохраняются.": "Boshqaruv faqat matnni, shikoyatda tanlangan xodimni va fotoni ko'radi. Yuboruvchining ismi va Telegram ID saqlanmaydi.",
 "Обращения полностью анонимны: данные автора и Telegram ID не сохраняются. В жалобе видны выбранный сотрудник, текст и фото; в предложении — текст и фото.": "Murojaatlar to'liq anonim: muallif ma'lumotlari va Telegram ID saqlanmaydi. Shikoyatda tanlangan xodim, matn va foto; taklifda esa matn va foto ko'rinadi.",
 "Вы выйдете из текущего аккаунта и вернётесь на панель регистрации. Данные бизнеса останутся сохранены.": "Joriy akkauntdan chiqib, ro'yxatdan o'tish paneliga qaytasiz. Biznes ma'lumotlari saqlanib qoladi.",
@@ -16685,6 +18024,30 @@ const RU_UZ_DICT = {
 "Раздел в разработке": "Bo'lim ishlab chiqilmoqda",
 "Раздел заблокирован": "Bo'lim bloklangan",
 "Рассчитать зарплату": "Ish haqini hisoblash",
+"Расчёт зарплаты": "Ish haqini hisoblash",
+"Учёт смены": "Smena hisobi",
+"Открыть смену": "Smenani ochish",
+"Смена открыта": "Smena ochiq",
+"Смена закрыта": "Smena yopiq",
+"Почасовая зарплата": "Soatbay ish haqi",
+"Оплата за смену": "Smena uchun to'lov",
+"Настройки оплаты": "To'lov sozlamalari",
+"Способ расчёта": "Hisoblash usuli",
+"Стоимость одного часа": "Bir soat narxi",
+"Стоимость одной смены": "Bir smena narxi",
+"Сохранить настройки": "Sozlamalarni saqlash",
+"Текущий период": "Joriy davr",
+"Закрытые смены": "Yopilgan smenalar",
+"Штрафы периода": "Davr jarimalari",
+"Учесть штрафы": "Jarimalarni hisobga olish",
+"Простить штрафы": "Jarimalarni kechirish",
+"Начислено": "Hisoblandi",
+"Удержание штрафов": "Jarimalarni ushlab qolish",
+"К выдаче": "To'lanadi",
+"Выдать зарплату": "Ish haqini berish",
+"История выплат": "To'lovlar tarixi",
+"Других процессов пока нет": "Hozircha boshqa jarayonlar yo'q",
+"Учёт смены доступен выше": "Smena hisobi yuqorida mavjud",
 "Скопировать таблицу": "Jadvalni nusxalash",
 "Сообщение дежурному": "Navbatchiga xabar",
 "Сотрудник не найден": "Xodim topilmadi",
