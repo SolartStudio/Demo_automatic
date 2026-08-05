@@ -1489,6 +1489,23 @@
 </style>
 </head>
 <body class="light">
+<script>
+// Apply the saved theme before the interface and external SDKs are parsed.
+// This prevents the warm default theme from flashing before the user's
+// selected theme appears in Telegram WebView.
+(function applyStartupTheme() {
+ try {
+  var savedTheme = window.localStorage.getItem('inspect_uz_appTheme');
+  var startupTheme = ['system', 'light', 'dark'].includes(savedTheme) ? savedTheme : 'system';
+  document.body.classList.remove('light', 'system');
+  if (startupTheme === 'light') document.body.classList.add('light');
+  if (startupTheme === 'system') document.body.classList.add('system');
+ } catch (_) {
+  document.body.classList.remove('light');
+  document.body.classList.add('system');
+ }
+})();
+</script>
 
 <!-- ===== SCREEN: HOME ===== -->
 <div class="screen active" id="screen-home" style="position:relative;">
@@ -1513,7 +1530,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm" data-i18n-skip></div>
-  <div class="app-version" id="app-version-label">Версия 1.041</div>
+  <div class="app-version" id="app-version-label">Версия 1.042</div>
  </div>
 </div>
 
@@ -3215,6 +3232,107 @@
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<script>
+// Paint the cached home screen before Telegram/Firebase SDK downloads. Those
+// external scripts can be slow inside a mobile WebView, but they are not
+// required to show the last known list of departments.
+(function renderCachedHomeBeforeSdks() {
+ var grid = document.getElementById('home-role-grid');
+ if (!grid) return;
+
+ function setStartupStatus(text) {
+  var status = document.querySelector('.home-status-strip span');
+  if (status) status.textContent = text;
+ }
+
+ function queueOrRun(action, departmentId) {
+  var handlers = {
+   founder: 'enterFounder',
+   department: 'enterDepartmentRole',
+   create: 'openCreateBusiness',
+   join: 'openJoinBusiness'
+  };
+  var handlerName = handlers[action];
+  if (handlerName && typeof window[handlerName] === 'function') {
+   window[handlerName](departmentId);
+   return;
+  }
+  window.__inspectQueuedHomeAction = { action: action, departmentId: departmentId || '' };
+  setStartupStatus('Восстанавливаем доступ…');
+ }
+
+ window.__inspectRunQueuedHomeAction = function() {
+  var queued = window.__inspectQueuedHomeAction;
+  if (!queued) return false;
+  var handlers = {
+   founder: 'enterFounder',
+   department: 'enterDepartmentRole',
+   create: 'openCreateBusiness',
+   join: 'openJoinBusiness'
+  };
+  var handlerName = handlers[queued.action];
+  if (!handlerName || typeof window[handlerName] !== 'function') return false;
+  window.__inspectQueuedHomeAction = null;
+  setStartupStatus('Готово к работе');
+  window[handlerName](queued.departmentId);
+  return true;
+ };
+
+ function addRole(icon, name, description, action, departmentId) {
+  var card = document.createElement('div');
+  card.className = 'role-card active-role';
+  card.addEventListener('click', function() { queueOrRun(action, departmentId); });
+
+  var iconEl = document.createElement('div');
+  iconEl.className = 'role-icon';
+  iconEl.textContent = icon;
+
+  var copy = document.createElement('div');
+  copy.className = 'role-copy';
+  var nameEl = document.createElement('span');
+  nameEl.className = 'role-name';
+  nameEl.textContent = name;
+  var descriptionEl = document.createElement('div');
+  descriptionEl.className = 'role-desc';
+  descriptionEl.textContent = description;
+  copy.appendChild(nameEl);
+  copy.appendChild(descriptionEl);
+
+  var arrow = document.createElement('span');
+  arrow.className = 'role-arrow';
+  arrow.textContent = '→';
+  card.appendChild(iconEl);
+  card.appendChild(copy);
+  card.appendChild(arrow);
+  grid.appendChild(card);
+ }
+
+ try {
+  var businessId = window.localStorage.getItem('inspect_uz_businessId');
+  var rawDepartments = window.localStorage.getItem('inspect_uz_departments');
+  var departments = rawDepartments ? JSON.parse(rawDepartments) : [];
+  grid.replaceChildren();
+
+  if (!businessId) {
+   addRole('🏢', 'Создать бизнес', 'Вы учредитель и открываете компанию впервые', 'create', '');
+   addRole('🔑', 'Войти в бизнес', 'У вас уже есть код сотрудника или пароль учредителя', 'join', '');
+   return;
+  }
+
+  addRole('👑', 'Учредитель', 'Отчёты, аналитика, управление подразделениями', 'founder', '');
+  if (Array.isArray(departments)) {
+   departments.forEach(function(dep) {
+    if (!dep || !dep.id || !dep.name) return;
+    var label = dep.logoText ? String(dep.logoText) + ' · ' + String(dep.name) : String(dep.name);
+    addRole('👥', label, 'Срочные задачи, фотоотчёты и процессы подразделения', 'department', String(dep.id));
+   });
+  }
+ } catch (error) {
+  console.warn('cached home pre-render skipped', error);
+ }
+})();
+</script>
+
 <!-- Telegram Mini App SDK must load before application code so the real user id
      is available synchronously on every launch from the bot. -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -3268,7 +3386,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.041";
+const APP_VERSION = "1.042";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
@@ -15927,6 +16045,11 @@ async function init() {
  const versionEl = document.getElementById('app-version-label');
  if (versionEl) versionEl.textContent = APP_VERSION_LABEL;
 
+ // Theme restoration must never wait for Telegram or Firestore. The tiny
+ // startup script above already prevents the first-paint flash; this call
+ // synchronizes the settings select, toggle icon and button label.
+ initTheme();
+
  // ------------------------------------------------------------------
  // Мгновенная отрисовка из локального кэша (localStorage), без ожидания
  // сети. Раньше весь экран ждал полный цикл await initCloud() (Promise.all
@@ -15958,12 +16081,7 @@ async function init() {
  appCache.kpiContent = LocalDB.get("kpiContent") || appCache.kpiContent || getDefaultKpiContent();
  appCache.stopList = LocalDB.get("stopList") || appCache.stopList || getDefaultStopList();
 
- // The Telegram binding is the source of truth for an employee's business.
- // A normal repeat launch is restored instantly from the local binding; after
- // browser storage is cleared, one Firestore document restores the same
- // businessId and staffId automatically.
- await restoreTelegramEmployeeBinding();
-
+ // Render the complete cached interface before the first network await.
  applyDepartmentLabels(getPrimaryDepartment());
  renderHomeGrid();
 
@@ -15990,10 +16108,25 @@ async function init() {
  updateUnreadBadges();
  startTechnicianRepairReminderTimer();
  startFounderTaskReminderTimer();
- initDeepLinkRoute();
- initTheme();
  initLang();
  setupGlobalSwipeBack();
+
+ // Telegram binding remains the source of truth for employees, but its cloud
+ // lookup is intentionally delayed until after the cached home screen has
+ // already been painted. A slow connection can no longer leave an empty grid.
+ const bindingRestore = await restoreTelegramEmployeeBinding();
+ if (bindingRestore && bindingRestore.restored) {
+  appCache.departments = LocalDB.get("departments") || appCache.departments || [];
+  applyDepartmentLabels(getPrimaryDepartment());
+  renderHomeGrid();
+  const restoredStaff = getWaiter();
+  if (restoredStaff) renderWaiterMenu();
+  updateUnreadBadges();
+ }
+ if (typeof window.__inspectRunQueuedHomeAction === 'function') {
+  window.__inspectRunQueuedHomeAction();
+ }
+ initDeepLinkRoute();
 
  // После перезагрузки, вызванной submitEmployeeCode(), businessId уже
  // проставлен и подразделение известно — остаётся только спросить имя.
