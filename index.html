@@ -1530,7 +1530,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm" data-i18n-skip></div>
-  <div class="app-version" id="app-version-label">Версия 1.042</div>
+ <div class="app-version" id="app-version-label">Версия 1.047</div>
  </div>
 </div>
 
@@ -1679,7 +1679,7 @@
 </div>
  <div class="footer" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
  <span class="logo-sm">(ваш логотип)</span>
- <button class="btn btn-secondary btn-sm" onclick="waiterLogout()">Выйти</button>
+ <button class="btn btn-secondary btn-sm" onclick="goHome()">Выйти на главный экран</button>
  </div>
 </div>
 
@@ -1895,7 +1895,7 @@
  <div class="menu-icon">✅</div>
  <div class="menu-text">
  <div class="menu-title-row"><div class="menu-title">Срочные задачи</div><span class="notify-badge" id="badge-admin-tasks">0</span></div>
- <div class="menu-desc">Срочные задачи от учредителя</div>
+ <div class="menu-desc">Срочные задачи от управления</div>
  </div>
  <span class="menu-arrow">›</span>
  </div>
@@ -1988,9 +1988,8 @@
  <span class="menu-arrow">›</span>
  </div>
  </div>
- <div class="footer" style="display:flex; justify-content:space-between; align-items:center;">
+ <div class="footer">
  <span class="logo-sm">(ваш логотип)</span>
- <button class="btn btn-secondary btn-sm" onclick="adminLogout()">Выйти</button>
  </div>
 </div>
 
@@ -2269,7 +2268,7 @@
 <!-- ===== SCREEN: FOUNDER LOGIN ===== --><div class="screen" id="screen-founder-login">
  <div class="header">
  <button class="back-btn" onclick="goHome()">←</button>
- <span class="header-title">Учредитель</span>
+ <span class="header-title">Управление</span>
  </div>
  <div class="content content-padded">
  <div style="margin-bottom: 32px;">
@@ -2277,7 +2276,7 @@
  <div style="font-size: 14px; color: var(--text-2);">Введите имя и пароль для доступа</div>
  </div>
  <div class="field">
- <label>Имя учредителя</label>
+ <label>Имя владельца</label>
  <input type="text" id="founder-name" placeholder="Ваше имя" autocomplete="name">
  </div>
  <div class="field">
@@ -2297,7 +2296,7 @@
  <div class="content" style="padding-top: 24px;">
  <div style="margin-bottom: 28px;">
  <div style="font-size: 13px; color: var(--text-3); margin-bottom: 4px;">Панель управления</div>
- <div style="font-size: 24px; font-weight: 700;">Учредитель</div>
+ <div style="font-size: 24px; font-weight: 700;">Управление</div>
  </div>
  <div class="section-label">Меню</div>
  <div id="founder-menu-dynamic"></div>
@@ -2310,9 +2309,9 @@
  <span class="menu-arrow">›</span>
  </div>
  </div>
- <div class="footer" style="display:flex; justify-content:space-between; align-items:center;">
+ <div class="footer" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
  <span class="logo-sm">(ваш логотип)</span>
- <button class="btn btn-secondary btn-sm" onclick="founderLogout()">Выйти</button>
+ <button class="btn btn-secondary btn-sm" onclick="goHome()">Выйти на главный экран</button>
  </div>
 </div>
 
@@ -2435,7 +2434,7 @@
  <span>Отображать раздел «Штрафы» у сотрудников</span>
  </label>
  <div style="font-size:13px;color:var(--text-2);line-height:1.55;margin-top:12px;">
- Если галочка включена, сотрудники подразделения видят общую ленту: кого оштрафовали, сумму, причину, дату, время и фото. Назначать штрафы они не могут. Если выключена — раздел доступен только учредителю.
+ Если галочка включена, сотрудники подразделения видят общую ленту: кого оштрафовали, сумму, причину, дату, время и фото. Назначать штрафы они не могут. Если выключена — раздел доступен только управлению.
  </div>
  <button class="btn btn-primary" style="margin-top:18px;" onclick="saveDepartmentFinesSettings()">Сохранить</button>
  </div>
@@ -2584,7 +2583,7 @@
  <div class="menu-icon">✅</div>
  <div class="menu-text">
  <div class="menu-title-row"><div class="menu-title">Срочные задачи</div><span class="notify-badge" id="badge-bathmaster-tasks">0</span></div>
- <div class="menu-desc">Срочные задачи от учредителя</div>
+ <div class="menu-desc">Срочные задачи от управления</div>
  </div>
  <span class="menu-arrow">›</span>
  </div>
@@ -2629,9 +2628,8 @@
  <span class="menu-arrow">›</span>
  </div>
  </div>
- <div class="footer" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+ <div class="footer">
  <span class="logo-sm">(ваш логотип)</span>
- <button class="btn btn-secondary btn-sm" onclick="staffLogout()">Выйти</button>
  </div>
 </div>
 
@@ -2642,10 +2640,10 @@
  <span class="header-title">Заказать</span>
  </div>
  <div class="content content-padded">
- <div class="section-label">Сообщение учредителю</div>
+ <div class="section-label">Сообщение управлению</div>
  <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
  <div style="font-size:14px;color:var(--text-2);line-height:1.5;margin-bottom:12px;">
- Напишите, что заканчивается и что нужно купить. Учредитель увидит имя, дату, время и текст.
+ Напишите, что заканчивается и что нужно купить. Управление увидит имя, дату, время и текст.
  </div>
  <div class="field">
  <label>Что нужно заказать</label>
@@ -2685,7 +2683,7 @@
  <div class="section-label">Меню</div>
  <div class="menu-item" onclick="openStaffTasks('masseur')">
  <div class="menu-icon">✅</div>
- <div class="menu-text"><div class="menu-title-row"><div class="menu-title">Срочные задачи</div><span class="notify-badge" id="badge-masseur-tasks">0</span></div><div class="menu-desc">Срочные задачи от учредителя</div></div>
+ <div class="menu-text"><div class="menu-title-row"><div class="menu-title">Срочные задачи</div><span class="notify-badge" id="badge-masseur-tasks">0</span></div><div class="menu-desc">Срочные задачи от управления</div></div>
  <span class="menu-arrow">›</span>
  </div>
  <div class="menu-item" onclick="openMasseurMenuJpg()">
@@ -2709,9 +2707,8 @@
  <span class="menu-arrow">›</span>
  </div>
  </div>
- <div class="footer" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+ <div class="footer">
  <span class="logo-sm">(ваш логотип)</span>
- <button class="btn btn-secondary btn-sm" onclick="staffLogout()">Выйти</button>
  </div>
 </div>
 
@@ -2759,9 +2756,8 @@
  <span class="menu-arrow">›</span>
  </div>
  </div>
- <div class="footer" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+ <div class="footer">
  <span class="logo-sm">(ваш логотип)</span>
- <button class="btn btn-secondary btn-sm" onclick="staffLogout()">Выйти</button>
  </div>
 </div>
 
@@ -2827,7 +2823,7 @@
  <div class="section-label">Меню</div>
  <div class="menu-item" onclick="openTechnicianRepairs()"><div class="menu-icon">🛠️</div><div class="menu-text"><div class="menu-title-row"><div class="menu-title">Заявки на ремонт</div><span class="notify-badge" id="badge-technician-repairs">0</span></div><div class="menu-desc">Поломки от официантов, пармастеров, массажистов и поваров</div></div><span class="menu-arrow">›</span></div>
  </div>
- <div class="footer" style="display:flex; justify-content:space-between; align-items:center; gap:12px;"><span class="logo-sm">(ваш логотип)</span><button class="btn btn-secondary btn-sm" onclick="staffLogout()">Выйти</button></div>
+ <div class="footer"><span class="logo-sm">(ваш логотип)</span></div>
 </div>
 
 <!-- ===== SCREEN: REPAIR CREATE ===== -->
@@ -3077,6 +3073,30 @@
  </div>
  <button class="btn btn-primary" onclick="changePassword()">Сохранить пароль</button>
  </div>
+ <div class="section-label" style="margin-top:24px;">Аккаунт</div>
+ <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
+ <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Выйти из аккаунта</div>
+ <div style="font-size: 13px; color: var(--text-2); line-height: 1.55; margin-bottom: 16px;">Перед выходом приложение покажет логин и пароль текущего бизнеса. Данные бизнеса останутся сохранены.</div>
+ <button class="btn btn-secondary" onclick="openFounderLogoutConfirm()">Выйти из аккаунта</button>
+ </div>
+ </div>
+</div>
+
+<!-- ===== MODAL: FOUNDER LOGOUT CONFIRM ===== -->
+<div class="modal-overlay" id="modal-founder-logout">
+ <div class="modal">
+ <div class="modal-title">Сохраните данные для входа</div>
+ <div class="modal-sub" style="margin-bottom:16px;">Это ваш логин и пароль для входа в вашу учетную запись. Рекомендуем сделать скриншот перед выходом.</div>
+ <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:18px;">
+ <div style="font-size:12px;color:var(--text-3);margin-bottom:4px;">Логин</div>
+ <div id="founder-logout-login" style="font-size:17px;font-weight:700;overflow-wrap:anywhere;" data-i18n-skip>—</div>
+ <div style="font-size:12px;color:var(--text-3);margin:14px 0 4px;">Пароль</div>
+ <div id="founder-logout-password" style="font-size:20px;font-weight:800;letter-spacing:1px;overflow-wrap:anywhere;" data-i18n-skip>—</div>
+ </div>
+ <div class="modal-actions">
+ <button class="btn btn-danger" onclick="confirmFounderLogout()">Да, выйти</button>
+ <button class="btn btn-secondary" onclick="closeModal('modal-founder-logout')">Отмена</button>
+ </div>
  </div>
 </div>
 
@@ -3143,7 +3163,7 @@
 <div class="modal-overlay" id="modal-statistics-submit">
  <div class="modal">
  <div class="modal-title">Отправить значения?</div>
- <div class="modal-sub">Учредитель сразу увидит введённые данные на графике подразделения.</div>
+ <div class="modal-sub">Управление сразу увидит введённые данные на графике подразделения.</div>
  <div class="modal-actions">
  <button class="btn btn-primary" onclick="confirmSubmitDepartmentStatistics()">Да, отправить</button>
  <button class="btn btn-secondary" onclick="cancelSubmitDepartmentStatistics()">Нет, вернуться</button>
@@ -3154,13 +3174,13 @@
 
 
 <!-- ===== MODAL: ADMIN TRAINING CONFIRM ===== -->
-<div class="modal-overlay" id="modal-admin-training-confirm"><div class="modal"><div class="modal-title">Отправить отчет обучения?</div><div class="modal-sub">Учредитель увидит дату, время, администратора, тему, сотрудников и фото.</div><div class="modal-actions"><button class="btn btn-primary" onclick="confirmAdminTrainingReport()">Да, отправить</button><button class="btn btn-secondary" onclick="closeModal('modal-admin-training-confirm')">Нет, вернуться</button></div></div></div>
+<div class="modal-overlay" id="modal-admin-training-confirm"><div class="modal"><div class="modal-title">Отправить отчет обучения?</div><div class="modal-sub">Управление увидит дату, время, администратора, тему, сотрудников и фото.</div><div class="modal-actions"><button class="btn btn-primary" onclick="confirmAdminTrainingReport()">Да, отправить</button><button class="btn btn-secondary" onclick="closeModal('modal-admin-training-confirm')">Нет, вернуться</button></div></div></div>
 
 <!-- ===== MODAL: FOUNDER TASK CONFIRM ===== -->
 <div class="modal-overlay" id="modal-founder-task-confirm"><div class="modal"><div class="modal-title">Отправить задачу?</div><div class="modal-sub">Сотрудники выбранного подразделения увидят задачу в своём разделе. Фото отправятся после подтверждения.</div><div class="modal-actions"><button class="btn btn-primary" onclick="confirmFounderTask()">Да, отправить</button><button class="btn btn-secondary" onclick="closeModal('modal-founder-task-confirm')">Нет, вернуться</button></div></div></div>
 
 <!-- ===== MODAL: CLOSE TASK CONFIRM ===== -->
-<div class="modal-overlay" id="modal-close-task-confirm"><div class="modal"><div class="modal-title">Закрыть задачу?</div><div class="modal-sub">Учредитель увидит, кто закрыл задачу, время и прикрепленные фото.</div><div class="modal-actions"><button class="btn btn-primary" onclick="confirmCloseFounderTaskByWaiter()">Да, закрыть</button><button class="btn btn-secondary" onclick="closeModal('modal-close-task-confirm')">Нет, вернуться</button></div></div></div>
+<div class="modal-overlay" id="modal-close-task-confirm"><div class="modal"><div class="modal-title">Закрыть задачу?</div><div class="modal-sub">Управление увидит, кто закрыл задачу, время и прикрепленные фото.</div><div class="modal-actions"><button class="btn btn-primary" onclick="confirmCloseFounderTaskByWaiter()">Да, закрыть</button><button class="btn btn-secondary" onclick="closeModal('modal-close-task-confirm')">Нет, вернуться</button></div></div></div>
 
 <!-- ===== MODAL: REPAIR CONFIRM ===== -->
 <div class="modal-overlay" id="modal-repair-confirm"><div class="modal"><div class="modal-title">Отправить заявку?</div><div class="modal-sub">Проверьте текст и фото. Техник увидит заявку после отправки.</div><div class="modal-actions"><button class="btn btn-primary" onclick="confirmRepairRequest()">Да, отправить</button><button class="btn btn-secondary" onclick="closeModal('modal-repair-confirm')">Нет, вернуться</button></div></div></div>
@@ -3319,7 +3339,7 @@
    return;
   }
 
-  addRole('👑', 'Учредитель', 'Отчёты, аналитика, управление подразделениями', 'founder', '');
+  addRole('👑', 'Управление', 'Отчёты, аналитика, управление подразделениями', 'founder', '');
   if (Array.isArray(departments)) {
    departments.forEach(function(dep) {
     if (!dep || !dep.id || !dep.name) return;
@@ -3386,12 +3406,12 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.042";
+const APP_VERSION = "1.047";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
  label: APP_VERSION_LABEL,
- updatedAt: "2026-08-03"
+ updatedAt: "2026-08-05"
 };
 
 let db = null;
@@ -3790,33 +3810,11 @@ async function reconcileTelegramEmployeeAfterStaffLoad() {
  LocalDB.remove('departments');
  renderHomeGrid();
  goHome();
- showToast('Доступ сотрудника удалён учредителем');
+ showToast('Доступ сотрудника удалён управлением');
  } catch (err) {
  // A network error is never treated as a deletion. Keep the durable session.
  console.warn('employee binding reconcile error', err);
  }
-}
-
-function getAnonymousFeedbackAuditFields() {
- const staff = getCurrentApprovedStaff() || getWaiter() || getCurrentAdminProfile() || getCurrentFounderProfile() || {};
- const tgUser = getTelegramWebAppUser() || {};
- const role = staff.role || InspectStorage.getItem("currentStaffRole") || InspectStorage.getItem("founderActiveRole") || "";
- const lastScreen = LocalDB.get("lastActiveScreen") || {};
- const auditCreatedAt = new Date().toISOString();
-
- return {
- auditStaffId: staff.id ? String(staff.id) : "",
- auditStaffName: staff.name || "",
- auditStaffRole: role || "",
- auditStaffRoleLabel: staff.roleLabel || (role ? getRoleLabel(role) : ""),
- auditStaffLogin: staff.login || getTelegramWebAppUsername() || "",
- auditTelegramId: staff.telegramId || staff.chatId || staff.telegramID || getTelegramWebAppChatId() || "",
- auditTelegramUsername: tgUser.username ? normalizeLogin(tgUser.username) : "",
- auditCreatedAt,
- auditLastScreen: lastScreen.screenId || "",
- auditLastScreenAt: lastScreen.at || "",
- auditAppVersion: APP_VERSION
- };
 }
 
 function saveLastScreen(screenId) {
@@ -4016,15 +4014,15 @@ function findFounderProfileByName(name) {
 }
 
 async function ensureFounderEmployee(name) {
- const cleanName = String(name || '').trim() || 'Учредитель';
+ const cleanName = String(name || '').trim() || 'Управление';
  const existing = findFounderProfileByName(cleanName);
  const now = new Date().toISOString();
- const founder = fillTelegramMeta(existing ? { ...existing, name: cleanName, role: 'founder', roleLabel: 'Учредитель', updatedAt: now } : {
+ const founder = fillTelegramMeta(existing ? { ...existing, name: cleanName, role: 'founder', roleLabel: 'Управление', updatedAt: now } : {
  id: 'founder_' + Date.now(),
  login: 'founder',
  name: cleanName,
  role: 'founder',
- roleLabel: 'Учредитель',
+ roleLabel: 'Управление',
  approvedAt: now,
  createdAt: now,
  updatedAt: now
@@ -4055,9 +4053,9 @@ function getFounderActor(role = 'founder') {
  ...(profile || {}),
  id: profile && profile.id ? profile.id : 'founder-session',
  login: profile && profile.login ? profile.login : 'founder',
- name: profile && profile.name ? profile.name : 'Учредитель',
+ name: profile && profile.name ? profile.name : 'Управление',
  role,
- roleLabel: role === 'founder' ? 'Учредитель' : `Учредитель · ${getRoleLabel(role)}`,
+ roleLabel: role === 'founder' ? 'Управление' : `Управление · ${getRoleLabel(role)}`,
  isFounderSession: true
  };
 }
@@ -4073,9 +4071,9 @@ function getFounderDepartmentPreviewActor(departmentId = activePreviewDepartment
  return {
  ...founder,
  id: `founder_preview_${String(founder.id || 'session')}_${String(department.id)}`,
- name: founder.name || 'Учредитель',
+ name: founder.name || 'Управление',
  role: 'waiter',
- roleLabel: `Учредитель · ${department.name}`,
+ roleLabel: `Управление · ${department.name}`,
  departmentId: String(department.id),
  isFounderSession: false,
  isFounderDepartmentPreview: true
@@ -4169,7 +4167,7 @@ async function initCloud() {
  appCache.technicianRepairReminderLog = LocalDB.get("technicianRepairReminderLog") || {};
  appCache.founderTasks = LocalDB.get("founderTasks") || [];
  appCache.forgottenItems = LocalDB.get("forgottenItems") || [];
- appCache.anonymousFeedback = LocalDB.get("anonymousFeedback") || [];
+ appCache.anonymousFeedback = sanitizeAnonymousFeedbackList(LocalDB.get("anonymousFeedback") || []);
  appCache.kpiContent = LocalDB.get("kpiContent") || getDefaultKpiContent();
  appCache.stopList = LocalDB.get("stopList") || getDefaultStopList();
  // Legacy Drova cleanup is deliberately disabled in 1.030. Storage is already
@@ -4332,8 +4330,9 @@ async function initCloud() {
  });
 
  biz("anonymousFeedback").onSnapshot((snapshot) => {
- appCache.anonymousFeedback = rowsFromSnapshot(snapshot, 'desc');
+ appCache.anonymousFeedback = sanitizeAnonymousFeedbackList(rowsFromSnapshot(snapshot, 'desc'));
  LocalDB.set("anonymousFeedback", appCache.anonymousFeedback);
+ removeLegacyAnonymousFeedbackAudit(snapshot).catch(err => console.warn('anonymous feedback privacy cleanup skipped', err));
  refreshVisibleData();
  }, (err) => {
  console.error("anonymous feedback snapshot error", err);
@@ -4412,7 +4411,7 @@ async function loadCloudData() {
  appCache.adminTrainingReports = rowsFromSnapshot(adminTrainingReportsSnap, 'desc');
  appCache.founderTasks = rowsFromSnapshot(founderTasksSnap, 'desc');
  appCache.forgottenItems = rowsFromSnapshot(forgottenItemsSnap, 'desc');
- appCache.anonymousFeedback = rowsFromSnapshot(anonymousFeedbackSnap, 'desc');
+ appCache.anonymousFeedback = sanitizeAnonymousFeedbackList(rowsFromSnapshot(anonymousFeedbackSnap, 'desc'));
  LocalDB.set("staff", appCache.staff);
  LocalDB.set("departmentStatistics", appCache.departmentStatistics);
  LocalDB.set("adminProfiles", appCache.adminProfiles);
@@ -4530,7 +4529,7 @@ function getStaff() {
 
 const ROLE_LABELS = {
  waiter: 'Официант',
- founder: 'Учредитель',
+ founder: 'Управление',
  admin: 'Администратор',
  cook: 'Повар',
  stoker: 'Топник',
@@ -5046,6 +5045,7 @@ async function findBusinessByCredentials(founderName, password) {
 
 function enterBusiness(business) {
  clearBusinessContextForSwitch(business.id);
+ InspectStorage.removeItem('accountSelectionMode');
  appCache.business = business;
  setCurrentBusinessId(business.id);
  LocalDB.set('business', business);
@@ -5492,7 +5492,7 @@ async function submitAccessRequest() {
 
  try {
  await saveAccessRequest(req);
- notifyRole('admin', `✅ Новая заявка на вход\n\n${req.roleLabel}: ${req.name} · ${req.login}\n\nОткройте приложение → Учредитель → Сотрудники`, { startParam: 'access_requests', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+ notifyRole('admin', `✅ Новая заявка на вход\n\n${req.roleLabel}: ${req.name} · ${req.login}\n\nОткройте приложение → Управление → Сотрудники`, { startParam: 'access_requests', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
  notifyFounders(`✅ Новая заявка на вход\n\n${req.roleLabel}: ${req.name} · ${req.login}`);
  setSavedAccessRequest({ id: req.id, role: req.role, login: req.login, name: req.name, telegramId: getIdentityTelegramId(req) });
  showAccessPending(req.role, req.login);
@@ -6409,21 +6409,61 @@ async function updateForgottenItem(item) {
  }
 }
 
+function sanitizeAnonymousFeedbackItem(item) {
+ const source = item && typeof item === 'object' ? item : {};
+ const type = String(source.type || '') === 'complaint' ? 'complaint' : 'suggestion';
+ return {
+ id: source.id || Date.now(),
+ type,
+ text: String(source.text || '').trim(),
+ photos: Array.isArray(source.photos) ? source.photos.slice(0, 5) : [],
+ targetKey: type === 'complaint' ? String(source.targetKey || '') : '',
+ targetId: type === 'complaint' ? String(source.targetId || '') : '',
+ targetName: type === 'complaint' ? String(source.targetName || '') : '',
+ targetRole: type === 'complaint' ? String(source.targetRole || '') : '',
+ targetRoleLabel: type === 'complaint' ? String(source.targetRoleLabel || '') : '',
+ date: String(source.date || ''),
+ time: String(source.time || ''),
+ createdAt: String(source.createdAt || new Date().toISOString())
+ };
+}
+
+function sanitizeAnonymousFeedbackList(items) {
+ return (Array.isArray(items) ? items : [])
+ .filter(item => item && ['complaint', 'suggestion'].includes(String(item.type || 'suggestion')))
+ .map(sanitizeAnonymousFeedbackItem);
+}
+
+async function removeLegacyAnonymousFeedbackAudit(snapshot) {
+ if (!snapshot || !snapshot.docs || !firebase.firestore || !firebase.firestore.FieldValue) return;
+ const removeValue = firebase.firestore.FieldValue.delete();
+ const cleanupJobs = [];
+ snapshot.docs.forEach(doc => {
+ const data = doc.data() || {};
+ const privateKeys = Object.keys(data).filter(key => String(key).startsWith('audit'));
+ if (!privateKeys.length) return;
+ const patch = {};
+ privateKeys.forEach(key => { patch[key] = removeValue; });
+ cleanupJobs.push(doc.ref.update(patch));
+ });
+ if (cleanupJobs.length) await Promise.allSettled(cleanupJobs);
+}
+
 function getAnonymousFeedback() {
  return appCache.anonymousFeedback || [];
 }
 
 async function saveAnonymousFeedback(item) {
- const publicItem = { ...(item || {}) };
+ const publicItem = sanitizeAnonymousFeedbackItem(item);
  const arr = getAnonymousFeedback().filter(x => String(x.id) !== String(publicItem.id));
  arr.unshift(publicItem);
  appCache.anonymousFeedback = arr;
  LocalDB.set("anonymousFeedback", arr);
  if (CLOUD_ENABLED && db) {
- await biz("anonymousFeedback").doc(String(publicItem.id)).set({
- ...publicItem,
- ...getAnonymousFeedbackAuditFields()
- }, { merge: true });
+ // No author, Telegram ID, login, role or device metadata is written here.
+ // A full overwrite also prevents private legacy fields from surviving if an
+ // existing record is ever saved again.
+ await biz("anonymousFeedback").doc(String(publicItem.id)).set(publicItem, { merge: false });
  }
 }
 
@@ -7059,7 +7099,7 @@ function renderHomeGrid() {
  <div class="role-card active-role" onclick="enterFounder()">
  <div class="role-icon">&#128081;</div>
  <div class="role-copy">
- <span class="role-name">Учредитель</span>
+ <span class="role-name">Управление</span>
  <div class="role-desc">Отчёты, аналитика, управление подразделениями</div>
  </div>
  <span class="role-arrow">→</span>
@@ -8260,7 +8300,7 @@ function renderDepartmentStaffMenu() {
  container.innerHTML = `<div class="empty" style="padding:32px 0;">
  <div class="empty-icon">🗂️</div>
  <div class="empty-title">Процессы ещё не настроены</div>
- <div class="empty-sub">Учредитель добавит их в разделе подразделения</div>
+ <div class="empty-sub">Управление добавит их в разделе подразделения</div>
  </div>`;
  return;
  }
@@ -8364,7 +8404,7 @@ function requireDepartmentProcessAccess(key) {
  if (!access.department) {
  showToast(access.founderAccess ? 'Сначала откройте нужное подразделение' : 'Подразделение не найдено');
  } else if (access.processAdded && !access.employeeVisibilityAllowed) {
- showToast('Учредитель закрыл этот раздел для сотрудников');
+ showToast('Управление закрыло этот раздел для сотрудников');
  } else if (!access.processEnabled) {
  showToast('Этот процесс не добавлен в подразделение');
  } else {
@@ -8375,7 +8415,7 @@ function requireDepartmentProcessAccess(key) {
 
 function requireFounderDepartmentAccess(departmentId) {
  if (!hasFounderSession()) {
- showToast('Этот раздел доступен только учредителю');
+ showToast('Этот раздел доступен только управлению');
  return null;
  }
  const department = getDepartment(departmentId);
@@ -8434,6 +8474,7 @@ function openFounderProcessResults(departmentId, key) {
  if (key === 'payroll') { showToast('Раздел в разработке'); return; }
  if (key === 'statistics') { openFounderDepartmentStatistics(department.id); return; }
  if (key === 'fines') { openFounderDepartmentFines(department.id); return; }
+ if (key === 'feedback') { openFounderAnonymousFeedback(); return; }
  activeGenericProcessDeptId = String(department.id);
  activeGenericProcessKey = key;
  renderGenericProcessList();
@@ -8727,12 +8768,12 @@ function renderStaffDepartmentStatistics() {
 
  const metrics = getDepartmentStatisticMetrics(dep.id);
  if (!metrics.length) {
- content.innerHTML = `<div class="empty" style="padding:50px 0;"><div class="empty-icon">📈</div><div class="empty-title">Показатели ещё не настроены</div><div class="empty-sub">Учредитель пока не добавил значения для заполнения</div></div>`;
+ content.innerHTML = `<div class="empty" style="padding:50px 0;"><div class="empty-icon">📈</div><div class="empty-title">Показатели ещё не настроены</div><div class="empty-sub">Управление пока не добавило значения для заполнения</div></div>`;
  return;
  }
 
  content.innerHTML = `
- <div class="doc-placeholder" style="margin-bottom:20px;">Заполните все значения. После отправки учредитель сразу увидит их на графике.</div>
+ <div class="doc-placeholder" style="margin-bottom:20px;">Заполните все значения. После отправки управление сразу увидит их на графике.</div>
  <div class="section-label">Значения · ${metrics.length}</div>
  <div class="card" style="cursor:default;">
  ${metrics.map(metric => `
@@ -8760,7 +8801,7 @@ function submitDepartmentStatistics() {
  }
  const metrics = getDepartmentStatisticMetrics(dep.id);
  if (!metrics.length) {
- showToast('Учредитель ещё не добавил значения');
+ showToast('Управление ещё не добавило значения');
  return;
  }
 
@@ -9012,7 +9053,7 @@ function openMyFines() {
  const dep = getDepartment(departmentId);
  if (!dep) { showToast('Подразделение не найдено'); return; }
  if (!normalizeDepartmentFinesConfig(dep.finesConfig).employeeVisible) {
- showToast('Учредитель закрыл этот раздел для сотрудников');
+ showToast('Управление закрыло этот раздел для сотрудников');
  return;
  }
  activeGenericProcessDeptId = String(dep.id);
@@ -9030,11 +9071,11 @@ function renderMyFinesList(staff, department = null) {
  const items = getActiveDepartmentFines(dep && dep.id)
  .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
  if (!items.length) {
- el.innerHTML = `<div class="doc-placeholder" style="margin-bottom:16px;">Сотрудники могут только просматривать этот раздел. Назначает штрафы учредитель.</div><div class="empty" style="padding:40px 0;"><div class="empty-icon">💸</div><div class="empty-title">Штрафов нет</div></div>`;
+ el.innerHTML = `<div class="doc-placeholder" style="margin-bottom:16px;">Сотрудники могут только просматривать этот раздел. Штрафы назначает управление.</div><div class="empty" style="padding:40px 0;"><div class="empty-icon">💸</div><div class="empty-title">Штрафов нет</div></div>`;
  return;
  }
  const total = items.reduce((s, f) => s + (Number(f.amount) || 0), 0);
- el.innerHTML = `<div class="doc-placeholder" style="margin-bottom:16px;">Сотрудники могут только просматривать этот раздел. Назначает штрафы учредитель.</div><div style="margin-bottom:16px;font-size:14px;color:var(--text-2);">Общая сумма активных штрафов подразделения: <b style="color:var(--text);">${total.toLocaleString('ru-RU')} сум</b></div>` +
+ el.innerHTML = `<div class="doc-placeholder" style="margin-bottom:16px;">Сотрудники могут только просматривать этот раздел. Штрафы назначает управление.</div><div style="margin-bottom:16px;font-size:14px;color:var(--text-2);">Общая сумма активных штрафов подразделения: <b style="color:var(--text);">${total.toLocaleString('ru-RU')} сум</b></div>` +
  items.map(renderDepartmentFineCard).join('');
 }
 
@@ -9431,7 +9472,7 @@ async function saveDepartmentFinesSettings() {
  finesConfig: { employeeVisible: Boolean(checkbox.checked) }
  });
  renderDepartmentManage();
- showToast(checkbox.checked ? 'Штрафы открыты сотрудникам ✓' : 'Штрафы видит только учредитель ✓');
+ showToast(checkbox.checked ? 'Штрафы открыты сотрудникам ✓' : 'Штрафы видит только управление ✓');
 }
 
 // ============================================================
@@ -9844,14 +9885,14 @@ function renderInventoryStart() {
  }
 
  if (!department || !(department.processes || []).some(process => process.key === 'inventory')) {
- content.innerHTML = `<div class="empty"><div class="empty-icon">📦</div><div class="empty-title">Процесс не подключён</div><div class="empty-sub">Учредитель ещё не добавил инвентаризацию в ваше подразделение</div></div>`;
+ content.innerHTML = `<div class="empty"><div class="empty-icon">📦</div><div class="empty-title">Процесс не подключён</div><div class="empty-sub">Управление ещё не добавило инвентаризацию в ваше подразделение</div></div>`;
  footer.innerHTML = '';
  return;
  }
 
  const configuredItems = getDepartmentInventoryItems(departmentId);
  if (!configuredItems.length && !draft) {
- content.innerHTML = `<div class="empty"><div class="empty-icon">📦</div><div class="empty-title">Позиции ещё не настроены</div><div class="empty-sub">Учредитель добавит список для подразделения «${escapeHtml(department.name)}»</div></div>`;
+ content.innerHTML = `<div class="empty"><div class="empty-icon">📦</div><div class="empty-title">Позиции ещё не настроены</div><div class="empty-sub">Управление добавит список для подразделения «${escapeHtml(department.name)}»</div></div>`;
  footer.innerHTML = '';
  return;
  }
@@ -9899,7 +9940,7 @@ async function startInventory() {
 
  if (!draft || String(draft.departmentId || '') !== String(departmentId)) {
  if (!configuredItems.length) {
- showToast('Учредитель ещё не добавил позиции');
+ showToast('Управление ещё не добавило позиции');
  return;
  }
  draft = {
@@ -9941,7 +9982,7 @@ function renderInventoryForm() {
  const items = getInventoryDraftItems(draft);
  content.innerHTML = `
  <div class="doc-placeholder">
- Заполните все созданные учредителем позиции. Прогресс сохраняется автоматически.
+ Заполните все созданные управлением позиции. Прогресс сохраняется автоматически.
  </div>
  <div class="inventory-white">
  ${items.map((item, idx) => {
@@ -10042,7 +10083,7 @@ async function confirmInventorySubmit() {
 
  try {
  await saveInventoryRecord(record);
- notifyFounders(`📦 Новая инвентаризация\n\n${record.staffName || 'Сотрудник'} · ${record.departmentName || 'Подразделение'} · ${formatDateRu(record.date)}\nОткройте Учредитель → ${record.departmentName || 'Подразделение'} → Инвентаризация`);
+ notifyFounders(`📦 Новая инвентаризация\n\n${record.staffName || 'Сотрудник'} · ${record.departmentName || 'Подразделение'} · ${formatDateRu(record.date)}\nОткройте Управление → ${record.departmentName || 'Подразделение'} → Инвентаризация`);
  await clearInventoryDraft();
  showToast('Инвентаризация отправлена ✓');
  goBack();
@@ -10855,7 +10896,7 @@ function renderWaiterTasks() {
  }
  const tasks = getFounderTasks().filter(t => String(t.targetRole || 'waiter') === String(role)).sort((a,b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
  if (!tasks.length) {
- el.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">Срочных задач пока нет</div><div class="empty-sub">Срочные задачи от учредителя появятся здесь</div></div>`;
+ el.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">Срочных задач пока нет</div><div class="empty-sub">Срочные задачи от управления появятся здесь</div></div>`;
  return;
  }
  el.innerHTML = tasks.map(task => {
@@ -10918,7 +10959,7 @@ function renderWaiterTaskView() {
  return;
  }
  const dateText = task.date ? `${formatDateRu(task.date)}${task.time ? ' · ' + task.time : ''}` : '';
- const photosHtml = (task.photos || []).length ? `<div class="section-label">Фото от учредителя</div><div class="report-photo-grid" style="margin-bottom:16px;">${(task.photos || []).slice(0,10).map(photo => `<div class="report-photo-thumb" onclick="openFullscreen('${getPhotoDisplaySrc(photo)}')"><img src="${getPhotoDisplaySrc(photo)}" alt=""></div>`).join('')}</div>` : '';
+ const photosHtml = (task.photos || []).length ? `<div class="section-label">Фото от управления</div><div class="report-photo-grid" style="margin-bottom:16px;">${(task.photos || []).slice(0,10).map(photo => `<div class="report-photo-thumb" onclick="openFullscreen('${getPhotoDisplaySrc(photo)}')"><img src="${getPhotoDisplaySrc(photo)}" alt=""></div>`).join('')}</div>` : '';
  const closePhotosHtml = (task.closePhotos || []).length ? `<div class="section-label">Фото закрытия</div><div class="report-photo-grid" style="margin-bottom:16px;">${(task.closePhotos || []).slice(0,10).map(photo => `<div class="report-photo-thumb" onclick="openFullscreen('${getPhotoDisplaySrc(photo)}')"><img src="${getPhotoDisplaySrc(photo)}" alt=""></div>`).join('')}</div>` : '';
  const closeBlock = task.status !== 'closed' ? `<div class="section-label">Закрыть задачу</div><div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;"><div class="field"><label>Комментарий</label><textarea id="waiter-task-close-text" placeholder="Что сделано по задаче"></textarea></div><div class="photo-section" style="margin-bottom:14px;"><div class="photo-section-header"><span class="photo-section-title">Фото</span><span class="photo-count" id="waiter-task-close-photo-count">0 / 10</span></div><div class="photo-body"><div class="photo-grid" id="waiter-task-close-photo-grid" style="display:none;"></div><div id="waiter-task-close-add-btn" class="photo-actions"><button type="button" class="add-photo-btn" onclick="openCameraModal('waiterTaskClose')"><span>📷</span><span>Сделать фото</span></button></div></div></div><button class="btn btn-primary" onclick="closeFounderTaskByWaiter()">Закрыть задачу</button></div>` : `<div class="doc-placeholder"><b style="color:var(--text);">Задача закрыта</b><br>${escapeHtml(task.closedByName || 'Официант')}${task.closedAt ? ' · ' + escapeHtml(formatDateTimeShort(task.closedAt)) : ''}</div>`;
  el.innerHTML = `<div class="inventory-status"><div style="font-size:13px;color:var(--text-3);margin-bottom:6px;">Дата</div><div style="font-size:16px;font-weight:600;margin-bottom:12px;">${escapeHtml(dateText)}</div><div style="font-size:13px;color:var(--text-3);margin-bottom:6px;">Статус</div><div style="font-size:16px;font-weight:800;color:${task.status === 'closed' ? 'var(--success)' : 'var(--accent)'};">${task.status === 'closed' ? 'Закрыта' : 'Открыта'}</div></div><div class="section-label">Задача</div><div class="doc-placeholder" style="white-space:pre-line;color:var(--text);">${escapeHtml(task.text || '')}</div>${photosHtml}${task.closeText ? `<div class="doc-placeholder" style="white-space:pre-line;color:var(--text);">${escapeHtml(task.closeText)}</div>` : ''}${closePhotosHtml}${closeBlock}`;
@@ -11148,7 +11189,7 @@ function getTaskRoleLabel(role) {
 
 function openFounderTasks() {
  if (!hasFounderSession()) {
- showToast('Создавать задачи может только учредитель');
+ showToast('Создавать задачи может только управление');
  enterFounder();
  return;
  }
@@ -11162,7 +11203,7 @@ function openFounderTasks() {
 
 function openFounderTaskDepartment(departmentId) {
  if (!hasFounderSession()) {
- showToast('Создавать задачи может только учредитель');
+ showToast('Создавать задачи может только управление');
  enterFounder();
  return;
  }
@@ -11224,7 +11265,7 @@ function renderFounderTasks() {
  const title = document.getElementById('founder-tasks-title');
  if (!el) return;
  if (!hasFounderSession()) {
- el.innerHTML = '<div class="empty"><div class="empty-icon">🔒</div><div class="empty-title">Только для учредителя</div><div class="empty-sub">Сотрудники могут только просматривать и закрывать задачи</div></div>';
+ el.innerHTML = '<div class="empty"><div class="empty-icon">🔒</div><div class="empty-title">Только для управления</div><div class="empty-sub">Сотрудники могут только просматривать и закрывать задачи</div></div>';
  return;
  }
  if (!activeFounderTaskRole) {
@@ -11319,7 +11360,7 @@ function renderFounderTasks() {
 
 function submitFounderTask() {
  if (!hasFounderSession()) {
- showToast('Создавать задачи может только учредитель');
+ showToast('Создавать задачи может только управление');
  return;
  }
  const textValue = (document.getElementById('founder-task-text')?.value || '').trim();
@@ -11339,7 +11380,7 @@ function generateFounderTaskId() {
 async function confirmFounderTask() {
  closeModal('modal-founder-task-confirm');
  if (!hasFounderSession()) {
- showToast('Создавать задачи может только учредитель');
+ showToast('Создавать задачи может только управление');
  return;
  }
  const textValue = (document.getElementById('founder-task-text')?.value || '').trim();
@@ -11389,7 +11430,7 @@ async function confirmFounderTask() {
  time: now.toTimeString().slice(0, 5),
  createdAt: now.toISOString(),
  createdById: founder && founder.id ? String(founder.id) : '',
- createdByName: founder && founder.name ? founder.name : 'Учредитель',
+ createdByName: founder && founder.name ? founder.name : 'Управление',
  reminder15DueAt: new Date(now.getTime() + FOUNDER_TASK_REMINDER_15_MS).toISOString(),
  reminder60DueAt: new Date(now.getTime() + FOUNDER_TASK_REMINDER_60_MS).toISOString(),
  reminder15SentAt: null,
@@ -11434,7 +11475,7 @@ function getFounderTaskDepartmentPreviewActor(departmentId) {
  return {
  ...founder,
  id: `founder_preview_${String(founder.id || 'session')}_${String(department.id)}`,
- name: `${founder.name || 'Учредитель'} · предпросмотр`,
+ name: `${founder.name || 'Управление'} · предпросмотр`,
  role: 'waiter',
  roleLabel: department.name,
  departmentId: String(department.id),
@@ -11541,14 +11582,14 @@ function renderWaiterTasks() {
  const department = getDepartment(departmentId);
  if (title) title.textContent = `Срочные задачи · ${department ? department.name : getTaskRoleLabel(staff.role)}`;
  if (department && !(department.processes || []).some(process => process.key === 'tasks')) {
- el.innerHTML = '<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">Процесс не подключён</div><div class="empty-sub">Учредитель не добавил «Срочные задачи» в ваше подразделение</div></div>';
+ el.innerHTML = '<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">Процесс не подключён</div><div class="empty-sub">Управление не добавило «Срочные задачи» в ваше подразделение</div></div>';
  return;
  }
  const tasks = getFounderTasks()
  .filter(task => taskBelongsToDepartment(task, departmentId))
  .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
  if (!tasks.length) {
- el.innerHTML = '<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">Срочных задач пока нет</div><div class="empty-sub">Срочные задачи учредителя появятся здесь</div></div>';
+ el.innerHTML = '<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">Срочных задач пока нет</div><div class="empty-sub">Срочные задачи управления появятся здесь</div></div>';
  return;
  }
  el.innerHTML = tasks.map(task => {
@@ -11607,7 +11648,7 @@ function renderWaiterTaskView() {
  ? (String(task.responsibleStaffId) === String(staff.id) ? 'Вы назначены ответственным' : `Ответственный: ${task.responsibleStaffName}`)
  : 'Ответственно всё подразделение';
  const photosHtml = (task.photos || []).length
- ? `<div class="section-label">Фото от учредителя</div><div class="report-photo-grid" style="margin-bottom:16px;">${(task.photos || []).slice(0, 10).map(photo => `<div class="report-photo-thumb" onclick="openFullscreen('${getPhotoDisplaySrc(photo)}')"><img src="${getPhotoDisplaySrc(photo)}" alt=""></div>`).join('')}</div>`
+ ? `<div class="section-label">Фото от управления</div><div class="report-photo-grid" style="margin-bottom:16px;">${(task.photos || []).slice(0, 10).map(photo => `<div class="report-photo-thumb" onclick="openFullscreen('${getPhotoDisplaySrc(photo)}')"><img src="${getPhotoDisplaySrc(photo)}" alt=""></div>`).join('')}</div>`
  : '';
  const closePhotosHtml = (task.closePhotos || []).length
  ? `<div class="section-label">Фото закрытия</div><div class="report-photo-grid" style="margin-bottom:16px;">${(task.closePhotos || []).slice(0, 10).map(photo => `<div class="report-photo-thumb" onclick="openFullscreen('${getPhotoDisplaySrc(photo)}')"><img src="${getPhotoDisplaySrc(photo)}" alt=""></div>`).join('')}</div>`
@@ -13583,7 +13624,7 @@ function openAdminFines() {
  // Administrators and other employees are read-only by product rule.
  // Fine assignment exists only in the founder route inside a department.
  if (!hasFounderSession()) {
- showToast('Назначать штрафы может только учредитель');
+ showToast('Назначать штрафы может только управление');
  return;
  }
  const departmentId = activeManagedDepartmentId || activePreviewDepartmentId;
@@ -13628,7 +13669,7 @@ function renderAdminFines() {
 
 function addFine() {
  if (!hasFounderSession()) {
- showToast('Назначать штрафы может только учредитель');
+ showToast('Назначать штрафы может только управление');
  return;
  }
  const staffId = document.getElementById('fine-staff-select').value;
@@ -14374,7 +14415,7 @@ function renderFounderFines() {
 async function addFounderFine() {
  if (founderFineSaving) return;
  if (!hasFounderSession()) {
- showToast('Назначать штрафы может только учредитель');
+ showToast('Назначать штрафы может только управление');
  return;
  }
  const dep = getDepartment(activeFounderFineDepartmentId);
@@ -14806,12 +14847,13 @@ async function deleteAdminProfileById(adminId) {
 // ============================================================
 // ANONYMOUS FEEDBACK
 // ============================================================
-let activeAnonymousFeedbackType = 'suggestion';
+let activeAnonymousFeedbackType = '';
 let activeAnonymousFeedbackPhotos = [];
 let activeFounderAnonymousTab = 'complaint';
 
 function getAuthorizedAnonymousActor() {
- if (hasFounderSession()) return getFounderActor('founder');
+ // Управление только читает обращения. Создание доступно сотрудникам.
+ if (hasFounderSession() && InspectStorage.getItem('founderActiveRole') === 'founder') return null;
  if (hasAdminSession()) {
  const admin = getCurrentAdminProfile();
  return admin ? { ...admin, role: 'admin', roleLabel: 'Администратор' } : { id: 'admin-session', role: 'admin', roleLabel: 'Администратор', name: 'Администратор' };
@@ -14819,21 +14861,20 @@ function getAuthorizedAnonymousActor() {
  return getCurrentApprovedStaff();
 }
 
-function openAnonymousFeedback() {
+function openAnonymousFeedback(type = '') {
  const actor = getAuthorizedAnonymousActor();
  if (!actor) {
- showToast('Сначала войдите в своё подразделение');
+ showToast(hasFounderSession() ? 'Управление видит обращения в общем списке' : 'Сначала войдите в своё подразделение');
  return;
  }
- activeAnonymousFeedbackType = 'suggestion';
+ activeAnonymousFeedbackType = type === 'suggestion' || type === 'complaint' ? type : '';
  activeAnonymousFeedbackPhotos = [];
  renderAnonymousFeedback();
  goTo('screen-anonymous-feedback');
 }
 
 function switchAnonymousFeedbackType(type) {
- if (type === 'staff') activeAnonymousFeedbackType = 'staff';
- else activeAnonymousFeedbackType = type === 'complaint' ? 'complaint' : 'suggestion';
+ activeAnonymousFeedbackType = type === 'complaint' ? 'complaint' : 'suggestion';
  activeAnonymousFeedbackPhotos = [];
  renderAnonymousFeedback();
 }
@@ -14871,35 +14912,29 @@ function getAnonymousTargetEmployees() {
 function renderAnonymousFeedback() {
  const el = document.getElementById('anonymous-feedback-content');
  if (!el) return;
+ if (!activeAnonymousFeedbackType) {
+ el.innerHTML = `
+ <div class="doc-placeholder">Обращение будет отправлено полностью анонимно. Управление не увидит имя, логин или Telegram ID автора.</div>
+ <div style="display:grid;gap:12px;margin-top:18px;">
+ <button type="button" class="btn btn-primary" onclick="switchAnonymousFeedbackType('complaint')">Написать жалобу</button>
+ <button type="button" class="btn btn-secondary" onclick="switchAnonymousFeedbackType('suggestion')">Добавить предложение</button>
+ </div>`;
+ return;
+ }
  const isComplaint = activeAnonymousFeedbackType === 'complaint';
- const isStaff = activeAnonymousFeedbackType === 'staff';
  const targets = getAnonymousTargetEmployees();
  const targetSelect = isComplaint ? `
  <div class="field">
- <label>На кого жалоба (необязательно)</label>
+ <label>На кого жалоба</label>
  <select id="anonymous-feedback-target">
- <option value="">Не указывать сотрудника</option>
+ <option value="">Выберите сотрудника</option>
  ${targets.map(s => `<option value="${escapeHtml(s._key || ('staff:' + String(s.id)))}">${escapeHtml(s.name || 'Сотрудник')} · ${escapeHtml(getStaffRole(s))}</option>`).join('')}
  </select>
  </div>` : '';
 
- const staffFields = isStaff ? `
- <div class="field">
- <label>Число</label>
- <input type="text" id="anonymous-feedback-number" placeholder="Введите число" inputmode="numeric">
- </div>
- <div class="field">
- <label>Обед или ужин</label>
- <select id="anonymous-feedback-meal">
- <option value="">Выберите</option>
- <option value="lunch">Обед</option>
- <option value="dinner">Ужин</option>
- </select>
- </div>` : '';
-
- const photosSection = !isStaff ? `
+ const photosSection = `
  <div class="photo-section" style="margin-bottom:14px;">
- <div class="photo-section-header"><span class="photo-section-title">Фото</span><span class="photo-count" id="anonymous-feedback-photo-count">0 / 5</span></div>
+ <div class="photo-section-header"><span class="photo-section-title">Фото <span style="font-weight:500;color:var(--text-3);">(по желанию)</span></span><span class="photo-count" id="anonymous-feedback-photo-count">0 / 5</span></div>
  <div class="photo-body">
  <div class="photo-grid" id="anonymous-feedback-photo-grid" style="display:none;"></div>
  <div id="anonymous-feedback-add-btn" class="photo-actions" style="display:grid;gap:8px;">
@@ -14907,23 +14942,21 @@ function renderAnonymousFeedback() {
  <button type="button" class="add-photo-btn" onclick="openGalleryInput('anonymousFeedback')"><span>🖼️</span><span>Прикрепить из галереи</span></button>
  </div>
  </div>
- </div>` : '';
+ </div>`;
 
- const textLabel = isStaff ? 'Текст жалобы по стаффу' : (isComplaint ? 'Текст жалобы' : 'Текст предложения');
- const errorText = isStaff ? 'Заполните текст, число и выберите обед или ужин' : 'Напишите текст';
+ const textLabel = isComplaint ? 'Текст жалобы' : 'Текст предложения';
+ const errorText = isComplaint ? 'Выберите сотрудника и напишите текст' : 'Напишите текст предложения';
 
  el.innerHTML = `
  <div class="tabs">
- <div class="tab ${!isComplaint && !isStaff ? 'active' : ''}" onclick="switchAnonymousFeedbackType('suggestion')">Предложения</div>
  <div class="tab ${isComplaint ? 'active' : ''}" onclick="switchAnonymousFeedbackType('complaint')">Жалобы</div>
- <div class="tab ${isStaff ? 'active' : ''}" onclick="switchAnonymousFeedbackType('staff')">Стафф</div>
+ <div class="tab ${!isComplaint ? 'active' : ''}" onclick="switchAnonymousFeedbackType('suggestion')">Предложения</div>
  </div>
  <div class="doc-placeholder">
- Учредители видят только текст сообщения и фото. Имя отправителя скрыто.
+ Управление увидит только текст, выбранного сотрудника в жалобе и фото. Имя отправителя и Telegram ID не сохраняются.
  </div>
  <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
  ${targetSelect}
- ${staffFields}
  <div class="field">
  <label>${textLabel}</label>
  <textarea id="anonymous-feedback-text" placeholder="Напишите текст..."></textarea>
@@ -14932,7 +14965,7 @@ function renderAnonymousFeedback() {
  ${photosSection}
  <button class="btn btn-primary" onclick="submitAnonymousFeedback()">Отправить</button>
  </div>`;
- if (!isStaff) renderAnonymousFeedbackPhotos();
+ renderAnonymousFeedbackPhotos();
 }
 
 async function submitAnonymousFeedback() {
@@ -14945,31 +14978,24 @@ async function submitAnonymousFeedback() {
  const err = document.getElementById('anonymous-feedback-error');
  const textValue = (textEl ? textEl.value : '').trim();
  const isComplaint = activeAnonymousFeedbackType === 'complaint';
- const isStaff = activeAnonymousFeedbackType === 'staff';
- const staffNumber = isStaff ? (document.getElementById('anonymous-feedback-number')?.value || '').trim() : '';
- const staffMeal = isStaff ? (document.getElementById('anonymous-feedback-meal')?.value || '').trim() : '';
+ const selectedKey = isComplaint ? (document.getElementById('anonymous-feedback-target')?.value || '') : '';
+ const target = selectedKey ? getAnonymousTargetEmployees().find(s => String(s._key || ('staff:' + String(s.id))) === String(selectedKey)) : null;
 
- if (!textValue || (isStaff && (!staffNumber || !staffMeal))) {
+ if (!textValue || (isComplaint && !target)) {
  if (err) err.classList.add('show');
  return;
  }
  if (err) err.classList.remove('show');
 
- const selectedKey = isComplaint ? (document.getElementById('anonymous-feedback-target')?.value || '') : '';
- const target = selectedKey ? getAnonymousTargetEmployees().find(s => String(s._key || ('staff:' + String(s.id))) === String(selectedKey)) : null;
-
  try {
- showToast(!isStaff && activeAnonymousFeedbackPhotos.length ? 'Отправляем фото...' : 'Отправляем...');
- const photos = isStaff ? [] : await uploadTaskPhotos(activeAnonymousFeedbackPhotos, 'anonymousFeedback');
+ showToast(activeAnonymousFeedbackPhotos.length ? 'Отправляем фото...' : 'Отправляем...');
+ const photos = await uploadTaskPhotos(activeAnonymousFeedbackPhotos, 'anonymousFeedback');
  const now = new Date();
  const item = {
  id: Date.now(),
- type: isStaff ? 'staff' : (isComplaint ? 'complaint' : 'suggestion'),
+ type: isComplaint ? 'complaint' : 'suggestion',
  text: textValue,
  photos,
- staffNumber: isStaff ? staffNumber : '',
- staffMeal: isStaff ? staffMeal : '',
- staffMealLabel: isStaff ? (staffMeal === 'lunch' ? 'Обед' : 'Ужин') : '',
  targetKey: target ? String(target._key || ('staff:' + String(target.id))) : '',
  targetId: target ? String(target.id || '') : '',
  targetName: target ? String(target.name || '') : '',
@@ -14980,10 +15006,9 @@ async function submitAnonymousFeedback() {
  createdAt: now.toISOString()
  };
  await saveAnonymousFeedback(item);
- const label = isStaff ? 'жалоба по стаффу' : (isComplaint ? 'жалоба' : 'предложение');
+ const label = isComplaint ? 'жалоба' : 'предложение';
  const targetLine = target ? `\nНа: ${target.name || 'Сотрудник'} · ${getStaffRole(target)}` : '';
- const staffLine = isStaff ? `\nЧисло: ${staffNumber}\nПрием пищи: ${item.staffMealLabel}` : '';
- notifyFounders(`💬 Новая анонимная ${label}${targetLine}${staffLine}\n\nОткройте Учредитель → Жалобы и предложения`);
+ notifyFounders(`💬 Новая анонимная ${label}${targetLine}\n\nОткройте Управление → Жалобы и предложения`);
  activeAnonymousFeedbackPhotos = [];
  if (textEl) textEl.value = '';
  showToast('Отправлено анонимно ✓');
@@ -15106,8 +15131,7 @@ function openFounderAnonymousFeedback() {
 }
 
 function switchFounderAnonymousTab(type) {
- if (type === 'staff') activeFounderAnonymousTab = 'staff';
- else activeFounderAnonymousTab = type === 'suggestion' ? 'suggestion' : 'complaint';
+ activeFounderAnonymousTab = type === 'suggestion' ? 'suggestion' : 'complaint';
  markFounderItemsRead('feedback', getAnonymousFeedback().filter(x => String(x.type || 'suggestion') === activeFounderAnonymousTab), item => item.id);
  renderFounderAnonymousFeedback();
 }
@@ -15116,11 +15140,9 @@ function renderFounderAnonymousFeedback() {
  const el = document.getElementById('founder-anonymous-feedback-content');
  if (!el) return;
  const isSuggestion = activeFounderAnonymousTab === 'suggestion';
- const isStaff = activeFounderAnonymousTab === 'staff';
- const currentType = isStaff ? 'staff' : (isSuggestion ? 'suggestion' : 'complaint');
+ const currentType = isSuggestion ? 'suggestion' : 'complaint';
  const complaintUnread = getAnonymousFeedback().filter(x => String(x.type || '') === 'complaint' && isFounderItemUnread('feedback', x.id, x.createdAt)).length;
  const suggestionUnread = getAnonymousFeedback().filter(x => String(x.type || 'suggestion') === 'suggestion' && isFounderItemUnread('feedback', x.id, x.createdAt)).length;
- const staffUnread = getAnonymousFeedback().filter(x => String(x.type || '') === 'staff' && isFounderItemUnread('feedback', x.id, x.createdAt)).length;
  const items = getAnonymousFeedback()
  .filter(x => String(x.type || 'suggestion') === currentType)
  .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
@@ -15130,7 +15152,6 @@ function renderFounderAnonymousFeedback() {
  const listHtml = items.length ? items.map(item => {
  const dateText = `${item.date ? formatDateRu(item.date) : ''}${item.time ? ' · ' + escapeHtml(item.time) : ''}`;
  const targetHtml = item.targetName ? `<div class="card-sub" style="margin-top:6px;">На кого: ${escapeHtml(item.targetName)} · ${escapeHtml(item.targetRoleLabel || getRoleLabel(item.targetRole))}</div>` : '';
- const staffMetaHtml = String(item.type || '') === 'staff' ? `<div class="card-sub" style="margin-top:6px;">Число: ${escapeHtml(item.staffNumber || '—')} · ${escapeHtml(item.staffMealLabel || (item.staffMeal === 'lunch' ? 'Обед' : (item.staffMeal === 'dinner' ? 'Ужин' : '—')))}</div>` : '';
  const photosHtml = (item.photos || []).length ? `<div class="report-photo-grid" style="margin-top:12px;">${(item.photos || []).slice(0,5).map(photo => `<div class="report-photo-thumb" onclick="openFullscreen('${getPhotoDisplaySrc(photo)}')"><img src="${getPhotoDisplaySrc(photo)}" alt=""></div>`).join('')}</div>` : '';
  return `<div class="card swipe-delete-card" style="cursor:default;" data-feedback-id="${item.id}"
  ontouchstart="startAnonymousFeedbackSwipe(event, '${item.id}')"
@@ -15138,7 +15159,6 @@ function renderFounderAnonymousFeedback() {
  ontouchend="endAnonymousFeedbackSwipe(event, '${item.id}')">
  <div class="card-title">${escapeHtml(dateText || 'Без даты')}</div>
  ${targetHtml}
- ${staffMetaHtml}
  <div style="font-size:15px;line-height:1.55;margin-top:12px;white-space:pre-line;">${escapeHtml(item.text || '')}</div>
  ${photosHtml}
  <div style="font-size:12px;color:var(--text-3);margin-top:8px;">Длинный свайп влево до конца + подтверждение для удаления</div>
@@ -15147,11 +15167,10 @@ function renderFounderAnonymousFeedback() {
 
  el.innerHTML = `
  <div class="tabs">
- <div class="tab ${!isSuggestion && !isStaff ? 'active' : ''}" onclick="switchFounderAnonymousTab('complaint')">Жалобы ${badgeHtml(complaintUnread)}</div>
+ <div class="tab ${!isSuggestion ? 'active' : ''}" onclick="switchFounderAnonymousTab('complaint')">Жалобы ${badgeHtml(complaintUnread)}</div>
  <div class="tab ${isSuggestion ? 'active' : ''}" onclick="switchFounderAnonymousTab('suggestion')">Предложения ${badgeHtml(suggestionUnread)}</div>
- <div class="tab ${isStaff ? 'active' : ''}" onclick="switchFounderAnonymousTab('staff')">Стафф ${badgeHtml(staffUnread)}</div>
  </div>
- <div class="doc-placeholder">Авторы не отображаются и не сохраняются. Видны только текст, фото и сотрудник, если он указан в жалобе. В стаффе видны число и обед/ужин.</div>
+ <div class="doc-placeholder">Обращения полностью анонимны: данные автора и Telegram ID не сохраняются. В жалобе видны выбранный сотрудник, текст и фото; в предложении — текст и фото.</div>
  ${listHtml}`;
 }
 
@@ -15198,7 +15217,7 @@ async function checkFounderPwd() {
  renderFounderMenu();
  } catch (e) {
  console.error(e);
- showToast('Ошибка входа учредителя');
+ showToast('Ошибка входа управления');
  }
  } else {
  err.textContent = 'Неверный пароль';
@@ -15207,8 +15226,39 @@ async function checkFounderPwd() {
  }
 }
 
+function openFounderLogoutConfirm() {
+ if (!hasFounderSession()) {
+ showToast('Сначала войдите в управление');
+ return;
+ }
+ const business = getCurrentBusiness() || LocalDB.get('business') || {};
+ const profile = getCurrentFounderProfile() || {};
+ const login = String(business.founderName || profile.name || '').trim() || '—';
+ const password = String(getFounderPassword() || '').trim() || '—';
+ const loginEl = document.getElementById('founder-logout-login');
+ const passwordEl = document.getElementById('founder-logout-password');
+ if (loginEl) loginEl.textContent = login;
+ if (passwordEl) passwordEl.textContent = password;
+ openModal('modal-founder-logout');
+}
+
+function confirmFounderLogout() {
+ closeModal('modal-founder-logout');
+ founderLogout();
+}
+
 function founderLogout() {
- goHome();
+ clearFounderSession();
+ setCurrentBusinessId(null);
+ appCache.business = null;
+ activePreviewDepartmentId = '';
+ activeManagedDepartmentId = null;
+ activeGenericProcessDeptId = null;
+ activeGenericProcessKey = null;
+ // Keep the account chooser open until the user explicitly enters this or
+ // another business; an old employee binding must not replace this screen.
+ InspectStorage.setItem('accountSelectionMode', '1');
+ location.reload();
 }
 
 function changePassword() {
@@ -15220,7 +15270,7 @@ function changePassword() {
  setFounderPassword(np);
  document.getElementById('new-pwd').value = '';
  document.getElementById('confirm-pwd').value = '';
- showToast('Пароль изменён. Вход учредителя сброшен');
+ showToast('Пароль изменён. Вход управления сброшен');
  goHome();
 }
 
@@ -16078,6 +16128,7 @@ async function init() {
  appCache.technicianRepairReminderLog = LocalDB.get("technicianRepairReminderLog") || appCache.technicianRepairReminderLog || {};
  appCache.photoReportDrafts = LocalDB.get("photoReportDrafts") || appCache.photoReportDrafts || [];
  appCache.founderTasks = LocalDB.get("founderTasks") || appCache.founderTasks || [];
+ appCache.anonymousFeedback = sanitizeAnonymousFeedbackList(LocalDB.get("anonymousFeedback") || appCache.anonymousFeedback || []);
  appCache.kpiContent = LocalDB.get("kpiContent") || appCache.kpiContent || getDefaultKpiContent();
  appCache.stopList = LocalDB.get("stopList") || appCache.stopList || getDefaultStopList();
 
@@ -16114,7 +16165,10 @@ async function init() {
  // Telegram binding remains the source of truth for employees, but its cloud
  // lookup is intentionally delayed until after the cached home screen has
  // already been painted. A slow connection can no longer leave an empty grid.
- const bindingRestore = await restoreTelegramEmployeeBinding();
+ const accountSelectionMode = InspectStorage.getItem('accountSelectionMode') === '1';
+ const bindingRestore = accountSelectionMode
+ ? { restored: false, reason: 'account-switch' }
+ : await restoreTelegramEmployeeBinding();
  if (bindingRestore && bindingRestore.restored) {
   appCache.departments = LocalDB.get("departments") || appCache.departments || [];
   applyDepartmentLabels(getPrimaryDepartment());
@@ -16206,6 +16260,54 @@ function toggleTheme() {
 // разблокированные процессы и подразделения.
 // ============================================================
 const RU_UZ_DICT = {
+"Управление увидит только текст, выбранного сотрудника в жалобе и фото. Имя отправителя и Telegram ID не сохраняются.": "Boshqaruv faqat matnni, shikoyatda tanlangan xodimni va fotoni ko'radi. Yuboruvchining ismi va Telegram ID saqlanmaydi.",
+"Обращения полностью анонимны: данные автора и Telegram ID не сохраняются. В жалобе видны выбранный сотрудник, текст и фото; в предложении — текст и фото.": "Murojaatlar to'liq anonim: muallif ma'lumotlari va Telegram ID saqlanmaydi. Shikoyatda tanlangan xodim, matn va foto; taklifda esa matn va foto ko'rinadi.",
+"Вы выйдете из текущего аккаунта и вернётесь на панель регистрации. Данные бизнеса останутся сохранены.": "Joriy akkauntdan chiqib, ro'yxatdan o'tish paneliga qaytasiz. Biznes ma'lumotlari saqlanib qoladi.",
+"Если выключена — раздел доступен только управлению.": "O'chirilgan bo'lsa, bo'lim faqat boshqaruv uchun ochiq bo'ladi.",
+"Заполните все значения. После отправки управление сразу увидит их на графике.": "Barcha qiymatlarni to'ldiring. Yuborilgandan keyin boshqaruv ularni darhol grafikda ko'radi.",
+"Управление сразу увидит введённые данные на графике подразделения.": "Boshqaruv kiritilgan ma'lumotlarni bo'lim grafigida darhol ko'radi.",
+"Управление увидит дату, время, администратора, тему, сотрудников и фото.": "Boshqaruv sana, vaqt, administrator, mavzu, xodimlar va fotoni ko'radi.",
+"Управление увидит, кто закрыл задачу, время и прикрепленные фото.": "Boshqaruv vazifani kim yopganini, vaqtni va biriktirilgan fotolarni ko'radi.",
+"Напишите, что заканчивается и что нужно купить. Управление увидит имя, дату, время и текст.": "Nima tugayotganini va nima sotib olish kerakligini yozing. Boshqaruv ism, sana, vaqt va matnni ko'radi.",
+"Управление пока не добавило значения для заполнения": "Boshqaruv hali to'ldirish uchun qiymatlarni qo'shmagan",
+"Управление ещё не добавило инвентаризацию в ваше подразделение": "Boshqaruv hali bo'limingizga inventarizatsiyani qo'shmagan",
+"Управление добавит список для подразделения": "Boshqaruv bo'lim uchun ro'yxat qo'shadi",
+"Заполните все созданные управлением позиции. Прогресс сохраняется автоматически.": "Boshqaruv yaratgan barcha pozitsiyalarni to'ldiring. Jarayon avtomatik saqlanadi.",
+"Управление не добавило «Срочные задачи» в ваше подразделение": "Boshqaruv bo'limingizga «Shoshilinch vazifalar»ni qo'shmagan",
+"Срочные задачи от управления появятся здесь": "Boshqaruvdan shoshilinch vazifalar shu yerda paydo bo'ladi",
+"Срочные задачи управления появятся здесь": "Boshqaruvning shoshilinch vazifalari shu yerda paydo bo'ladi",
+"Сотрудники могут только просматривать этот раздел. Штрафы назначает управление.": "Xodimlar bu bo'limni faqat ko'rishi mumkin. Jarimalarni boshqaruv tayinlaydi.",
+"Управление добавит их в разделе подразделения": "Boshqaruv ularni bo'lim ichida qo'shadi",
+"Управление закрыло этот раздел для сотрудников": "Boshqaruv bu bo'limni xodimlar uchun yopdi",
+"Этот раздел доступен только управлению": "Bu bo'lim faqat boshqaruv uchun ochiq",
+"Создавать задачи может только управление": "Vazifalarni faqat boshqaruv yarata oladi",
+"Назначать штрафы может только управление": "Jarimalarni faqat boshqaruv tayinlay oladi",
+"Штрафы видит только управление ✓": "Jarimalarni faqat boshqaruv ko'radi ✓",
+"Управление ещё не добавило значения": "Boshqaruv hali qiymatlarni qo'shmagan",
+"Управление ещё не добавило позиции": "Boshqaruv hali pozitsiyalarni qo'shmagan",
+"Откройте приложение → Управление → Сотрудники": "Ilovani oching → Boshqaruv → Xodimlar",
+"Откройте Управление → Жалобы и предложения": "Boshqaruv → Shikoyat va takliflar bo'limini oching",
+"Откройте Управление →": "Boshqaruvni oching →",
+"Срочные задачи от управления": "Boshqaruvdan shoshilinch vazifalar",
+"Фото от управления": "Boshqaruvdan foto",
+"Сообщение управлению": "Boshqaruvga xabar",
+"Ошибка входа управления": "Boshqaruv kirishida xatolik",
+"Пароль изменён. Вход управления сброшен": "Parol o'zgartirildi. Boshqaruv kirishi bekor qilindi",
+"Доступ сотрудника удалён управлением": "Xodimga kirish huquqi boshqaruv tomonidan o'chirildi",
+"Выберите сотрудника и напишите текст": "Xodimni tanlang va matn yozing",
+"Напишите текст предложения": "Taklif matnini yozing",
+"На кого жалоба": "Kim ustidan shikoyat",
+"Выйти из аккаунта": "Akkauntdan chiqish",
+"Выйти на главный экран": "Bosh ekranga chiqish",
+"Сохраните данные для входа": "Kirish ma'lumotlarini saqlab qo'ying",
+"Да, выйти": "Ha, chiqish",
+"Перед выходом приложение покажет логин и пароль текущего бизнеса. Данные бизнеса останутся сохранены.": "Chiqishdan oldin ilova joriy biznes login va parolini ko'rsatadi. Biznes ma'lumotlari saqlanib qoladi.",
+"Это ваш логин и пароль для входа в вашу учетную запись. Рекомендуем сделать скриншот перед выходом.": "Bu akkauntingizga kirish uchun login va parolingiz. Chiqishdan oldin skrinshot olishni tavsiya qilamiz.",
+"Сменить бизнес": "Biznesni almashtirish",
+"Имя владельца": "Egasi ismi",
+"Управление ·": "Boshqaruv ·",
+"Управление": "Boshqaruv",
+"Аккаунт": "Akkaunt",
 "Динамика показателей": "Ko'rsatkichlar dinamikasi",
 "Двигайте график влево или вправо пальцем.": "Grafikni barmoq bilan chapga yoki o'ngga suring.",
 "Добавьте показатели ниже": "Quyida ko'rsatkichlarni qo'shing",
@@ -16535,6 +16637,9 @@ const RU_UZ_DICT = {
 "Войдите как официант": "Ofitsiant sifatida kiring",
 "Войти как учредитель": "Muassis sifatida kirish",
 "Жалобы и предложения": "Shikoyat va takliflar",
+"Написать жалобу": "Shikoyat yozish",
+"Добавить предложение": "Taklif qo'shish",
+"Обращение будет отправлено полностью анонимно. Управление не увидит имя, логин или Telegram ID автора.": "Murojaat to'liq anonim yuboriladi. Boshqaruv muallifning ismi, logini yoki Telegram ID sini ko'rmaydi.",
 "Заказать · Массажист": "Buyurtma berish · Massajist",
 "Заполнить статистику": "Statistikani to'ldirish",
 "Камера ещё не готова": "Kamera hali tayyor emas",
