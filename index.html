@@ -347,6 +347,25 @@
  box-shadow: 0 0 0 3px var(--accent-soft);
  }
  .home-status-strip span { font-size: 12px; color: var(--text-2); }
+ .home-status-strip.status-loading .home-status-dot {
+ background: #d7a52b;
+ box-shadow: 0 0 0 3px rgba(215,165,43,0.16);
+ animation: homeStatusPulse 1.25s ease-in-out infinite;
+ }
+ .home-status-strip.status-ready .home-status-dot {
+ background: var(--success);
+ box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 18%, transparent);
+ animation: none;
+ }
+ .home-status-strip.status-offline .home-status-dot {
+ background: var(--danger);
+ box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 18%, transparent);
+ animation: none;
+ }
+ @keyframes homeStatusPulse {
+ 0%, 100% { opacity: 0.55; transform: scale(0.92); }
+ 50% { opacity: 1; transform: scale(1.08); }
+ }
 
  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -1486,6 +1505,207 @@
  overflow-wrap: anywhere;
  }
 
+
+
+ /* CHECKLIST PROCESS */
+ .checklist-tabs {
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:6px;
+ background:var(--surface);
+ border:1px solid var(--border-strong);
+ border-radius:var(--radius-sm);
+ padding:5px;
+ margin-bottom:18px;
+ box-shadow:var(--shadow-raised);
+ }
+ .checklist-tab {
+ border:none;
+ border-radius:11px;
+ padding:12px 8px;
+ background:transparent;
+ color:var(--text-2);
+ font:inherit;
+ font-size:14px;
+ font-weight:800;
+ cursor:pointer;
+ }
+ .checklist-tab.active {
+ background:var(--accent-soft);
+ color:var(--accent);
+ }
+ .checklist-question-card {
+ background:var(--surface);
+ border:1px solid var(--border-strong);
+ border-radius:var(--radius);
+ padding:17px;
+ margin-bottom:12px;
+ box-shadow:var(--shadow-raised);
+ }
+ .checklist-question-head {
+ display:flex;
+ align-items:flex-start;
+ gap:12px;
+ }
+ .checklist-question-number {
+ width:32px;
+ height:32px;
+ border-radius:11px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ flex:0 0 32px;
+ background:var(--accent-soft);
+ color:var(--accent);
+ font-weight:900;
+ }
+ .checklist-question-text {
+ flex:1;
+ min-width:0;
+ font-size:16px;
+ line-height:1.42;
+ font-weight:750;
+ overflow-wrap:anywhere;
+ }
+ .checklist-photo-required {
+ display:inline-flex;
+ align-items:center;
+ gap:6px;
+ margin-top:8px;
+ font-size:12px;
+ font-weight:800;
+ color:var(--text-2);
+ }
+ .checklist-answer-row {
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:9px;
+ margin-top:15px;
+ }
+ .checklist-answer-btn {
+ border:1px solid var(--border-strong);
+ border-radius:14px;
+ background:var(--surface2);
+ color:var(--text);
+ padding:13px 10px;
+ font:inherit;
+ font-weight:850;
+ cursor:pointer;
+ }
+ .checklist-answer-btn.yes.selected {
+ background:color-mix(in srgb,var(--success) 24%,var(--surface));
+ border-color:var(--success);
+ color:var(--success);
+ }
+ .checklist-answer-btn.no.selected {
+ background:color-mix(in srgb,var(--danger) 20%,var(--surface));
+ border-color:var(--danger);
+ color:var(--danger);
+ }
+ .checklist-photo-box {
+ margin-top:14px;
+ padding:12px;
+ border:1px dashed var(--border-strong);
+ border-radius:14px;
+ background:var(--surface2);
+ }
+ .checklist-photo-preview {
+ position:relative;
+ width:100%;
+ max-height:230px;
+ border-radius:12px;
+ overflow:hidden;
+ background:var(--surface3);
+ margin-bottom:10px;
+ }
+ .checklist-photo-preview img {
+ width:100%;
+ max-height:230px;
+ display:block;
+ object-fit:cover;
+ }
+ .checklist-photo-remove {
+ position:absolute;
+ top:7px;
+ right:7px;
+ width:32px;
+ height:32px;
+ border:none;
+ border-radius:50%;
+ background:rgba(0,0,0,.68);
+ color:#fff;
+ font-size:16px;
+ cursor:pointer;
+ }
+ .checklist-config-item {
+ display:flex;
+ align-items:flex-start;
+ gap:12px;
+ background:var(--surface);
+ border:1px solid var(--border-strong);
+ border-radius:var(--radius);
+ padding:15px;
+ margin-bottom:10px;
+ box-shadow:var(--shadow-raised);
+ }
+ .checklist-summary-row {
+ display:flex;
+ align-items:center;
+ flex-wrap:wrap;
+ gap:8px;
+ margin-top:8px;
+ font-size:12px;
+ color:var(--text-2);
+ }
+ .checklist-summary-pill {
+ border-radius:999px;
+ padding:5px 9px;
+ font-weight:800;
+ background:var(--surface2);
+ border:1px solid var(--border);
+ }
+ .checklist-summary-pill.yes { color:var(--success); }
+ .checklist-summary-pill.no { color:var(--danger); }
+ .checklist-result-answer {
+ padding:14px 0;
+ border-bottom:1px solid var(--border);
+ }
+ .checklist-result-answer:last-child { border-bottom:none; }
+
+
+ /* EVENT CALENDAR */
+ .event-calendar-toolbar { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; }
+ .event-calendar-month { flex:1; text-align:center; font-family:'Quicksand',sans-serif; font-size:20px; font-weight:800; }
+ .event-calendar-nav { width:42px; height:42px; border:none; border-radius:14px; background:var(--surface2); color:var(--text); font-size:22px; cursor:pointer; box-shadow:var(--shadow-raised); }
+ .event-calendar-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:7px; }
+ .event-calendar-weekday { text-align:center; color:var(--text-3); font-size:11px; font-weight:800; padding:5px 0; text-transform:uppercase; }
+ .event-calendar-day { min-height:62px; border:1px solid var(--border-strong); border-radius:14px; background:var(--surface); color:var(--text); padding:7px 5px; text-align:left; cursor:pointer; position:relative; box-shadow:var(--shadow-raised); }
+ .event-calendar-day:active { box-shadow:var(--shadow-pressed); }
+ .event-calendar-day.outside { opacity:.28; }
+ .event-calendar-day.today { outline:2px solid var(--accent); outline-offset:1px; }
+ .event-calendar-number { font-size:18px; font-weight:800; line-height:1; }
+ .event-calendar-dots { display:flex; gap:3px; flex-wrap:wrap; margin-top:8px; }
+ .event-calendar-dot { width:8px; height:8px; border-radius:50%; }
+ .event-calendar-dot.green { background:#3F9B67; }
+ .event-calendar-dot.yellow { background:#E2B33D; }
+ .event-calendar-dot.red { background:#D94A4A; }
+ .event-calendar-day.priority-green { background:color-mix(in srgb,#3F9B67 17%,var(--surface)); border-color:color-mix(in srgb,#3F9B67 55%,var(--border)); }
+ .event-calendar-day.priority-yellow { background:color-mix(in srgb,#E2B33D 18%,var(--surface)); border-color:color-mix(in srgb,#E2B33D 58%,var(--border)); }
+ .event-calendar-day.priority-red { background:color-mix(in srgb,#D94A4A 17%,var(--surface)); border-color:color-mix(in srgb,#D94A4A 55%,var(--border)); }
+ .event-list-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:15px; margin-top:10px; }
+ .event-list-head { display:flex; align-items:flex-start; gap:10px; }
+ .event-priority-pill { width:12px; height:12px; border-radius:50%; margin-top:4px; flex-shrink:0; }
+ .event-priority-pill.green { background:#3F9B67; }
+ .event-priority-pill.yellow { background:#E2B33D; }
+ .event-priority-pill.red { background:#D94A4A; }
+ .event-calendar-legend { display:flex; justify-content:center; flex-wrap:wrap; gap:12px; margin-top:14px; color:var(--text-2); font-size:12px; }
+ .event-priority-options { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+ .event-priority-option { border:2px solid transparent; border-radius:14px; padding:12px 6px; text-align:center; font-weight:800; cursor:pointer; background:var(--surface2); }
+ .event-priority-option.selected { border-color:var(--text); }
+ .event-priority-option.green { background:color-mix(in srgb,#3F9B67 22%,var(--surface)); }
+ .event-priority-option.yellow { background:color-mix(in srgb,#E2B33D 24%,var(--surface)); }
+ .event-priority-option.red { background:color-mix(in srgb,#D94A4A 22%,var(--surface)); }
+
 </style>
 </head>
 <body class="light">
@@ -1523,14 +1743,14 @@
  <div class="home-eyebrow">Вход в систему</div>
  <div class="home-headline">Выберите роль,<br>чтобы продолжить</div>
  <div class="role-grid" id="home-role-grid"></div>
- <div class="home-status-strip">
- <div class="home-status-dot"></div>
- <span>Готово к работе</span>
+ <div class="home-status-strip status-loading" id="home-status-strip">
+ <div class="home-status-dot" id="home-status-dot"></div>
+ <span id="home-status-text">Ожидание сети..</span>
  </div>
  </div>
  <div class="home-footer">
  <div class="logo-sm" data-i18n-skip></div>
-<div class="app-version" id="app-version-label">Версия 1.054</div>
+<div class="app-version" id="app-version-label">Версия 1.059</div>
  </div>
 </div>
 
@@ -2280,12 +2500,12 @@
  </div>
  <div class="content" style="padding-top: 24px;">
  <div style="margin-bottom: 28px;">
- <div style="font-size: 13px; color: var(--text-3); margin-bottom: 4px;">Панель управления</div>
- <div style="font-size: 24px; font-weight: 700;">Управление</div>
+ <div id="management-panel-caption" style="font-size: 13px; color: var(--text-3); margin-bottom: 4px;">Панель управления</div>
+ <div id="management-panel-title" style="font-size: 24px; font-weight: 700;">Управление</div>
  </div>
  <div class="section-label">Меню</div>
  <div id="founder-menu-dynamic"></div>
- <div class="menu-item" onclick="goTo('screen-settings')">
+ <div class="menu-item" id="founder-settings-menu-item" onclick="goTo('screen-settings')">
  <div class="menu-icon">⚙️</div>
  <div class="menu-text">
  <div class="menu-title">Настройки</div>
@@ -2319,6 +2539,49 @@
  </div>
 </div>
 
+
+<!-- ===== SCREEN: BUSINESS ADMINISTRATOR CREATE ===== -->
+<div class="screen" id="screen-business-admin-create">
+ <div class="header">
+  <button class="back-btn" onclick="goBack()">←</button>
+  <span class="header-title">Добавить администратора</span>
+ </div>
+ <div class="content content-padded">
+  <div class="doc-placeholder">Будет создано отдельное подразделение администратора. После создания отправьте администратору код регистрации и созданный пароль.</div>
+  <div class="field">
+   <label>Название подразделения</label>
+   <input type="text" id="business-admin-department-name" value="Администратор" placeholder="Например: Администратор">
+  </div>
+  <div class="field">
+   <label>Пароль администратора</label>
+   <input type="password" id="business-admin-create-password" placeholder="Придумайте пароль" autocomplete="off">
+  </div>
+  <div class="field">
+   <label>Повторите пароль</label>
+   <input type="password" id="business-admin-create-password-confirm" placeholder="Повторите пароль" autocomplete="off" onkeydown="if(event.key==='Enter') submitBusinessAdministratorCreate()">
+   <div class="error-msg" id="business-admin-create-error">Заполните поля</div>
+  </div>
+  <button class="btn btn-primary" onclick="submitBusinessAdministratorCreate()">Создать администратора</button>
+ </div>
+</div>
+
+<!-- ===== SCREEN: BUSINESS ADMINISTRATOR LOGIN ===== -->
+<div class="screen" id="screen-business-admin-login">
+ <div class="header">
+  <button class="back-btn" onclick="goHome()">←</button>
+  <span class="header-title" id="business-admin-login-title">Администратор</span>
+ </div>
+ <div class="content content-padded">
+  <div class="doc-placeholder">Сначала зарегистрируйтесь по коду, который прислал учредитель. После регистрации вход выполняется по паролю администратора.</div>
+  <div class="field">
+   <label>Пароль</label>
+   <input type="password" id="business-admin-login-password" placeholder="••••" autocomplete="off" onkeydown="if(event.key==='Enter') checkBusinessAdministratorPassword()">
+   <div class="error-msg" id="business-admin-login-error">Неверный пароль</div>
+  </div>
+  <button class="btn btn-primary" onclick="checkBusinessAdministratorPassword()">Войти</button>
+ </div>
+</div>
+
 <!-- ===== SCREEN: DEPARTMENT MANAGE ===== -->
 <div class="screen" id="screen-department-manage">
  <div class="header">
@@ -2326,6 +2589,111 @@
  <span class="header-title" id="dep-manage-title" data-i18n-skip>Подразделение</span>
  </div>
  <div class="content content-padded" id="dep-manage-content"></div>
+</div>
+
+
+<!-- ===== SCREEN: EVENT CALENDAR ===== -->
+<div class="screen" id="screen-event-calendar">
+ <div class="header">
+  <button class="back-btn" onclick="goBack()">←</button>
+  <span class="header-title" id="event-calendar-title">Календарь событий</span>
+ </div>
+ <div class="content content-padded">
+  <div class="event-calendar-toolbar">
+   <button class="event-calendar-nav" onclick="shiftEventCalendarMonth(-1)">‹</button>
+   <div class="event-calendar-month" id="event-calendar-month"></div>
+   <button class="event-calendar-nav" onclick="shiftEventCalendarMonth(1)">›</button>
+  </div>
+  <div class="event-calendar-grid" id="event-calendar-grid"></div>
+  <div class="event-calendar-legend">
+   <span>🟢 Обычный</span><span>🟡 Важный</span><span>🔴 Срочный</span>
+  </div>
+  <div id="event-calendar-upcoming"></div>
+ </div>
+</div>
+
+<div class="modal-overlay" id="modal-event-calendar-day">
+ <div class="modal" style="max-height:90dvh;overflow-y:auto;">
+  <div class="modal-title" id="event-day-modal-title">Событие</div>
+  <div id="event-day-existing"></div>
+  <div id="event-day-editor">
+   <div class="field" style="margin-top:16px;">
+    <label>Текст события</label>
+    <textarea id="event-calendar-text" placeholder="Например: Генеральная уборка"></textarea>
+   </div>
+   <div class="field">
+    <label>Приоритет</label>
+    <div class="event-priority-options">
+     <div class="event-priority-option green selected" data-priority="green" onclick="selectEventPriority('green')">Зелёный</div>
+     <div class="event-priority-option yellow" data-priority="yellow" onclick="selectEventPriority('yellow')">Жёлтый</div>
+     <div class="event-priority-option red" data-priority="red" onclick="selectEventPriority('red')">Красный</div>
+    </div>
+   </div>
+   <button class="btn btn-primary" onclick="createCalendarEvent()">Создать событие</button>
+  </div>
+  <button class="btn btn-secondary" style="margin-top:10px;" onclick="closeModal('modal-event-calendar-day')">Закрыть</button>
+ </div>
+</div>
+
+
+<!-- ===== SCREEN: CHECKLIST SETTINGS ===== -->
+<div class="screen" id="screen-checklist-settings">
+ <div class="header">
+  <button class="back-btn" onclick="goBack()">←</button>
+  <span class="header-title" id="checklist-settings-title">Настройка чек-листа</span>
+ </div>
+ <div class="content content-padded">
+  <div class="checklist-tabs">
+   <button class="checklist-tab active" id="checklist-settings-tab-opening" onclick="switchChecklistSettingsType('opening')">Открытие смены</button>
+   <button class="checklist-tab" id="checklist-settings-tab-closing" onclick="switchChecklistSettingsType('closing')">Закрытие смены</button>
+  </div>
+  <div class="doc-placeholder">Создайте обязательные вопросы. Сотрудник не сможет отправить чек-лист, пока не ответит на каждый пункт и не приложит требуемые фотографии.</div>
+  <div id="checklist-settings-list"></div>
+  <div class="section-label">Добавить пункт</div>
+  <div class="card" style="cursor:default;">
+   <div class="field">
+    <label>Текст вопроса</label>
+    <textarea id="checklist-question-text" placeholder="Например: Бокалы натёрты?"></textarea>
+   </div>
+   <label style="display:flex;align-items:center;gap:11px;margin-bottom:16px;cursor:pointer;">
+    <input type="checkbox" id="checklist-question-photo-required" style="width:21px;height:21px;accent-color:var(--accent);">
+    <span style="font-size:14px;font-weight:700;">Обязательно прикрепить фото</span>
+   </label>
+   <button class="btn btn-primary" onclick="addChecklistQuestion()">+ Добавить пункт</button>
+  </div>
+ </div>
+</div>
+
+<!-- ===== SCREEN: EMPLOYEE CHECKLIST ===== -->
+<div class="screen" id="screen-checklist-fill">
+ <div class="header">
+  <button class="back-btn" onclick="goBack()">←</button>
+  <span class="header-title" id="checklist-fill-title">Чек-лист</span>
+ </div>
+ <div class="content content-padded">
+  <div class="checklist-tabs">
+   <button class="checklist-tab active" id="checklist-fill-tab-opening" onclick="switchChecklistFillType('opening')">Открытие смены</button>
+   <button class="checklist-tab" id="checklist-fill-tab-closing" onclick="switchChecklistFillType('closing')">Закрытие смены</button>
+  </div>
+  <div id="checklist-fill-content"></div>
+ </div>
+</div>
+
+<!-- ===== SCREEN: FOUNDER CHECKLIST RESULTS ===== -->
+<div class="screen" id="screen-founder-checklist-results">
+ <div class="header">
+  <button class="back-btn" onclick="goBack()">←</button>
+  <span class="header-title" id="founder-checklist-results-title">Результаты чек-листа</span>
+ </div>
+ <div class="content content-padded" id="founder-checklist-results-content"></div>
+</div>
+
+<div class="modal-overlay" id="modal-checklist-submission">
+ <div class="modal" style="max-height:92dvh;overflow-y:auto;">
+  <div class="modal-title" id="checklist-submission-modal-title">Чек-лист</div>
+  <div id="checklist-submission-modal-content"></div>
+  <button class="btn btn-secondary" style="margin-top:16px;" onclick="closeModal('modal-checklist-submission')">Закрыть</button>
+ </div>
 </div>
 
 <!-- ===== SCREEN: GENERIC PROCESS RESULTS (для процессов без своего экрана) ===== -->
@@ -3071,7 +3439,24 @@
  </div>
  <button class="btn btn-primary" onclick="changePassword()">Сохранить пароль</button>
  </div>
- <div class="section-label" style="margin-top:24px;">Аккаунт</div>
+ 
+<div id="founder-admin-password-settings">
+ <div class="section-label" style="margin-top:24px;">Администратор</div>
+ <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
+  <div style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Изменить пароль администратора</div>
+  <div class="field">
+   <label>Новый пароль администратора</label>
+   <input type="password" id="founder-new-business-admin-password" placeholder="Введите новый пароль">
+  </div>
+  <div class="field">
+   <label>Подтвердите пароль</label>
+   <input type="password" id="founder-confirm-business-admin-password" placeholder="Повторите пароль">
+   <div class="error-msg" id="founder-business-admin-password-error">Пароли не совпадают</div>
+  </div>
+  <button class="btn btn-primary" onclick="changeBusinessAdministratorPassword()">Сохранить пароль администратора</button>
+ </div>
+</div>
+<div class="section-label" style="margin-top:24px;">Аккаунт</div>
  <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
  <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Выйти из аккаунта</div>
  <div style="font-size: 13px; color: var(--text-2); line-height: 1.55; margin-bottom: 16px;">Перед выходом приложение покажет логин и пароль текущего бизнеса. Данные бизнеса останутся сохранены.</div>
@@ -3263,6 +3648,91 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// HOME CONNECTION STATUS
+// Shows a live loading message from the first paint, waits for the initial
+// department data, and switches to a clear offline state after 15 seconds.
+var homeStatusState = 'loading';
+var homeStatusDots = 2;
+var homeStatusAnimationTimer = null;
+var homeStatusOfflineTimer = null;
+
+function renderHomeConnectionStatus() {
+ var strip = document.getElementById('home-status-strip');
+ var text = document.getElementById('home-status-text');
+ if (!strip || !text) return;
+ strip.classList.remove('status-loading', 'status-ready', 'status-offline');
+ strip.classList.add('status-' + homeStatusState);
+ if (homeStatusState === 'ready') {
+  text.textContent = 'Готово к работе';
+ } else if (homeStatusState === 'offline') {
+  text.textContent = 'Нет подключения к интернету';
+ } else {
+  text.textContent = 'Ожидание сети' + '.'.repeat(homeStatusDots);
+ }
+}
+
+function stopHomeStatusAnimation() {
+ if (homeStatusAnimationTimer) {
+  clearInterval(homeStatusAnimationTimer);
+  homeStatusAnimationTimer = null;
+ }
+}
+
+function clearHomeStatusOfflineTimer() {
+ if (homeStatusOfflineTimer) {
+  clearTimeout(homeStatusOfflineTimer);
+  homeStatusOfflineTimer = null;
+ }
+}
+
+function scheduleHomeOfflineStatus() {
+ clearHomeStatusOfflineTimer();
+ homeStatusOfflineTimer = setTimeout(function() {
+  if (navigator.onLine === false) {
+   homeStatusState = 'offline';
+   stopHomeStatusAnimation();
+   renderHomeConnectionStatus();
+  }
+ }, 15000);
+}
+
+function startHomeNetworkWaiting() {
+ homeStatusState = 'loading';
+ homeStatusDots = 2;
+ clearHomeStatusOfflineTimer();
+ renderHomeConnectionStatus();
+ if (!homeStatusAnimationTimer) {
+  homeStatusAnimationTimer = setInterval(function() {
+   if (homeStatusState !== 'loading') return;
+   homeStatusDots = homeStatusDots >= 5 ? 2 : homeStatusDots + 1;
+   renderHomeConnectionStatus();
+  }, 420);
+ }
+ if (navigator.onLine === false) scheduleHomeOfflineStatus();
+}
+
+function markHomeConnectionReady() {
+ homeStatusState = 'ready';
+ clearHomeStatusOfflineTimer();
+ stopHomeStatusAnimation();
+ renderHomeConnectionStatus();
+}
+
+window.addEventListener('offline', function() {
+ scheduleHomeOfflineStatus();
+});
+
+window.addEventListener('online', function() {
+ var hasBusiness = typeof getCurrentBusinessId === 'function' && Boolean(getCurrentBusinessId());
+ if (typeof CLOUD_ENABLED !== 'undefined' && CLOUD_ENABLED && hasBusiness) {
+  startHomeNetworkWaiting();
+ } else {
+  markHomeConnectionReady();
+ }
+});
+
+startHomeNetworkWaiting();
+
 // Paint the cached home screen before Telegram/Firebase SDK downloads. Those
 // external scripts can be slow inside a mobile WebView, but they are not
 // required to show the last known list of departments.
@@ -3288,7 +3758,7 @@
    return;
   }
   window.__inspectQueuedHomeAction = { action: action, departmentId: departmentId || '' };
-  setStartupStatus('Восстанавливаем доступ…');
+  startHomeNetworkWaiting();
  }
 
  window.__inspectRunQueuedHomeAction = function() {
@@ -3303,7 +3773,6 @@
   var handlerName = handlers[queued.action];
   if (!handlerName || typeof window[handlerName] !== 'function') return false;
   window.__inspectQueuedHomeAction = null;
-  setStartupStatus('Готово к работе');
   window[handlerName](queued.departmentId);
   return true;
  };
@@ -3416,7 +3885,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.054";
+const APP_VERSION = "1.059";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
@@ -3513,6 +3982,8 @@ const appCache = {
  founderTasks: [],
  forgottenItems: [],
  anonymousFeedback: [],
+ calendarEvents: [],
+ checklistSubmissions: [],
  kpiContent: getDefaultKpiContent(),
  stopList: getDefaultStopList()
 };
@@ -3930,10 +4401,13 @@ function hasFounderSession() {
 }
 
 function setAdminSession(profile = null) {
+ const departmentId = profile && profile.departmentId ? String(profile.departmentId) : String((getAdministratorDepartment() || {}).id || '');
+ const department = getDepartment(departmentId) || getAdministratorDepartment();
  LocalDB.set("adminSession", {
  ok: true,
- passwordToken: getAdminPassword(),
+ passwordToken: department && department.adminPassword ? String(department.adminPassword) : getAdminPassword(),
  adminId: profile && profile.id ? String(profile.id) : (InspectStorage.getItem("currentAdminProfileId") || null),
+ departmentId: department ? String(department.id) : departmentId,
  createdAt: new Date().toISOString()
  });
 }
@@ -3947,7 +4421,9 @@ function hasAdminSession() {
  if (!session || !session.ok) return false;
 
  // Пароль администратора сменили — прежний локальный вход автоматически недействителен.
- if (String(session.passwordToken || '') !== String(getAdminPassword())) {
+ const department = getDepartment(session.departmentId) || getAdministratorDepartment();
+ const currentPassword = department && department.adminPassword ? String(department.adminPassword) : String(getAdminPassword());
+ if (String(session.passwordToken || '') !== currentPassword) {
  clearAdminSession();
  return false;
  }
@@ -3964,6 +4440,34 @@ function hasAdminSession() {
 
  return true;
 }
+
+function hasManagementSession() {
+ return hasFounderSession() || hasAdminSession();
+}
+
+function getAdministratorDepartment() {
+ return getDepartments().find(dep => dep && dep.isAdminDepartment) || null;
+}
+
+function hasBusinessAdministrator() {
+ return !!getAdministratorDepartment() || InspectStorage.getItem('businessAdministratorCreated') === '1';
+}
+
+function getManagementActor(role = 'founder') {
+ if (hasFounderSession()) return getFounderActor(role);
+ const profile = getCurrentAdminProfile() || {};
+ return {
+  ...profile,
+  id: profile.id || 'administrator-session',
+  login: profile.login || 'administrator',
+  name: profile.name || 'Администратор',
+  role,
+  roleLabel: role === 'founder' ? 'Администратор' : `Администратор · ${getRoleLabel(role)}`,
+  isFounderSession: true,
+  isAdministratorSession: true
+ };
+}
+
 function getAdminProfiles() {
  return appCache.adminProfiles || [];
 }
@@ -4082,8 +4586,8 @@ function getFounderActor(role = 'founder') {
 // подразделения, поэтому черновики и отметки разных отделов не смешиваются.
 function getFounderDepartmentPreviewActor(departmentId = activePreviewDepartmentId) {
  const department = getDepartment(departmentId);
- if (!department || !hasFounderSession()) return null;
- const founder = getCurrentFounderProfile() || getFounderActor('founder');
+ if (!department || !hasManagementSession()) return null;
+ const founder = getManagementActor('founder');
  return {
  ...founder,
  id: `founder_preview_${String(founder.id || 'session')}_${String(department.id)}`,
@@ -4187,11 +4691,14 @@ async function initCloud() {
  appCache.founderTasks = LocalDB.get("founderTasks") || [];
  appCache.forgottenItems = LocalDB.get("forgottenItems") || [];
  appCache.anonymousFeedback = sanitizeAnonymousFeedbackList(LocalDB.get("anonymousFeedback") || []);
+ appCache.calendarEvents = LocalDB.get("calendarEvents") || [];
+ appCache.checklistSubmissions = LocalDB.get("checklistSubmissions") || [];
  appCache.kpiContent = LocalDB.get("kpiContent") || getDefaultKpiContent();
  appCache.stopList = LocalDB.get("stopList") || getDefaultStopList();
  // Legacy Drova cleanup is deliberately disabled in 1.030. Storage is already
  // isolated, and running a destructive cleanup for a new business could delete
  // legitimate employees when the old marker is absent.
+ markHomeConnectionReady();
  return;
  }
 
@@ -4200,7 +4707,11 @@ async function initCloud() {
  // A clean 1.030 install intentionally has no namespaced businessId yet.
  // Keep Firebase ready for create/join, but do not query a null business or
  // create shared settings before the user has selected their Inspector business.
- if (!getCurrentBusinessId()) return;
+ if (!getCurrentBusinessId()) {
+ markHomeConnectionReady();
+ return;
+ }
+ startHomeNetworkWaiting();
  staffCloudState = 'loading';
 
  // Finish writes that were saved locally while the network was unavailable
@@ -4243,6 +4754,7 @@ async function initCloud() {
  renderHomeGrid();
  renderFounderMenu();
  refreshVisibleData();
+ markHomeConnectionReady();
  }, (err) => {
  console.error("departments snapshot error", err);
  showToast("Ошибка загрузки подразделений");
@@ -4374,6 +4886,26 @@ async function initCloud() {
  showToast("Ошибка загрузки забытых вещей");
  });
 
+
+ biz("calendarEvents").onSnapshot((snapshot) => {
+ appCache.calendarEvents = rowsFromSnapshot(snapshot, 'asc');
+ LocalDB.set("calendarEvents", appCache.calendarEvents);
+ refreshVisibleData();
+ }, (err) => {
+ console.error("calendar events snapshot error", err);
+ showToast("Ошибка загрузки календаря");
+ });
+
+
+ biz("checklistSubmissions").onSnapshot((snapshot) => {
+ appCache.checklistSubmissions = rowsFromSnapshot(snapshot, 'desc');
+ LocalDB.set("checklistSubmissions", appCache.checklistSubmissions);
+ refreshVisibleData();
+ }, (err) => {
+ console.error("checklist submissions snapshot error", err);
+ showToast("Ошибка загрузки чек-листов");
+ });
+
  biz("anonymousFeedback").onSnapshot((snapshot) => {
  appCache.anonymousFeedback = sanitizeAnonymousFeedbackList(rowsFromSnapshot(snapshot, 'desc'));
  LocalDB.set("anonymousFeedback", appCache.anonymousFeedback);
@@ -4439,6 +4971,7 @@ async function loadCloudData() {
  appCache.departments = rowsFromSnapshot(departmentsSnap, 'asc').map(stripRetiredDepartmentProcesses);
  LocalDB.set("departments", appCache.departments);
  applyDepartmentLabels(getPrimaryDepartment());
+ markHomeConnectionReady();
  const loadedReports = rowsFromSnapshot(reportsSnap, 'desc');
  appCache.reports = filterRecentPhotoReports(loadedReports);
  const loadedFines = rowsFromSnapshot(finesSnap, 'desc');
@@ -4532,8 +5065,8 @@ function clearCurrentWaiter() {
 }
 
 function getWaiter() {
- if (hasFounderSession() && InspectStorage.getItem("founderActiveRole") === 'waiter') {
- return getFounderDepartmentPreviewActor(activePreviewDepartmentId) || getFounderActor('waiter');
+ if (hasManagementSession() && InspectStorage.getItem("founderActiveRole") === 'waiter') {
+ return getFounderDepartmentPreviewActor(activePreviewDepartmentId) || getManagementActor('waiter');
  }
 
  const id = getCurrentWaiterId();
@@ -4672,6 +5205,8 @@ const PROCESS_CATALOG = [
  { key: 'feedback', label: 'Жалобы и предложения', icon: '💬' },
  { key: 'payroll', label: 'Рассчитать зарплату', icon: '💰' },
  { key: 'repair', label: 'Поломки', icon: '🛠️' },
+ { key: 'eventCalendar', label: 'Календарь событий', icon: '📅' },
+ { key: 'checklist', label: 'Чек-лист', icon: '☑️' },
  { key: 'order', label: 'Сделать заказ', icon: '🛒' }
 ];
 
@@ -4717,7 +5252,8 @@ async function createTechnicianDepartmentForRepairs() {
  inventoryConfig: { items: [] },
  statisticsConfig: { metrics: [] },
  finesConfig: { employeeVisible: true },
- createdAt: new Date().toISOString()
+ createdAt: new Date().toISOString(),
+ ...(extraFields && typeof extraFields === 'object' ? extraFields : {})
  };
  await setDepartments([...getDepartments(), technicianDepartment]);
  renderHomeGrid();
@@ -4901,7 +5437,8 @@ function getDepartments() {
  processes,
  inventoryConfig: normalizeInventoryConfig(dep.inventoryConfig),
  statisticsConfig: normalizeDepartmentStatisticsConfig(dep.statisticsConfig),
- finesConfig: normalizeDepartmentFinesConfig(dep.finesConfig)
+ finesConfig: normalizeDepartmentFinesConfig(dep.finesConfig),
+ checklistConfig: normalizeChecklistConfig(dep.checklistConfig)
  };
  });
 }
@@ -5021,7 +5558,7 @@ function generateDepartmentId() {
  return 'dep_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
 }
 
-async function createDepartment(name, logoText) {
+async function createDepartment(name, logoText, extraFields = {}) {
  if (!canCreateDepartment()) {
  showToast('В демо-версии доступно только одно подразделение');
  return null;
@@ -5093,7 +5630,7 @@ function clearBusinessContextForSwitch(nextBusinessId) {
  'staff', 'departments', 'reports', 'fines', 'payrollShifts', 'payrollRuns', 'pendingPayrollShiftWrites', 'inventoryRecords', 'departmentStatistics',
  'accessRequests', 'adminStats', 'adminProfiles', 'bathmasterOrders',
  'repairRequests', 'cookStaffReports', 'adminTrainingReports',
- 'founderTasks', 'forgottenItems', 'anonymousFeedback'
+ 'founderTasks', 'forgottenItems', 'anonymousFeedback', 'checklistSubmissions', 'pendingChecklistSubmissions'
  ];
  arrayKeys.forEach(key => LocalDB.remove(key));
  appCache.staff = [];
@@ -5362,9 +5899,9 @@ function clearStaffRoleSession(role) {
 }
 
 function getCurrentApprovedStaffForRole(role) {
- if (hasFounderSession()) {
+ if (hasManagementSession()) {
  const founderRole = InspectStorage.getItem("founderActiveRole") || role || 'founder';
- return getFounderActor(founderRole);
+ return getManagementActor(founderRole);
  }
 
  const roleId = role ? InspectStorage.getItem("currentStaffId_" + role) : null;
@@ -5484,7 +6021,7 @@ function resetAccessRequestForm() {
 async function enterRole(role) {
  if (!EMPLOYEE_ROLES.includes(role)) return;
 
- if (hasFounderSession()) {
+ if (hasManagementSession()) {
  openRoleAsFounder(role);
  return;
  }
@@ -6381,7 +6918,7 @@ function renderFounderPayrollList() {
  const title = document.getElementById('founder-payroll-list-title');
  const content = document.getElementById('founder-payroll-list-content');
  if (!content) return;
- if (!department || !hasFounderSession()) {
+ if (!department || !hasManagementSession()) {
  if (title) title.textContent = 'Рассчитать зарплату';
  content.innerHTML = `<div class="empty" style="padding:50px 0;"><div class="empty-icon">🔒</div><div class="empty-title">Нет доступа</div></div>`;
  return;
@@ -6451,7 +6988,7 @@ function renderFounderPayrollDetail() {
  const title = document.getElementById('founder-payroll-detail-title');
  const content = document.getElementById('founder-payroll-detail-content');
  if (!content) return;
- if (!department || !person || !hasFounderSession()) {
+ if (!department || !person || !hasManagementSession()) {
  if (title) title.textContent = 'Расчёт зарплаты';
  content.innerHTML = `<div class="empty" style="padding:50px 0;"><div class="empty-icon">🔒</div><div class="empty-title">Нет доступа</div></div>`;
  return;
@@ -6573,7 +7110,7 @@ function renderPayrollCalculationTotals() {
 }
 
 async function savePayrollSettings() {
- if (!hasFounderSession() || isEmployeeWorkspaceActive()) {
+ if (!hasManagementSession() || isEmployeeWorkspaceActive()) {
  showToast('Настройки зарплаты доступны только управлению');
  return;
  }
@@ -6602,7 +7139,7 @@ async function savePayrollSettings() {
 
 async function issuePayroll() {
  if (payrollActionInProgress) return;
- if (!hasFounderSession() || isEmployeeWorkspaceActive()) {
+ if (!hasManagementSession() || isEmployeeWorkspaceActive()) {
  showToast('Выдать зарплату может только управление');
  return;
  }
@@ -7401,6 +7938,8 @@ function getDepartmentProcessActivityTime(item, processKey) {
  if (processKey === 'tasks') return getTimeMs(item && item.closedAt);
  if (processKey === 'repair') return getTimeMs(item && (item.repairedAt || item.createdAt));
  if (processKey === 'payroll') return getTimeMs(item && (item.closedAt || item.openedAt));
+ if (processKey === 'eventCalendar') return getTimeMs(item && (item.updatedAt || item.createdAt));
+ if (processKey === 'checklist') return getTimeMs(item && (item.submittedAt || item.createdAt));
  return getTimeMs(item && (item.submittedAt || item.createdAt || item.updatedAt));
 }
 
@@ -7443,6 +7982,12 @@ function getDepartmentProcessActivities(departmentId, processKey) {
  String(task.status || '') === 'closed' &&
  Boolean(task.closedAt)
  );
+ }
+ if (processKey === 'eventCalendar') {
+  return getCalendarEvents().filter(item => String(item.departmentId) === String(departmentId));
+ }
+ if (processKey === 'checklist') {
+  return getChecklistSubmissions().filter(item => String(item.departmentId) === String(departmentId));
  }
  if (processKey === 'payroll') {
  return getPayrollShifts().filter(shift =>
@@ -7965,7 +8510,7 @@ function runPendingDeepLinkRoute() {
 
  if (route.startsWith('founder_task_')) {
  const taskId = route.slice('founder_task_'.length);
- if (!hasFounderSession()) {
+ if (!hasManagementSession()) {
  enterFounder();
  return;
  }
@@ -7992,7 +8537,7 @@ function runPendingDeepLinkRoute() {
  }
 
  if (route === 'founder_repairs') {
- if (!hasFounderSession()) {
+ if (!hasManagementSession()) {
  enterFounder();
  return;
  }
@@ -8075,10 +8620,15 @@ function renderHomeGrid() {
 
 function enterDepartmentRole(departmentId) {
  activePreviewDepartmentId = String(departmentId || '');
+ const targetDepartment = getDepartment(activePreviewDepartmentId);
 
- // Учредитель имеет сквозной доступ ко всем подразделениям. Старая сессия
- // сотрудника на том же устройстве не должна ограничивать его переход.
- if (hasFounderSession()) {
+ if (targetDepartment && targetDepartment.isAdminDepartment && !hasFounderSession()) {
+  enterBusinessAdministrator(targetDepartment.id);
+  return;
+ }
+
+ // Управление и администратор имеют сквозной доступ ко всем подразделениям.
+ if (hasManagementSession()) {
  enterRole('waiter');
  return;
  }
@@ -8377,9 +8927,9 @@ async function submitEmployeeJoinConfirm() {
  id: 'staff_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
  login: getTelegramWebAppUsername() || '@telegram',
  name: name,
- role: 'waiter',
+ role: dep && dep.isAdminDepartment ? 'admin' : 'waiter',
  departmentId: String(depId),
- roleLabel: dep ? dep.name : (InspectStorage.getItem('pendingJoinDepartmentName') || getRoleLabel('waiter')),
+ roleLabel: dep && dep.isAdminDepartment ? 'Администратор' : (dep ? dep.name : (InspectStorage.getItem('pendingJoinDepartmentName') || getRoleLabel('waiter'))),
  approvedAt: nowIso,
  createdAt: nowIso,
  updatedAt: nowIso
@@ -8410,15 +8960,27 @@ async function submitEmployeeJoinConfirm() {
  clearFounderSession();
  clearAdminSession();
  clearCurrentAdminProfile();
- setCurrentStaffSession(staffMember);
+ if (dep && dep.isAdminDepartment) {
+  const adminProfile = { ...staffMember, role:'admin', roleLabel:'Администратор', departmentId:String(depId), businessId:getCurrentBusinessId() };
+  await saveAdminProfile(adminProfile);
+  setCurrentAdminProfile(adminProfile);
+  await updateDepartment(dep.id, { adminRegistered:true, adminStaffId:String(adminProfile.id), joinCode:null });
+ } else {
+  setCurrentStaffSession(staffMember);
+ }
  InspectStorage.removeItem('pendingJoinDepartmentId');
  InspectStorage.removeItem('pendingJoinDepartmentName');
  LocalDB.remove('pendingJoinDepartment');
- showToast('Добро пожаловать ✓');
+ showToast(dep && dep.isAdminDepartment ? 'Регистрация завершена. Введите пароль администратора' : 'Добро пожаловать ✓');
  screenStack = ['screen-home'];
  document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active'));
- goTo('screen-waiter-menu');
- renderWaiterMenu();
+ document.getElementById('screen-home')?.classList.add('active');
+ if (dep && dep.isAdminDepartment) {
+  enterBusinessAdministrator(dep.id);
+ } else {
+  goTo('screen-waiter-menu');
+  renderWaiterMenu();
+ }
 }
 
 // ============================================================
@@ -8516,8 +9078,16 @@ function refreshScreen(id) {
  if (id === 'screen-founder-menu') renderFounderMenu();
  if (id === 'screen-department-manage') renderDepartmentManage();
  if (id === 'screen-generic-process-list') renderGenericProcessList();
+ if (id === 'screen-event-calendar') renderEventCalendar();
+ if (id === 'screen-checklist-settings') renderChecklistSettings();
+ if (id === 'screen-checklist-fill') renderEmployeeChecklist();
+ if (id === 'screen-founder-checklist-results') renderFounderChecklistResults();
  if (id === 'screen-founder-payroll-list') renderFounderPayrollList();
  if (id === 'screen-founder-payroll-detail') renderFounderPayrollDetail();
+ if (id === 'screen-settings') {
+  const block = document.getElementById('founder-admin-password-settings');
+  if (block) block.style.display = getAdministratorDepartment() ? 'block' : 'none';
+ }
  if (id === 'screen-founder-department-statistics') renderFounderDepartmentStatistics();
  if (id === 'screen-staff-department-statistics') renderStaffDepartmentStatistics();
  if (id === 'screen-department-add-process') renderAddProcessList();
@@ -8654,6 +9224,9 @@ function addLocalPhotoToCameraTarget(localPhoto) {
  }
  if (cameraTarget === 'adminTrainingReport') {
  return addAdminTrainingReportPhoto(localPhoto);
+ }
+ if (cameraTarget === 'checklistAnswer' && cameraSectionKey) {
+ return addChecklistAnswerPhoto(cameraSectionKey, localPhoto);
  }
 
  showToast('Раздел фото не найден');
@@ -9249,7 +9822,7 @@ function renderDepartmentStaffMenu() {
  ? dep.processes.filter(process =>
  process.key !== 'payroll' && (
  process.key !== 'fines' ||
- hasFounderSession() ||
+ hasManagementSession() ||
  normalizeDepartmentFinesConfig(dep.finesConfig).employeeVisible
  )
  )
@@ -9320,7 +9893,7 @@ function getDepartmentProcessAccess(key) {
  // session. The active employee workspace must never inherit management
  // permissions, otherwise the employee fines tile opens the creation form.
  const employeeWorkspaceActive = isEmployeeWorkspaceActive();
- const founderAccess = hasFounderSession() && !employeeWorkspaceActive;
+ const founderAccess = hasManagementSession() && !employeeWorkspaceActive;
  let staff = null;
  let departmentId = '';
 
@@ -9392,7 +9965,7 @@ function isEmployeeWorkspaceActive() {
 }
 
 function requireFounderDepartmentAccess(departmentId) {
- if (!hasFounderSession()) {
+ if (!hasManagementSession()) {
  showToast('Этот раздел доступен только управлению');
  return null;
  }
@@ -9420,6 +9993,8 @@ function openStaffProcess(key) {
  return;
  case 'feedback': openAnonymousFeedback(); return;
  case 'order': openBathmasterOrder(getMyDepartmentId() || 'bathmaster'); return;
+ case 'eventCalendar': openEventCalendar(access.departmentId, access.founderAccess); return;
+ case 'checklist': openEmployeeChecklist(access.departmentId); return;
  case 'repair':
  if (isTechnicianDepartment(access.department)) openTechnicianRepairs();
  else openRepairCreate(access.departmentId);
@@ -9456,6 +10031,8 @@ function openFounderProcessResults(departmentId, key) {
  if (key === 'fines') { openFounderDepartmentFines(department.id); return; }
  if (key === 'feedback') { openFounderAnonymousFeedback(); return; }
  if (key === 'repair') { openFounderRepairs(); return; }
+ if (key === 'eventCalendar') { openEventCalendar(department.id, true); return; }
+ if (key === 'checklist') { openFounderChecklistResults(department.id); return; }
  if (key === 'order') {
  markDepartmentOrdersStatusRead(department.id).catch(err => console.warn('department orders read status deferred', err));
  }
@@ -9480,6 +10057,14 @@ function openFounderProcessSettings(departmentId, key) {
  openFounderPayroll(department.id);
  return;
  }
+ if (key === 'eventCalendar') {
+ openEventCalendar(department.id, true);
+ return;
+ }
+ if (key === 'checklist') {
+ openChecklistSettings(department.id);
+ return;
+ }
  showToast('У этого процесса пока нет отдельных настроек — использует общие параметры');
 }
 
@@ -9492,7 +10077,7 @@ function renderGenericProcessList() {
  if (titleEl) titleEl.textContent = getManagementProcessLabel(proc) + (dep ? ' · ' + dep.name : '');
  if (!el) return;
 
- if (key === 'fines' && !hasFounderSession()) {
+ if (key === 'fines' && !hasManagementSession()) {
  const staff = getWaiter();
  if (staff && dep && normalizeDepartmentFinesConfig(dep.finesConfig).employeeVisible) {
  renderMyFinesList(staff, dep);
@@ -10090,6 +10675,14 @@ function renderFounderMenu() {
  const container = document.getElementById('founder-menu-dynamic');
  if (!container) return;
 
+ const administratorMode = hasAdminSession() && !hasFounderSession();
+ const caption = document.getElementById('management-panel-caption');
+ const title = document.getElementById('management-panel-title');
+ const settingsItem = document.getElementById('founder-settings-menu-item');
+ if (caption) caption.textContent = administratorMode ? 'Панель администратора' : 'Панель управления';
+ if (title) title.textContent = administratorMode ? (getAdminDisplayName() || 'Администратор') : 'Управление';
+ if (settingsItem) settingsItem.style.display = administratorMode ? 'none' : 'flex';
+
  const departments = getDepartments();
  let html = '';
 
@@ -10129,7 +10722,152 @@ function renderFounderMenu() {
  </div>`;
  }
 
+ if (!administratorMode && !hasBusinessAdministrator()) {
+ html += `
+ <div class="menu-item" onclick="openBusinessAdministratorCreate()">
+ <div class="menu-icon">👔</div>
+ <div class="menu-text">
+ <div class="menu-title">Добавить администратора</div>
+ <div class="menu-desc">Отдельное подразделение, код регистрации и пароль</div>
+ </div>
+ <span class="menu-arrow">›</span>
+ </div>`;
+ }
+
  container.innerHTML = html;
+}
+
+
+let activeBusinessAdministratorDepartmentId = null;
+
+function openBusinessAdministratorCreate() {
+ if (!hasFounderSession()) { showToast('Добавить администратора может только учредитель'); return; }
+ if (hasBusinessAdministrator()) { showToast('Подразделение администратора уже создано'); return; }
+ const name = document.getElementById('business-admin-department-name');
+ const pwd = document.getElementById('business-admin-create-password');
+ const confirm = document.getElementById('business-admin-create-password-confirm');
+ const error = document.getElementById('business-admin-create-error');
+ if (name) name.value = 'Администратор';
+ if (pwd) pwd.value = '';
+ if (confirm) confirm.value = '';
+ if (error) error.classList.remove('show');
+ goTo('screen-business-admin-create');
+}
+
+async function submitBusinessAdministratorCreate() {
+ if (!hasFounderSession()) { showToast('Добавить администратора может только учредитель'); return; }
+ const nameEl = document.getElementById('business-admin-department-name');
+ const pwdEl = document.getElementById('business-admin-create-password');
+ const confirmEl = document.getElementById('business-admin-create-password-confirm');
+ const error = document.getElementById('business-admin-create-error');
+ const name = String(nameEl && nameEl.value || '').trim();
+ const password = String(pwdEl && pwdEl.value || '').trim();
+ const confirm = String(confirmEl && confirmEl.value || '').trim();
+ if (!name || !password || password !== confirm) {
+  if (error) {
+   error.textContent = !name || !password ? 'Заполните все поля' : 'Пароли не совпадают';
+   error.classList.add('show');
+  }
+  return;
+ }
+ if (hasBusinessAdministrator()) { showToast('Подразделение администратора уже создано'); return; }
+ if (error) error.classList.remove('show');
+ const dep = await createDepartment(name, '', {
+  isAdminDepartment: true,
+  adminPassword: password,
+  joinCode: generateJoinCode(),
+  adminRegistered: false
+ });
+ if (!dep) return;
+ InspectStorage.setItem('businessAdministratorCreated', '1');
+ activeManagedDepartmentId = String(dep.id);
+ renderHomeGrid();
+ renderFounderMenu();
+ showToast('Администратор создан. Отправьте код и пароль ✓');
+ screenStack.pop();
+ document.getElementById('screen-business-admin-create')?.classList.remove('active');
+ openDepartmentManage(dep.id);
+}
+
+function enterBusinessAdministrator(departmentId) {
+ const dep = getDepartment(departmentId) || getAdministratorDepartment();
+ if (!dep || !dep.isAdminDepartment) { showToast('Подразделение администратора не найдено'); return; }
+ activeBusinessAdministratorDepartmentId = String(dep.id);
+ const profile = getCurrentAdminProfile();
+ if (hasAdminSession() && profile && String(profile.departmentId || '') === String(dep.id)) {
+  InspectStorage.setItem('founderActiveRole', 'founder');
+  goTo('screen-founder-menu');
+  renderFounderMenu();
+  return;
+ }
+ const title = document.getElementById('business-admin-login-title');
+ if (title) title.textContent = dep.name || 'Администратор';
+ const input = document.getElementById('business-admin-login-password');
+ const error = document.getElementById('business-admin-login-error');
+ if (input) input.value = '';
+ if (error) error.classList.remove('show');
+ goTo('screen-business-admin-login');
+}
+
+async function checkBusinessAdministratorPassword() {
+ const dep = getDepartment(activeBusinessAdministratorDepartmentId) || getAdministratorDepartment();
+ const input = document.getElementById('business-admin-login-password');
+ const error = document.getElementById('business-admin-login-error');
+ const password = String(input && input.value || '');
+ if (!dep || password !== String(dep.adminPassword || '')) {
+  if (error) { error.textContent = 'Неверный пароль'; error.classList.add('show'); }
+  if (input) input.value = '';
+  return;
+ }
+ const telegramId = getTelegramWebAppChatId();
+ const login = normalizeLogin(getTelegramWebAppUsername() || '');
+ const profile = getAdminProfiles().find(item =>
+  String(item.departmentId || '') === String(dep.id) && (
+   (telegramId && String(getTelegramIdForStaff(item)) === String(telegramId)) ||
+   (login && normalizeLogin(item.login) === login)
+  )
+ ) || getStaff().find(item =>
+  String(item.role || '') === 'admin' && String(item.departmentId || '') === String(dep.id) &&
+  (!telegramId || String(getTelegramIdForStaff(item)) === String(telegramId))
+ );
+ if (!profile) {
+  if (error) {
+   error.textContent = 'Сначала зарегистрируйтесь по коду администратора';
+   error.classList.add('show');
+  }
+  return;
+ }
+ const normalizedProfile = { ...profile, role:'admin', roleLabel:'Администратор', departmentId:String(dep.id) };
+ await saveAdminProfile(normalizedProfile);
+ setCurrentAdminProfile(normalizedProfile);
+ setAdminSession(normalizedProfile);
+ clearFounderSession();
+ InspectStorage.setItem('founderActiveRole', 'founder');
+ if (error) error.classList.remove('show');
+ screenStack = ['screen-home'];
+ document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active'));
+ document.getElementById('screen-home')?.classList.add('active');
+ goTo('screen-founder-menu');
+ renderFounderMenu();
+}
+
+async function changeBusinessAdministratorPassword() {
+ if (!hasFounderSession()) { showToast('Изменить пароль может только учредитель'); return; }
+ const dep = getAdministratorDepartment();
+ if (!dep) { showToast('Сначала добавьте администратора'); return; }
+ const first = String(document.getElementById('founder-new-business-admin-password')?.value || '').trim();
+ const second = String(document.getElementById('founder-confirm-business-admin-password')?.value || '').trim();
+ const error = document.getElementById('founder-business-admin-password-error');
+ if (!first || first !== second) {
+  if (error) { error.textContent = !first ? 'Введите новый пароль' : 'Пароли не совпадают'; error.classList.add('show'); }
+  return;
+ }
+ if (error) error.classList.remove('show');
+ await updateDepartment(dep.id, { adminPassword:first, adminPasswordUpdatedAt:new Date().toISOString() });
+ clearAdminSession();
+ document.getElementById('founder-new-business-admin-password').value = '';
+ document.getElementById('founder-confirm-business-admin-password').value = '';
+ showToast('Пароль администратора изменён ✓');
 }
 
 // ============================================================
@@ -10238,7 +10976,8 @@ function renderDepartmentManage() {
 
  html += `
  <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px;">
- <div style="font-size:14px;color:var(--text-2);line-height:1.5;margin-bottom:14px;">Отправьте этот код новому сотруднику — он введёт его при регистрации и попадёт именно в это подразделение.</div>
+ <div style="font-size:14px;color:var(--text-2);line-height:1.5;margin-bottom:14px;">${dep.isAdminDepartment ? 'Отправьте администратору код регистрации и пароль. После регистрации он будет входить в это подразделение по паролю.' : 'Отправьте этот код новому сотруднику — он введёт его при регистрации и попадёт именно в это подразделение.'}</div>
+ ${dep.isAdminDepartment && dep.adminPassword && hasFounderSession() ? `<div style="margin-bottom:12px;padding:12px;background:var(--surface2);border-radius:var(--radius-sm);"><div style="font-size:12px;color:var(--text-3);margin-bottom:4px;">Пароль администратора</div><div style="font-size:20px;font-weight:800;letter-spacing:1px;" data-i18n-skip>${escapeHtml(dep.adminPassword)}</div></div>` : ''}
  ${dep.joinCode ? `
  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
  <div style="flex:1;font-size:24px;font-weight:800;letter-spacing:4px;text-align:center;background:var(--surface2);border-radius:var(--radius-sm);padding:12px;" data-i18n-skip>${escapeHtml(dep.joinCode)}</div>
@@ -12252,7 +12991,7 @@ function getTaskRoleLabel(role) {
 }
 
 function openFounderTasks() {
- if (!hasFounderSession()) {
+ if (!hasManagementSession()) {
  showToast('Создавать задачи может только управление');
  enterFounder();
  return;
@@ -12266,7 +13005,7 @@ function openFounderTasks() {
 }
 
 function openFounderTaskDepartment(departmentId) {
- if (!hasFounderSession()) {
+ if (!hasManagementSession()) {
  showToast('Создавать задачи может только управление');
  enterFounder();
  return;
@@ -12328,7 +13067,7 @@ function renderFounderTasks() {
  const el = document.getElementById('founder-tasks-content');
  const title = document.getElementById('founder-tasks-title');
  if (!el) return;
- if (!hasFounderSession()) {
+ if (!hasManagementSession()) {
  el.innerHTML = '<div class="empty"><div class="empty-icon">🔒</div><div class="empty-title">Только для управления</div><div class="empty-sub">Сотрудники могут только просматривать и закрывать задачи</div></div>';
  return;
  }
@@ -12423,7 +13162,7 @@ function renderFounderTasks() {
 }
 
 function submitFounderTask() {
- if (!hasFounderSession()) {
+ if (!hasManagementSession()) {
  showToast('Создавать задачи может только управление');
  return;
  }
@@ -12443,7 +13182,7 @@ function generateFounderTaskId() {
 
 async function confirmFounderTask() {
  closeModal('modal-founder-task-confirm');
- if (!hasFounderSession()) {
+ if (!hasManagementSession()) {
  showToast('Создавать задачи может только управление');
  return;
  }
@@ -12516,7 +13255,7 @@ async function confirmFounderTask() {
  console.warn('task notify skipped: department has no Telegram IDs', departmentId);
  }
 
- notifyFounderOnly(`✅ Задача создана\n\nПодразделение: ${department.name}${responsibleLine}\n\n${textValue}`, {
+ notifyFounders(`✅ Задача создана\n\nПодразделение: ${department.name}${responsibleLine}\n\n${textValue}`, {
  startParam: `founder_task_${task.id}`,
  buttonText: NOTIFICATION_OPEN_BUTTON_TEXT
  });
@@ -12534,8 +13273,8 @@ async function confirmFounderTask() {
 
 function getFounderTaskDepartmentPreviewActor(departmentId) {
  const department = getDepartment(departmentId);
- if (!department || !hasFounderSession()) return null;
- const founder = getCurrentFounderProfile() || getFounderActor('founder');
+ if (!department || !hasManagementSession()) return null;
+ const founder = getManagementActor('founder');
  return {
  ...founder,
  id: `founder_preview_${String(founder.id || 'session')}_${String(department.id)}`,
@@ -12555,7 +13294,7 @@ function getCurrentTaskStaff(departmentOrRole) {
  // Когда учредитель открывает подразделение как сотрудник для предпросмотра,
  // показываем только список, открытие и закрытие. Создание доступно учредителю
  // через процесс «Срочные задачи» в экране управления подразделением.
- if (hasFounderSession()) {
+ if (hasManagementSession()) {
  const previewDepartmentId = requestedDepartment
  ? String(requestedDepartment.id)
  : String(activeFounderTaskDepartmentPreviewId || activePreviewDepartmentId || '');
@@ -12584,7 +13323,7 @@ function getUnreadTasksForRole(departmentOrRole) {
 }
 
 function openStaffTasks(departmentOrRole) {
- if (hasFounderSession()) {
+ if (hasManagementSession()) {
  const previewDepartmentId = getDepartment(departmentOrRole)
  ? String(departmentOrRole)
  : (activePreviewDepartmentId || getPrimaryDepartment()?.id || '');
@@ -12786,7 +13525,7 @@ async function confirmCloseFounderTaskByWaiter() {
  closeText,
  closePhotos
  });
- notifyFounderOnly(`✅ Задача закрыта\n\nПодразделение: ${getTaskDepartmentName(closed)}\nЗакрыл: ${closed.closedByName}\n\n${closed.text || ''}`, {
+ notifyFounders(`✅ Задача закрыта\n\nПодразделение: ${getTaskDepartmentName(closed)}\nЗакрыл: ${closed.closedByName}\n\n${closed.text || ''}`, {
  startParam: `founder_task_${closed.id}`,
  buttonText: NOTIFICATION_OPEN_BUTTON_TEXT
  });
@@ -12868,7 +13607,7 @@ async function sendFounderTaskReminder(task, kind) {
  const textValue = kind === '15'
  ? `⚠️ Задачу не просмотрел ни один сотрудник\n\nПодразделение: ${departmentName}\n\n${claimed.text || ''}`
  : `⏰ Задача не выполняется более часа\n\nПодразделение: ${departmentName}\nПросмотрели: ${(claimed.readBy || []).length}\n\n${claimed.text || ''}`;
- const result = await notifyFounderOnly(textValue, {
+ const result = await notifyFounders(textValue, {
  startParam: `founder_task_${claimed.id}`,
  buttonText: NOTIFICATION_OPEN_BUTTON_TEXT
  });
@@ -13721,7 +14460,7 @@ function getCurrentTechnician() {
  const waiter = getWaiter();
  const waiterDepartment = waiter ? getDepartment(getStaffDepartmentId(waiter)) : null;
  if (waiter && isTechnicianDepartment(waiterDepartment)) return waiter;
- if (hasFounderSession() && InspectStorage.getItem("founderActiveRole") === 'technician') return getFounderActor('technician');
+ if (hasManagementSession() && InspectStorage.getItem("founderActiveRole") === 'technician') return getManagementActor('technician');
  const current = getCurrentApprovedStaffForRole('technician');
  if (!current || current.role !== 'technician') return null;
  return current;
@@ -13886,7 +14625,7 @@ async function confirmRepairRequest() {
  };
  await saveRepairRequest(req);
  notifyRepairTechnicians(`🛠️ Создана заявка на ремонт\n\nОт: ${req.sourceRoleLabel} · ${req.staffName}\n${req.text}`, { startParam: 'technician_repairs', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
- notifyFounderOnly(`🛠️ Создана заявка на ремонт\n\nОт: ${req.sourceRoleLabel} · ${req.staffName}\n${req.text}`, { startParam: 'founder_repairs', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+ notifyFounders(`🛠️ Создана заявка на ремонт\n\nОт: ${req.sourceRoleLabel} · ${req.staffName}\n${req.text}`, { startParam: 'founder_repairs', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
  activeRepairPhotos = [];
  document.getElementById('repair-create-text').value = '';
  renderRepairCreatePhotos();
@@ -13963,7 +14702,7 @@ async function openRepairView(reqId, mode) {
  const req = getRepairRequests().find(r => String(r.id) === String(reqId));
  const viewMode = mode || 'technician';
  if (!req) { showToast('Заявка не найдена'); return; }
- if (viewMode === 'founder' && !hasFounderSession()) { showToast('Доступно только управлению'); return; }
+ if (viewMode === 'founder' && !hasManagementSession()) { showToast('Доступно только управлению'); return; }
  if (viewMode === 'technician' && !getCurrentTechnician()) { showToast('Доступно только подразделению «Техник»'); return; }
  if (viewMode === 'staff') {
  const actor = getRepairActor(req.sourceRole);
@@ -14056,7 +14795,7 @@ async function confirmCloseRepairRequest() {
  await updateRepairRequest(req);
  const closeText = `✅ Заявка на ремонт закрыта\n\nТехник: ${req.technicianName}\nОт: ${req.departmentName || req.sourceRoleLabel || 'Подразделение'} · ${req.staffName || 'Сотрудник'}\n${req.text || ''}${resolutionText ? '\n\nКомментарий: ' + resolutionText : ''}`;
  notifyRepairTechnicians(closeText, { startParam: 'technician_repairs', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
- notifyFounderOnly(closeText, { startParam: 'founder_repairs', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+ notifyFounders(closeText, { startParam: 'founder_repairs', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
  activeRepairClosePhotos = [];
  showToast('Заявка закрыта ✓');
  renderRepairView();
@@ -14087,7 +14826,7 @@ function markAllDepartmentRepairsRead() {
 }
 
 function openFounderRepairs() {
- if (!hasFounderSession()) { showToast('Доступно только управлению'); return; }
+ if (!hasManagementSession()) { showToast('Доступно только управлению'); return; }
  markFounderItemsRead('repair', getRepairRequests(), request => request.id);
  markAllDepartmentRepairsRead();
  renderFounderRepairs();
@@ -14142,8 +14881,8 @@ function removeDepartmentOrderPhoto(index) {
 }
 
 function getCurrentMasseur() {
- if (hasFounderSession() && InspectStorage.getItem("founderActiveRole") === 'masseur') {
- return getFounderActor('masseur');
+ if (hasManagementSession() && InspectStorage.getItem("founderActiveRole") === 'masseur') {
+ return getManagementActor('masseur');
  }
 
  const current = getCurrentApprovedStaffForRole('masseur');
@@ -14188,8 +14927,8 @@ function getOrderRoleLabel(sourceRole = activeOrderSourceRole || 'bathmaster') {
 }
 
 function getCurrentBathmaster() {
- if (hasFounderSession() && InspectStorage.getItem("founderActiveRole") === 'bathmaster') {
- return getFounderActor('bathmaster');
+ if (hasManagementSession() && InspectStorage.getItem("founderActiveRole") === 'bathmaster') {
+ return getManagementActor('bathmaster');
  }
 
  const current = getCurrentApprovedStaffForRole('bathmaster');
@@ -14861,7 +15600,7 @@ async function submitAdminShiftHandover() {
 function openAdminFines() {
  // Administrators and other employees are read-only by product rule.
  // Fine assignment exists only in the founder route inside a department.
- if (!hasFounderSession()) {
+ if (!hasManagementSession()) {
  showToast('Назначать штрафы может только управление');
  return;
  }
@@ -14906,7 +15645,7 @@ function renderAdminFines() {
 }
 
 function addFine() {
- if (!hasFounderSession()) {
+ if (!hasManagementSession()) {
  showToast('Назначать штрафы может только управление');
  return;
  }
@@ -15652,7 +16391,7 @@ function renderFounderFines() {
 
 async function addFounderFine() {
  if (founderFineSaving) return;
- if (!hasFounderSession() || isEmployeeWorkspaceActive()) {
+ if (!hasManagementSession() || isEmployeeWorkspaceActive()) {
  showToast('Назначать штрафы может только управление');
  return;
  }
@@ -16096,7 +16835,7 @@ let activeFounderAnonymousTab = 'complaint';
 
 function getAuthorizedAnonymousActor() {
  // Управление только читает обращения. Создание доступно сотрудникам.
- if (hasFounderSession() && InspectStorage.getItem('founderActiveRole') === 'founder') return null;
+ if (hasManagementSession() && InspectStorage.getItem('founderActiveRole') === 'founder') return null;
  if (hasAdminSession()) {
  const admin = getCurrentAdminProfile();
  return admin ? { ...admin, role: 'admin', roleLabel: 'Администратор' } : { id: 'admin-session', role: 'admin', roleLabel: 'Администратор', name: 'Администратор' };
@@ -16107,7 +16846,7 @@ function getAuthorizedAnonymousActor() {
 function openAnonymousFeedback(type = '') {
  const actor = getAuthorizedAnonymousActor();
  if (!actor) {
- showToast(hasFounderSession() ? 'Управление видит обращения в общем списке' : 'Сначала войдите в своё подразделение');
+ showToast(hasManagementSession() ? 'Управление видит обращения в общем списке' : 'Сначала войдите в своё подразделение');
  return;
  }
  activeAnonymousFeedbackType = type === 'suggestion' || type === 'complaint' ? type : '';
@@ -17237,7 +17976,7 @@ function openStaffView(staffId, replaceCurrent = false) {
 }
 
 async function assignDutyFromEmployeeProfile() {
- if (!hasFounderSession()) {
+ if (!hasManagementSession()) {
   showToast('Назначать дежурного может только управление');
   return;
  }
@@ -17454,6 +18193,8 @@ async function init() {
  appCache.photoReportDrafts = LocalDB.get("photoReportDrafts") || appCache.photoReportDrafts || [];
  appCache.founderTasks = LocalDB.get("founderTasks") || appCache.founderTasks || [];
  appCache.anonymousFeedback = sanitizeAnonymousFeedbackList(LocalDB.get("anonymousFeedback") || appCache.anonymousFeedback || []);
+ appCache.calendarEvents = LocalDB.get("calendarEvents") || appCache.calendarEvents || [];
+ appCache.checklistSubmissions = LocalDB.get("checklistSubmissions") || appCache.checklistSubmissions || [];
  appCache.kpiContent = LocalDB.get("kpiContent") || appCache.kpiContent || getDefaultKpiContent();
  appCache.stopList = LocalDB.get("stopList") || appCache.stopList || getDefaultStopList();
 
@@ -17525,6 +18266,7 @@ async function init() {
  // ------------------------------------------------------------------
  try {
  await initCloud();
+ await flushPendingChecklistSubmissions();
  } catch (e) {
  console.error('initCloud failed', e);
  showToast('Связь с базой нестабильна, открыта локальная копия');
@@ -17675,6 +18417,11 @@ const RU_UZ_DICT = {
 "Выберите роль,": "Rolni tanlang,",
 "чтобы продолжить": "davom etish uchun",
 "Готово к работе": "Ishga tayyor",
+"Ожидание сети..": "Tarmoq kutilmoqda..",
+"Ожидание сети...": "Tarmoq kutilmoqda...",
+"Ожидание сети....": "Tarmoq kutilmoqda....",
+"Ожидание сети.....": "Tarmoq kutilmoqda.....",
+"Нет подключения к интернету": "Internetga ulanish yo'q",
 "Отчёты, аналитика, управление подразделениями": "Hisobotlar, tahlil, bo'limlarni boshqarish",
 "Срочные задачи, фотоотчёты и процессы подразделения": "Shoshilinch vazifalar, fotohisobotlar va bo'lim jarayonlari",
 "Аттестация будет работать по актуальному меню: из общего списка 60–80 вопросов система будет случайно выдавать 20 вопросов на попытку. Проходить можно будет сколько угодно раз.": "Attestatsiya joriy menyu asosida ishlaydi: umumiy 60–80 ta savol ro'yxatidan tizim har urinishda tasodifiy 20 ta savol beradi. Istalgancha marta topshirish mumkin.",
@@ -18717,6 +19464,602 @@ init().catch((e) => {
  console.error('init fatal', e);
  showToast('Ошибка запуска. Перезагрузите Mini App');
 });
+
+
+
+
+// ============================================================
+// CHECKLIST PROCESS
+// Настройки учредителя, обязательное заполнение сотрудником и история.
+// ============================================================
+let activeChecklistDepartmentId = null;
+let activeChecklistSettingsType = 'opening';
+let activeChecklistFillType = 'opening';
+let activeChecklistDrafts = {
+ opening: { answers: {}, photos: {} },
+ closing: { answers: {}, photos: {} }
+};
+
+function normalizeChecklistConfig(config) {
+ const source = config && typeof config === 'object' ? config : {};
+ const normalizeRows = rows => {
+ const seen = new Set();
+ return (Array.isArray(rows) ? rows : []).map((item, index) => {
+  const textValue = String(item && item.text || '').trim();
+  if (!textValue) return null;
+  let id = String(item && item.id || '');
+  if (!id || seen.has(id)) id = `check_${Date.now()}_${index}_${Math.random().toString(36).slice(2,6)}`;
+  seen.add(id);
+  return {
+   id,
+   text: textValue,
+   photoRequired: Boolean(item && item.photoRequired)
+  };
+ }).filter(Boolean);
+ };
+ return {
+  opening: normalizeRows(source.opening),
+  closing: normalizeRows(source.closing)
+ };
+}
+
+function getChecklistTypeLabel(type) {
+ return type === 'closing' ? 'Закрытие смены' : 'Открытие смены';
+}
+
+function getChecklistConfigForDepartment(departmentId) {
+ const dep = getDepartment(departmentId);
+ return dep ? normalizeChecklistConfig(dep.checklistConfig) : normalizeChecklistConfig(null);
+}
+
+function getChecklistSubmissions() {
+ const rows = Array.isArray(appCache.checklistSubmissions) ? appCache.checklistSubmissions : [];
+ return rows.filter(item => item && item.departmentId && item.submittedAt);
+}
+
+function openChecklistSettings(departmentId) {
+ const dep = requireFounderDepartmentAccess(departmentId);
+ if (!dep) return;
+ activeChecklistDepartmentId = String(dep.id);
+ activeChecklistSettingsType = 'opening';
+ renderChecklistSettings();
+ goTo('screen-checklist-settings');
+}
+
+function switchChecklistSettingsType(type) {
+ activeChecklistSettingsType = type === 'closing' ? 'closing' : 'opening';
+ renderChecklistSettings();
+}
+
+function renderChecklistSettings() {
+ const dep = getDepartment(activeChecklistDepartmentId);
+ const title = document.getElementById('checklist-settings-title');
+ const list = document.getElementById('checklist-settings-list');
+ if (!dep || !list) return;
+ if (title) title.textContent = `Чек-лист · ${dep.name}`;
+ document.getElementById('checklist-settings-tab-opening')?.classList.toggle('active', activeChecklistSettingsType === 'opening');
+ document.getElementById('checklist-settings-tab-closing')?.classList.toggle('active', activeChecklistSettingsType === 'closing');
+ const rows = getChecklistConfigForDepartment(dep.id)[activeChecklistSettingsType];
+ list.innerHTML = rows.length ? `
+  <div class="section-label">${getChecklistTypeLabel(activeChecklistSettingsType)} · ${rows.length}</div>
+  ${rows.map((item, index) => `
+   <div class="checklist-config-item">
+    <div class="checklist-question-number">${index + 1}</div>
+    <div style="flex:1;min-width:0;">
+     <div style="font-size:15px;font-weight:800;line-height:1.4;overflow-wrap:anywhere;">${escapeHtml(item.text)}</div>
+     <div class="checklist-photo-required">${item.photoRequired ? '📷 Фото обязательно' : 'Без обязательного фото'}</div>
+    </div>
+    <button class="btn btn-secondary btn-sm" onclick="deleteChecklistQuestion('${item.id}')" aria-label="Удалить пункт">✕</button>
+   </div>`).join('')}
+ ` : `<div class="empty" style="padding:30px 0;">
+  <div class="empty-icon">☑️</div>
+  <div class="empty-title">Пунктов пока нет</div>
+  <div class="empty-sub">Добавьте вопросы для раздела «${getChecklistTypeLabel(activeChecklistSettingsType)}»</div>
+ </div>`;
+}
+
+async function addChecklistQuestion() {
+ const dep = requireFounderDepartmentAccess(activeChecklistDepartmentId);
+ if (!dep) return;
+ const textEl = document.getElementById('checklist-question-text');
+ const photoEl = document.getElementById('checklist-question-photo-required');
+ const textValue = String(textEl && textEl.value || '').trim();
+ if (!textValue) {
+  showToast('Введите текст вопроса');
+  return;
+ }
+ const config = getChecklistConfigForDepartment(dep.id);
+ config[activeChecklistSettingsType].push({
+  id: `check_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
+  text: textValue,
+  photoRequired: Boolean(photoEl && photoEl.checked)
+ });
+ await updateDepartment(dep.id, { checklistConfig: config });
+ if (textEl) textEl.value = '';
+ if (photoEl) photoEl.checked = false;
+ renderChecklistSettings();
+ renderDepartmentManage();
+ showToast('Пункт добавлен ✓');
+}
+
+async function deleteChecklistQuestion(questionId) {
+ const dep = requireFounderDepartmentAccess(activeChecklistDepartmentId);
+ if (!dep) return;
+ const config = getChecklistConfigForDepartment(dep.id);
+ config[activeChecklistSettingsType] = config[activeChecklistSettingsType].filter(item => String(item.id) !== String(questionId));
+ await updateDepartment(dep.id, { checklistConfig: config });
+ renderChecklistSettings();
+ renderDepartmentManage();
+ showToast('Пункт удалён');
+}
+
+function resetChecklistDrafts() {
+ Object.values(activeChecklistDrafts).forEach(draft => {
+  Object.values(draft.photos || {}).forEach(photo => {
+   if (photo && photo.type === 'local' && photo.preview_url) {
+    try { URL.revokeObjectURL(photo.preview_url); } catch (_) {}
+   }
+  });
+ });
+ activeChecklistDrafts = {
+  opening: { answers: {}, photos: {} },
+  closing: { answers: {}, photos: {} }
+ };
+}
+
+function openEmployeeChecklist(departmentId) {
+ const access = requireDepartmentProcessAccess('checklist');
+ if (!access) return;
+ activeChecklistDepartmentId = String(departmentId || access.departmentId);
+ activeChecklistFillType = 'opening';
+ resetChecklistDrafts();
+ renderEmployeeChecklist();
+ goTo('screen-checklist-fill');
+}
+
+function switchChecklistFillType(type) {
+ activeChecklistFillType = type === 'closing' ? 'closing' : 'opening';
+ renderEmployeeChecklist();
+}
+
+function setChecklistAnswer(questionId, answer) {
+ const draft = activeChecklistDrafts[activeChecklistFillType];
+ if (!draft) return;
+ draft.answers[String(questionId)] = answer === 'no' ? 'no' : 'yes';
+ renderEmployeeChecklist();
+}
+
+function addChecklistAnswerPhoto(questionId, localPhoto) {
+ const dep = getDepartment(activeChecklistDepartmentId);
+ const rows = dep ? getChecklistConfigForDepartment(dep.id)[activeChecklistFillType] : [];
+ const question = rows.find(item => String(item.id) === String(questionId));
+ if (!question || !question.photoRequired) {
+  showToast('Для этого пункта фото не требуется');
+  return false;
+ }
+ const draft = activeChecklistDrafts[activeChecklistFillType];
+ const previous = draft.photos[String(questionId)];
+ if (previous && previous.type === 'local' && previous.preview_url) {
+  try { URL.revokeObjectURL(previous.preview_url); } catch (_) {}
+ }
+ draft.photos[String(questionId)] = localPhoto;
+ renderEmployeeChecklist();
+ return true;
+}
+
+function removeChecklistAnswerPhoto(questionId) {
+ const draft = activeChecklistDrafts[activeChecklistFillType];
+ const photo = draft && draft.photos[String(questionId)];
+ if (photo && photo.type === 'local' && photo.preview_url) {
+  try { URL.revokeObjectURL(photo.preview_url); } catch (_) {}
+ }
+ if (draft) delete draft.photos[String(questionId)];
+ renderEmployeeChecklist();
+}
+
+function renderEmployeeChecklist() {
+ const dep = getDepartment(activeChecklistDepartmentId);
+ const title = document.getElementById('checklist-fill-title');
+ const content = document.getElementById('checklist-fill-content');
+ if (!dep || !content) return;
+ if (title) title.textContent = `Чек-лист · ${dep.name}`;
+ document.getElementById('checklist-fill-tab-opening')?.classList.toggle('active', activeChecklistFillType === 'opening');
+ document.getElementById('checklist-fill-tab-closing')?.classList.toggle('active', activeChecklistFillType === 'closing');
+
+ const rows = getChecklistConfigForDepartment(dep.id)[activeChecklistFillType];
+ const draft = activeChecklistDrafts[activeChecklistFillType];
+ if (!rows.length) {
+  content.innerHTML = `<div class="empty" style="padding:45px 0;">
+   <div class="empty-icon">☑️</div>
+   <div class="empty-title">Чек-лист ещё не настроен</div>
+   <div class="empty-sub">Управление пока не добавило пункты для раздела «${getChecklistTypeLabel(activeChecklistFillType)}»</div>
+  </div>`;
+  return;
+ }
+
+ const completed = rows.filter(item => {
+  const answerReady = Boolean(draft.answers[String(item.id)]);
+  const photoReady = !item.photoRequired || Boolean(draft.photos[String(item.id)]);
+  return answerReady && photoReady;
+ }).length;
+
+ content.innerHTML = `
+  <div class="doc-placeholder"><b style="color:var(--text);">${getChecklistTypeLabel(activeChecklistFillType)}</b><br>Заполнено ${completed} из ${rows.length}. Каждый вопрос обязателен.</div>
+  ${rows.map((item, index) => {
+   const answer = draft.answers[String(item.id)] || '';
+   const photo = draft.photos[String(item.id)] || null;
+   const photoSrc = getPhotoDisplaySrc(photo);
+   return `<div class="checklist-question-card">
+    <div class="checklist-question-head">
+     <div class="checklist-question-number">${index + 1}</div>
+     <div class="checklist-question-text">${escapeHtml(item.text)}</div>
+    </div>
+    ${item.photoRequired ? '<div class="checklist-photo-required">📷 Для этого пункта обязательно фото</div>' : ''}
+    <div class="checklist-answer-row">
+     <button class="checklist-answer-btn yes${answer === 'yes' ? ' selected' : ''}" onclick="setChecklistAnswer('${item.id}','yes')">Да</button>
+     <button class="checklist-answer-btn no${answer === 'no' ? ' selected' : ''}" onclick="setChecklistAnswer('${item.id}','no')">Нет</button>
+    </div>
+    ${item.photoRequired ? `<div class="checklist-photo-box">
+     ${photoSrc ? `<div class="checklist-photo-preview"><img src="${escapeHtml(photoSrc)}" alt=""><button class="checklist-photo-remove" onclick="removeChecklistAnswerPhoto('${item.id}')">✕</button></div>` : ''}
+     <button type="button" class="add-photo-btn" onclick="openCameraModal('checklistAnswer','${item.id}')"><span>📷</span><span>${photoSrc ? 'Переснять фото' : 'Прикрепить фото'}</span></button>
+    </div>` : ''}
+   </div>`;
+  }).join('')}
+  <button class="btn btn-primary" onclick="submitEmployeeChecklist()">Отправить чек-лист</button>
+ `;
+}
+
+
+let checklistSubmitting = false;
+
+function getPendingChecklistSubmissions() {
+ return LocalDB.get('pendingChecklistSubmissions') || [];
+}
+
+function queuePendingChecklistSubmission(submission) {
+ const rows = getPendingChecklistSubmissions().filter(item => String(item.id) !== String(submission.id));
+ rows.push(submission);
+ LocalDB.set('pendingChecklistSubmissions', rows);
+}
+
+async function flushPendingChecklistSubmissions() {
+ if (!CLOUD_ENABLED || !db) return;
+ const rows = getPendingChecklistSubmissions();
+ if (!rows.length) return;
+ const remaining = [];
+ for (const submission of rows) {
+  try {
+   await biz('checklistSubmissions').doc(String(submission.id)).set(submission, { merge:true });
+  } catch (err) {
+   remaining.push(submission);
+  }
+ }
+ if (remaining.length) LocalDB.set('pendingChecklistSubmissions', remaining);
+ else LocalDB.remove('pendingChecklistSubmissions');
+}
+
+window.addEventListener('online', () => { flushPendingChecklistSubmissions().catch(() => {}); });
+
+async function uploadChecklistPhoto(photo, sectionKey) {
+ if (!photo) return null;
+ if (photo.type === 'local' && photo.file) return uploadReportPhoto(photo.file, sectionKey);
+ return photo;
+}
+
+async function submitEmployeeChecklist() {
+ if (checklistSubmitting) return;
+ const access = requireDepartmentProcessAccess('checklist');
+ if (!access || !access.department || !access.staff) return;
+ const dep = access.department;
+ const rows = getChecklistConfigForDepartment(dep.id)[activeChecklistFillType];
+ const draft = activeChecklistDrafts[activeChecklistFillType];
+ if (!rows.length) {
+  showToast('В этом разделе пока нет вопросов');
+  return;
+ }
+
+ const unanswered = rows.find(item => !draft.answers[String(item.id)]);
+ if (unanswered) {
+  showToast('Ответьте на каждый пункт');
+  return;
+ }
+ const missingPhoto = rows.find(item => item.photoRequired && !draft.photos[String(item.id)]);
+ if (missingPhoto) {
+  showToast('Прикрепите все обязательные фото');
+  return;
+ }
+
+ checklistSubmitting = true;
+ const submitButton = document.querySelector('#screen-checklist-fill .btn.btn-primary');
+ if (submitButton) { submitButton.disabled = true; submitButton.textContent = 'Отправляем...'; }
+ try {
+  showToast(Object.keys(draft.photos).length ? 'Отправляем фото...' : 'Отправляем чек-лист...');
+  const answers = [];
+  for (const item of rows) {
+   const photo = item.photoRequired
+    ? await uploadChecklistPhoto(draft.photos[String(item.id)], `checklist_${activeChecklistFillType}_${item.id}`)
+    : null;
+   answers.push({
+    questionId: String(item.id),
+    questionText: item.text,
+    answer: draft.answers[String(item.id)],
+    photoRequired: Boolean(item.photoRequired),
+    photo
+   });
+  }
+
+  const now = new Date();
+  const submission = {
+   id: `checklist_${now.getTime().toString(36)}_${Math.random().toString(36).slice(2,7)}`,
+   businessId: getCurrentBusinessId(),
+   departmentId: String(dep.id),
+   departmentName: dep.name,
+   type: activeChecklistFillType,
+   typeLabel: getChecklistTypeLabel(activeChecklistFillType),
+   staffId: String(access.staff.id || ''),
+   staffName: access.staff.name || 'Сотрудник',
+   answers,
+   date: toDateKey(now),
+   time: now.toTimeString().slice(0,5),
+   submittedAt: now.toISOString(),
+   createdAt: now.toISOString()
+  };
+
+  appCache.checklistSubmissions = [submission, ...getChecklistSubmissions()];
+  LocalDB.set('checklistSubmissions', appCache.checklistSubmissions);
+  let cloudSynced = false;
+  if (CLOUD_ENABLED && db) {
+   try {
+    await biz('checklistSubmissions').doc(String(submission.id)).set(submission, { merge:true });
+    cloudSynced = true;
+   } catch (cloudError) {
+    console.warn('checklist cloud write deferred', cloudError);
+    queuePendingChecklistSubmission(submission);
+   }
+  } else {
+   queuePendingChecklistSubmission(submission);
+  }
+
+  const noCount = answers.filter(item => item.answer === 'no').length;
+  notifyFounders(
+   `☑️ Отправлен чек-лист\n\nПодразделение: ${dep.name}\nСотрудник: ${submission.staffName}\nРаздел: ${submission.typeLabel}\nОтветов «Нет»: ${noCount}`,
+   { startParam:`checklist_${dep.id}`, buttonText:NOTIFICATION_OPEN_BUTTON_TEXT }
+  ).catch(err => console.warn('checklist founder notification skipped', err));
+
+  resetChecklistDrafts();
+  renderEmployeeChecklist();
+  showToast(cloudSynced ? 'Чек-лист отправлен ✓' : 'Чек-лист сохранён — синхронизируется при восстановлении связи');
+ } catch (err) {
+  console.error('checklist submit error', err);
+  const message = String(err && err.message || '');
+  showToast(message.includes('photo') || message.includes('Worker') ? 'Не удалось загрузить обязательное фото' : 'Не удалось отправить чек-лист');
+ } finally {
+  checklistSubmitting = false;
+  const button = document.querySelector('#screen-checklist-fill .btn.btn-primary');
+  if (button) { button.disabled = false; button.textContent = 'Отправить чек-лист'; }
+ }
+}
+
+function openFounderChecklistResults(departmentId) {
+ const dep = requireFounderDepartmentAccess(departmentId);
+ if (!dep) return;
+ activeChecklistDepartmentId = String(dep.id);
+ markDepartmentProcessRead(dep.id, 'checklist');
+ renderFounderChecklistResults();
+ goTo('screen-founder-checklist-results');
+}
+
+function renderFounderChecklistResults() {
+ const dep = getDepartment(activeChecklistDepartmentId);
+ const title = document.getElementById('founder-checklist-results-title');
+ const content = document.getElementById('founder-checklist-results-content');
+ if (!dep || !content) return;
+ if (title) title.textContent = `Чек-листы · ${dep.name}`;
+ const rows = getChecklistSubmissions()
+  .filter(item => String(item.departmentId) === String(dep.id))
+  .sort((a,b) => getTimeMs(b.submittedAt) - getTimeMs(a.submittedAt));
+
+ content.innerHTML = rows.length ? rows.map(item => {
+  const answers = Array.isArray(item.answers) ? item.answers : [];
+  const yesCount = answers.filter(answer => answer.answer === 'yes').length;
+  const noCount = answers.filter(answer => answer.answer === 'no').length;
+  return `<div class="menu-item" onclick="openChecklistSubmission('${item.id}')">
+   <div class="menu-icon">☑️</div>
+   <div class="menu-text">
+    <div class="menu-title" data-i18n-skip>${escapeHtml(item.staffName || 'Сотрудник')}</div>
+    <div class="menu-desc">${escapeHtml(item.typeLabel || getChecklistTypeLabel(item.type))} · ${escapeHtml(formatDateTimeShort(item.submittedAt))}</div>
+    <div class="checklist-summary-row">
+     <span class="checklist-summary-pill yes">Да: ${yesCount}</span>
+     <span class="checklist-summary-pill no">Нет: ${noCount}</span>
+     <span class="checklist-summary-pill">Пунктов: ${answers.length}</span>
+    </div>
+   </div>
+   <span class="menu-arrow">›</span>
+  </div>`;
+ }).join('') : `<div class="empty" style="padding:50px 0;">
+  <div class="empty-icon">☑️</div>
+  <div class="empty-title">Отправленных чек-листов пока нет</div>
+  <div class="empty-sub">После заполнения сотрудником результат появится здесь</div>
+ </div>`;
+}
+
+function openChecklistSubmission(submissionId) {
+ const item = getChecklistSubmissions().find(row => String(row.id) === String(submissionId));
+ const title = document.getElementById('checklist-submission-modal-title');
+ const content = document.getElementById('checklist-submission-modal-content');
+ if (!item || !content) return;
+ if (title) title.textContent = item.typeLabel || getChecklistTypeLabel(item.type);
+ const answers = Array.isArray(item.answers) ? item.answers : [];
+ content.innerHTML = `
+  <div class="doc-placeholder">
+   <b style="color:var(--text);">${escapeHtml(item.staffName || 'Сотрудник')}</b><br>
+   ${escapeHtml(item.departmentName || '')}<br>
+   ${escapeHtml(formatDateTimeShort(item.submittedAt))}
+  </div>
+  <div class="card" style="cursor:default;">
+   ${answers.map((answer, index) => {
+    const src = getPhotoDisplaySrc(answer.photo);
+    return `<div class="checklist-result-answer">
+     <div style="font-size:13px;color:var(--text-3);margin-bottom:5px;">Пункт ${index + 1}</div>
+     <div style="font-weight:800;line-height:1.4;">${escapeHtml(answer.questionText || 'Вопрос')}</div>
+     <div style="margin-top:8px;font-size:14px;font-weight:900;color:${answer.answer === 'yes' ? 'var(--success)' : 'var(--danger)'};">${answer.answer === 'yes' ? 'Да' : 'Нет'}</div>
+     ${src ? `<img src="${escapeHtml(src)}" alt="" style="width:100%;max-height:260px;object-fit:cover;border-radius:14px;margin-top:10px;border:1px solid var(--border);">` : ''}
+    </div>`;
+   }).join('')}
+  </div>`;
+ openModal('modal-checklist-submission');
+}
+
+// ============================================================
+// EVENT CALENDAR
+// Общий календарь подразделения с цветными приоритетами.
+// ============================================================
+let activeEventCalendarDepartmentId = null;
+let activeEventCalendarFounderMode = false;
+let eventCalendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let selectedEventCalendarDate = '';
+let selectedEventCalendarPriority = 'green';
+
+function getCalendarEvents() {
+ const rows = Array.isArray(appCache.calendarEvents) ? appCache.calendarEvents : [];
+ return rows.filter(item => item && item.date && item.departmentId);
+}
+
+function openEventCalendar(departmentId, founderMode) {
+ const dep = getDepartment(departmentId);
+ if (!dep) { showToast('Подразделение не найдено'); return; }
+ activeEventCalendarDepartmentId = String(dep.id);
+ activeEventCalendarFounderMode = Boolean(founderMode && hasManagementSession());
+ eventCalendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+ markDepartmentProcessRead(dep.id, 'eventCalendar');
+ renderEventCalendar();
+ goTo('screen-event-calendar');
+}
+
+function eventDateKey(date) {
+ const y = date.getFullYear();
+ const m = String(date.getMonth() + 1).padStart(2, '0');
+ const d = String(date.getDate()).padStart(2, '0');
+ return `${y}-${m}-${d}`;
+}
+
+function formatEventDateRu(dateKey) {
+ const date = new Date(`${dateKey}T12:00:00`);
+ return date.toLocaleDateString('ru-RU', { day:'numeric', month:'long', year:'numeric' });
+}
+
+function shiftEventCalendarMonth(delta) {
+ eventCalendarCursor = new Date(eventCalendarCursor.getFullYear(), eventCalendarCursor.getMonth() + Number(delta || 0), 1);
+ renderEventCalendar();
+}
+
+function renderEventCalendar() {
+ const dep = getDepartment(activeEventCalendarDepartmentId);
+ const grid = document.getElementById('event-calendar-grid');
+ const monthEl = document.getElementById('event-calendar-month');
+ const titleEl = document.getElementById('event-calendar-title');
+ const upcomingEl = document.getElementById('event-calendar-upcoming');
+ if (!dep || !grid || !monthEl) return;
+ if (titleEl) titleEl.textContent = `Календарь · ${dep.name}`;
+ monthEl.textContent = eventCalendarCursor.toLocaleDateString('ru-RU', { month:'long', year:'numeric' }).replace(/^./, c => c.toUpperCase());
+ const weekdays = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+ let html = weekdays.map(day => `<div class="event-calendar-weekday">${day}</div>`).join('');
+ const first = new Date(eventCalendarCursor.getFullYear(), eventCalendarCursor.getMonth(), 1);
+ const startOffset = (first.getDay() + 6) % 7;
+ const start = new Date(first.getFullYear(), first.getMonth(), 1 - startOffset);
+ const todayKey = eventDateKey(new Date());
+ const events = getCalendarEvents().filter(item => String(item.departmentId) === String(dep.id));
+ const rank = { green:1, yellow:2, red:3 };
+ for (let i=0; i<42; i++) {
+  const date = new Date(start.getFullYear(), start.getMonth(), start.getDate()+i);
+  const key = eventDateKey(date);
+  const dayEvents = events.filter(item => item.date === key);
+  const highest = dayEvents.reduce((best,item) => (rank[item.priority]||0) > (rank[best]||0) ? item.priority : best, '');
+  const outside = date.getMonth() !== eventCalendarCursor.getMonth();
+  html += `<button class="event-calendar-day${outside?' outside':''}${key===todayKey?' today':''}${highest?' priority-'+highest:''}" onclick="openEventCalendarDay('${key}')">
+   <div class="event-calendar-number">${date.getDate()}</div>
+   <div class="event-calendar-dots">${dayEvents.slice(0,5).map(item=>`<span class="event-calendar-dot ${item.priority||'green'}"></span>`).join('')}</div>
+  </button>`;
+ }
+ grid.innerHTML = html;
+ if (upcomingEl) {
+  const upcoming = events.filter(item => item.date >= todayKey).sort((a,b)=>String(a.date).localeCompare(String(b.date))).slice(0,5);
+  upcomingEl.innerHTML = upcoming.length ? `<div class="section-label">Ближайшие события</div>${upcoming.map(renderCalendarEventCard).join('')}` : '';
+ }
+}
+
+function renderCalendarEventCard(item, allowDelete=false) {
+ const del = allowDelete ? `<button class="btn btn-secondary btn-sm" onclick="deleteCalendarEvent('${item.id}')">Удалить</button>` : '';
+ return `<div class="event-list-card"><div class="event-list-head"><span class="event-priority-pill ${item.priority||'green'}"></span><div style="flex:1;min-width:0;"><div style="font-weight:800;overflow-wrap:anywhere;">${escapeHtml(item.text||'Событие')}</div><div style="font-size:12px;color:var(--text-2);margin-top:5px;">${formatEventDateRu(item.date)}</div></div>${del}</div></div>`;
+}
+
+function openEventCalendarDay(dateKey) {
+ selectedEventCalendarDate = dateKey;
+ selectedEventCalendarPriority = 'green';
+ const title = document.getElementById('event-day-modal-title');
+ const existing = document.getElementById('event-day-existing');
+ const editor = document.getElementById('event-day-editor');
+ const text = document.getElementById('event-calendar-text');
+ if (title) title.textContent = formatEventDateRu(dateKey);
+ if (text) text.value = '';
+ selectEventPriority('green');
+ const rows = getCalendarEvents().filter(item => String(item.departmentId)===String(activeEventCalendarDepartmentId) && item.date===dateKey);
+ if (existing) existing.innerHTML = rows.length ? rows.map(item=>renderCalendarEventCard(item, activeEventCalendarFounderMode)).join('') : `<div class="empty-sub" style="text-align:center;padding:8px 0;">На эту дату событий пока нет</div>`;
+ if (editor) editor.style.display = activeEventCalendarFounderMode ? 'block' : 'none';
+ openModal('modal-event-calendar-day');
+}
+
+function selectEventPriority(priority) {
+ selectedEventCalendarPriority = ['green','yellow','red'].includes(priority) ? priority : 'green';
+ document.querySelectorAll('.event-priority-option').forEach(el => el.classList.toggle('selected', el.dataset.priority === selectedEventCalendarPriority));
+}
+
+async function createCalendarEvent() {
+ if (!activeEventCalendarFounderMode || !hasManagementSession()) { showToast('Создавать события может управление'); return; }
+ const dep = getDepartment(activeEventCalendarDepartmentId);
+ const input = document.getElementById('event-calendar-text');
+ const text = input ? input.value.trim() : '';
+ if (!dep || !selectedEventCalendarDate || !text) { showToast('Введите текст события'); return; }
+ const event = {
+  id: 'calendar_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+  departmentId: String(dep.id), departmentName: dep.name,
+  date: selectedEventCalendarDate, text,
+  priority: selectedEventCalendarPriority,
+  createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+ };
+ appCache.calendarEvents = [...getCalendarEvents(), event];
+ LocalDB.set('calendarEvents', appCache.calendarEvents);
+ try {
+  if (CLOUD_ENABLED && db) await biz('calendarEvents').doc(String(event.id)).set(event, { merge:true });
+ } catch (err) { console.warn('calendar event cloud save deferred', err); }
+ notifyCalendarEventUpdate(event, 'создано').catch(err => console.warn('calendar notification skipped', err));
+ showToast('Событие создано ✓');
+ renderEventCalendar();
+ openEventCalendarDay(selectedEventCalendarDate);
+}
+
+async function deleteCalendarEvent(eventId) {
+ if (!activeEventCalendarFounderMode || !hasManagementSession()) return;
+ const event = getCalendarEvents().find(item => String(item.id) === String(eventId));
+ if (!event) return;
+ appCache.calendarEvents = getCalendarEvents().filter(item => String(item.id)!==String(eventId));
+ LocalDB.set('calendarEvents', appCache.calendarEvents);
+ try { if (CLOUD_ENABLED && db) await biz('calendarEvents').doc(String(eventId)).delete(); } catch(err) { console.warn('calendar event cloud delete deferred', err); }
+ notifyCalendarEventUpdate(event, 'удалено').catch(err => console.warn('calendar notification skipped', err));
+ showToast('Событие удалено');
+ renderEventCalendar();
+ openEventCalendarDay(selectedEventCalendarDate);
+}
+
+async function notifyCalendarEventUpdate(event, action) {
+ const dep = getDepartment(event.departmentId);
+ if (!dep) return;
+ const priorityNames = { green:'зелёный', yellow:'жёлтый', red:'красный' };
+ const message = `📅 Календарь событий обновлён\n\nПодразделение: ${dep.name}\nДата: ${formatEventDateRu(event.date)}\nПриоритет: ${priorityNames[event.priority]||'зелёный'}\nСобытие: ${event.text}\nСтатус: ${action}`;
+ const ids = getDepartmentStaffList(dep.id).map(item => item.telegramId || item.chatId).filter(Boolean);
+ if (ids.length) await notifyTelegramUsers(ids, message, { startParam:`calendar_${dep.id}`, buttonText:NOTIFICATION_OPEN_BUTTON_TEXT });
+ await notifyFounders(message, { startParam:`calendar_${dep.id}`, buttonText:NOTIFICATION_OPEN_BUTTON_TEXT });
+}
 
 </script>
 </body>
