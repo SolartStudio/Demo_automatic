@@ -1860,7 +1860,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm" data-i18n-skip></div>
-<div class="app-version" id="app-version-label">Версия 1.067</div>
+<div class="app-version" id="app-version-label">Версия 1.069</div>
  </div>
 </div>
 
@@ -4091,7 +4091,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.067";
+const APP_VERSION = "1.069";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
@@ -4380,6 +4380,16 @@ function isStaffPending(staff) {
 async function restoreTelegramEmployeeBinding() {
  const telegramId = getTelegramWebAppChatId();
  if (!telegramId) return { restored: false, reason: 'not-telegram' };
+
+ // Учредитель или администратор на СВОЁМ устройстве могли когда-то из
+ // любопытства/тестирования зайти и по коду сотрудника — Telegram-привязка
+ // от этого никуда не делась. Раньше при каждом закрытии и открытии
+ // Mini App это тихо выкидывало их из учредительской сессии в режим
+ // сотрудника. Действующая сессия управления на этом устройстве важнее
+ // старой привязки — трогать её не нужно.
+ if (hasFounderSession() || hasAdminSession()) {
+  return { restored: false, reason: 'management-session-active' };
+ }
 
  const cachedBinding = getCachedTelegramEmployeeBinding();
  if (cachedBinding && cachedBinding.status === 'active' &&
@@ -5508,7 +5518,7 @@ async function createTechnicianDepartmentForRepairs() {
  finesConfig: { employeeVisible: true },
  createdAt: new Date().toISOString()
  };
- await setDepartments([...getDepartments(), technicianDepartment]);
+ await setDepartments([...getDepartments(), technicianDepartment], { onlyIds: [String(technicianDepartment.id)] });
  renderHomeGrid();
  renderFounderMenu();
  return technicianDepartment;
@@ -5696,7 +5706,7 @@ function getDepartments() {
  });
 }
 
-async function setDepartments(arr) {
+async function setDepartments(arr, options = {}) {
  const businessId = getCurrentBusinessId();
  const scopedDepartments = (Array.isArray(arr) ? arr : []).map(stripRetiredDepartmentProcesses).map(d =>
  businessId ? { ...d, businessId: d.businessId || businessId } : { ...d }
@@ -5706,8 +5716,19 @@ async function setDepartments(arr) {
  LocalDB.set("departments", scopedDepartments);
 
  if (CLOUD_ENABLED && db && businessId) {
+ // По умолчанию (options.onlyIds не передан) пишем в облако весь список —
+ // это нужно для массовых операций. Но большинство вызовов меняют только
+ // ОДНО подразделение (добавили процесс, переименовали, сгенерировали код
+ // и т.д.) — им передают onlyIds, и в Firestore уходит запись только по
+ // реально изменившимся id. Раньше каждое такое действие перезаписывало
+ // ВСЕ подразделения бизнеса разом: чем больше их накапливалось, тем
+ // дольше выполнялось любое действие — от этого и было ощущение,
+ // что «всё тяжело нажимается» и процессы долго создаются.
+ const targets = Array.isArray(options.onlyIds)
+ ? scopedDepartments.filter(d => options.onlyIds.includes(String(d.id)))
+ : scopedDepartments;
  try {
- await Promise.all(scopedDepartments.map(d =>
+ await Promise.all(targets.map(d =>
  biz("departments").doc(String(d.id)).set(d, { merge: true })
  ));
  LocalDB.remove('pendingDepartmentWrites');
@@ -5839,7 +5860,7 @@ async function createDepartment(name, logoText, extraFields = {}) {
  };
 
  const arr = [...getDepartments(), dep];
- await setDepartments(arr);
+ await setDepartments(arr, { onlyIds: [String(dep.id)] });
  applyDepartmentLabels(dep);
  return dep;
 }
@@ -6001,7 +6022,7 @@ async function updateDepartment(id, patch) {
  const idx = arr.findIndex(d => String(d.id) === String(id));
  if (idx === -1) return null;
  arr[idx] = { ...arr[idx], ...patch, updatedAt: new Date().toISOString() };
- await setDepartments(arr);
+ await setDepartments(arr, { onlyIds: [String(id)] });
  applyDepartmentLabels(getPrimaryDepartment());
  return arr[idx];
 }
@@ -6064,7 +6085,7 @@ async function deleteDepartment(id) {
  ));
 
  const arr = getDepartments().filter(d => String(d.id) !== String(id));
- await setDepartments(arr);
+ await setDepartments(arr, { onlyIds: [] });
  if (CLOUD_ENABLED && db) {
  await biz("departments").doc(String(id)).delete().catch(err => console.error("department delete error", err));
  }
@@ -11267,7 +11288,13 @@ function openBusinessAdministratorCreate() {
  goTo('screen-business-admin-create');
 }
 
+let businessAdministratorCreateSubmitting = false;
 async function submitBusinessAdministratorCreate() {
+ // Двойной тап здесь особенно опасен: без защиты обе попытки успевают
+ // пройти проверку hasBusinessAdministrator() ДО того, как первая допишет
+ // подразделение, и в итоге создаются два отдельных «Администратор»-
+ // подразделения с разными join-кодами — классический дублёр учредителя.
+ if (businessAdministratorCreateSubmitting) return;
  if (!hasFounderSession()) { showToast('Добавить администратора может только учредитель'); return; }
  const nameEl = document.getElementById('business-admin-department-name');
  const pwdEl = document.getElementById('business-admin-create-password');
@@ -11285,21 +11312,26 @@ async function submitBusinessAdministratorCreate() {
  }
  if (hasBusinessAdministrator()) { showToast('Подразделение администратора уже создано'); return; }
  if (error) error.classList.remove('show');
- const dep = await createDepartment(name, '', {
-  isAdminDepartment: true,
-  adminPassword: password,
-  joinCode: generateJoinCode(),
-  adminRegistered: false
- });
- if (!dep) return;
- InspectStorage.setItem('businessAdministratorCreated', '1');
- activeManagedDepartmentId = String(dep.id);
- renderHomeGrid();
- renderFounderMenu();
- showToast('Администратор создан. Отправьте код и пароль ✓');
- screenStack.pop();
- document.getElementById('screen-business-admin-create')?.classList.remove('active');
- openDepartmentManage(dep.id);
+ businessAdministratorCreateSubmitting = true;
+ try {
+  const dep = await createDepartment(name, '', {
+   isAdminDepartment: true,
+   adminPassword: password,
+   joinCode: generateJoinCode(),
+   adminRegistered: false
+  });
+  if (!dep) return;
+  InspectStorage.setItem('businessAdministratorCreated', '1');
+  activeManagedDepartmentId = String(dep.id);
+  renderHomeGrid();
+  renderFounderMenu();
+  showToast('Администратор создан. Отправьте код и пароль ✓');
+  screenStack.pop();
+  document.getElementById('screen-business-admin-create')?.classList.remove('active');
+  openDepartmentManage(dep.id);
+ } finally {
+  businessAdministratorCreateSubmitting = false;
+ }
 }
 
 function enterBusinessAdministrator(departmentId) {
@@ -11394,7 +11426,9 @@ function openDepartmentCreateForm() {
  goTo('screen-department-create');
 }
 
+let departmentCreateSubmitting = false;
 async function submitDepartmentCreate() {
+ if (departmentCreateSubmitting) return;
  const nameEl = document.getElementById('dep-create-name');
  const errEl = document.getElementById('dep-create-error');
  const name = nameEl ? nameEl.value.trim() : '';
@@ -11406,15 +11440,20 @@ async function submitDepartmentCreate() {
  }
  if (errEl) errEl.classList.remove('show');
 
- const dep = await createDepartment(name, logo);
- if (!dep) return;
+ departmentCreateSubmitting = true;
+ try {
+  const dep = await createDepartment(name, logo);
+  if (!dep) return;
 
- renderHomeGrid();
- renderFounderMenu();
- showToast('Подразделение создано ✓');
- screenStack.pop();
- document.getElementById('screen-department-create').classList.remove('active');
- openDepartmentManage(dep.id);
+  renderHomeGrid();
+  renderFounderMenu();
+  showToast('Подразделение создано ✓');
+  screenStack.pop();
+  document.getElementById('screen-department-create').classList.remove('active');
+  openDepartmentManage(dep.id);
+ } finally {
+  departmentCreateSubmitting = false;
+ }
 }
 
 let activeManagedDepartmentId = null;
@@ -11698,7 +11737,9 @@ function renderAddProcessList() {
 
 let pendingDepartmentProcessSubmission = null;
 
+let addProcessesSubmitting = false;
 async function submitAddProcesses() {
+ if (addProcessesSubmitting) return;
  const dep = getDepartment(activeManagedDepartmentId);
  if (!dep) return;
 
@@ -11718,7 +11759,12 @@ async function submitAddProcesses() {
  return;
  }
 
- await finishDepartmentProcessSubmission(String(dep.id), checked, null, false);
+ addProcessesSubmitting = true;
+ try {
+  await finishDepartmentProcessSubmission(String(dep.id), checked, null, false);
+ } finally {
+  addProcessesSubmitting = false;
+ }
 }
 
 function cancelTechnicianDepartmentCreation() {
