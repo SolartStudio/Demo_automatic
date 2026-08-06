@@ -1860,7 +1860,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm" data-i18n-skip></div>
-<div class="app-version" id="app-version-label">Версия 1.069</div>
+<div class="app-version" id="app-version-label">Версия 1.071</div>
  </div>
 </div>
 
@@ -4091,7 +4091,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.069";
+const APP_VERSION = "1.071";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
@@ -5518,7 +5518,7 @@ async function createTechnicianDepartmentForRepairs() {
  finesConfig: { employeeVisible: true },
  createdAt: new Date().toISOString()
  };
- await setDepartments([...getDepartments(), technicianDepartment], { onlyIds: [String(technicianDepartment.id)] });
+ setDepartments([...getDepartments(), technicianDepartment], { onlyIds: [String(technicianDepartment.id)] });
  renderHomeGrid();
  renderFounderMenu();
  return technicianDepartment;
@@ -5860,7 +5860,7 @@ async function createDepartment(name, logoText, extraFields = {}) {
  };
 
  const arr = [...getDepartments(), dep];
- await setDepartments(arr, { onlyIds: [String(dep.id)] });
+ setDepartments(arr, { onlyIds: [String(dep.id)] });
  applyDepartmentLabels(dep);
  return dep;
 }
@@ -6022,7 +6022,7 @@ async function updateDepartment(id, patch) {
  const idx = arr.findIndex(d => String(d.id) === String(id));
  if (idx === -1) return null;
  arr[idx] = { ...arr[idx], ...patch, updatedAt: new Date().toISOString() };
- await setDepartments(arr, { onlyIds: [String(id)] });
+ setDepartments(arr, { onlyIds: [String(id)] });
  applyDepartmentLabels(getPrimaryDepartment());
  return arr[idx];
 }
@@ -6085,9 +6085,9 @@ async function deleteDepartment(id) {
  ));
 
  const arr = getDepartments().filter(d => String(d.id) !== String(id));
- await setDepartments(arr, { onlyIds: [] });
+ setDepartments(arr, { onlyIds: [] });
  if (CLOUD_ENABLED && db) {
- await biz("departments").doc(String(id)).delete().catch(err => console.error("department delete error", err));
+ biz("departments").doc(String(id)).delete().catch(err => console.error("department delete error", err));
  }
  applyDepartmentLabels(getPrimaryDepartment());
 }
@@ -6487,12 +6487,19 @@ function getStaffDisplay(staff) {
  return `${staff.name} · ${getStaffRole(staff)}`;
 }
 
-function setStaff(arr) {
+function setStaff(arr, options = {}) {
  appCache.staff = arr;
  LocalDB.set("staff", arr);
 
  if (CLOUD_ENABLED && db) {
- arr.forEach(s => {
+ // Та же логика, что и в setDepartments/setReports: по умолчанию пишем
+ // только реально изменившихся сотрудников, а не весь штат — иначе
+ // каждое назначение дежурного/правка одного сотрудника переписывает
+ // в облако вообще всех.
+ const targets = Array.isArray(options.onlyIds)
+ ? arr.filter(s => options.onlyIds.includes(String(s.id)))
+ : arr;
+ targets.forEach(s => {
  biz("staff").doc(String(s.id)).set(s, { merge: true })
  .catch(err => console.error("staff save error", err));
  });
@@ -6557,13 +6564,21 @@ function getReports() {
  return filterRecentPhotoReports(appCache.reports || []);
 }
 
-function setReports(arr) {
+function setReports(arr, options = {}) {
  appCache.reports = filterRecentPhotoReports(arr);
  LocalDB.set("reports", appCache.reports);
  updateUnreadBadges();
 
  if (CLOUD_ENABLED && db) {
- arr.forEach(r => {
+ // Фотоотчёт — самая частая кнопка во всём приложении. Раньше отправка
+ // ОДНОГО нового отчёта переписывала в облако ВСЕ отчёты за 30 дней
+ // хранения — чем больше их накапливалось, тем медленнее и «туже»
+ // ощущалась каждая отправка. Теперь по умолчанию пишем только реально
+ // новые/изменившиеся записи (options.onlyIds), а не весь список.
+ const targets = Array.isArray(options.onlyIds)
+ ? appCache.reports.filter(r => options.onlyIds.includes(String(r.id)))
+ : appCache.reports;
+ targets.forEach(r => {
  biz("reports").doc(String(r.id)).set(r, { merge: true })
  .catch(err => {
  console.error(err);
@@ -14934,7 +14949,7 @@ async function confirmReport() {
 
  const reports = getReports();
  reports.push(report);
- setReports(reports);
+ setReports(reports, { onlyIds: [String(report.id)] });
 
  if (isDepartmentMode) {
  notifyFounders(`📷 Новый фотоотчёт\n\n${report.staffName} · ${report.bathName}\n${formatDateRu(report.date)} · ${report.time}`);
@@ -15032,43 +15047,57 @@ function assignDuty() {
  openModal('modal-duty-confirm');
 }
 
+let confirmDutyLastAt = 0;
 function confirmDuty() {
+ // confirmDuty — синхронная функция без await-точек, поэтому обычный
+ // булев флаг с сбросом в finally тут бесполезен: каждый тап успевает
+ // выполниться целиком (и сбросить флаг) до следующего события клика.
+ // Реальная проблема — несколько физических тапов подряд, пока модалка
+ // визуально не закрылась. Спасает только защита по времени.
+ const nowTs = Date.now();
+ if (nowTs - confirmDutyLastAt < 1500) return;
+ confirmDutyLastAt = nowTs;
  closeModal('modal-duty-confirm');
  const allStaff = getStaff();
  const person = allStaff.find(s => String(s.id) === String(selectedDutyId) && String(s.role || '') === 'waiter');
  if (!person) { showToast('Выберите официанта'); return; }
 
- const tasks = (document.getElementById('duty-tasks')?.value || '').trim();
- const targetDate = getNextShiftDateKey();
- const messageText =
- `Здравствуйте, ${person.name}!\n\nЗавтра вы назначены дежурным (${formatDateRu(targetDate)})!` +
- (tasks ? `\n\nСписок задач:\n${tasks}` : '');
+ try {
+  const tasks = (document.getElementById('duty-tasks')?.value || '').trim();
+  const targetDate = getNextShiftDateKey();
+  const messageText =
+  `Здравствуйте, ${person.name}!\n\nЗавтра вы назначены дежурным (${formatDateRu(targetDate)})!` +
+  (tasks ? `\n\nСписок задач:\n${tasks}` : '');
 
- // Update duty count
- person.dutyCount = (person.dutyCount || 0) + 1;
- setStaff(allStaff);
+  // Update duty count
+  person.dutyCount = (person.dutyCount || 0) + 1;
+  setStaff(allStaff, { onlyIds: [String(person.id)] });
 
- const dutySnapshot = {
- staffId: selectedDutyId,
- staffName: person.name,
- staffLogin: person.login || '',
- targetDate,
- tasks,
- messageText,
- assignedAt: new Date().toISOString()
- };
+  const dutySnapshot = {
+  staffId: selectedDutyId,
+  staffName: person.name,
+  staffLogin: person.login || '',
+  targetDate,
+  tasks,
+  messageText,
+  assignedAt: new Date().toISOString()
+  };
 
- setDutyAssignment(dutySnapshot);
- setDutyAssignmentForDate(targetDate, dutySnapshot).catch(err => {
- console.error('duty archive save error', err);
- showToast('Ошибка сохранения истории дежурного');
- });
+  setDutyAssignment(dutySnapshot);
+  setDutyAssignmentForDate(targetDate, dutySnapshot).catch(err => {
+  console.error('duty archive save error', err);
+  showToast('Ошибка сохранения истории дежурного');
+  });
 
- notifyStaffMember(person, `🌅 Вы назначены дежурным\n\nДата: ${formatDateRu(targetDate)}${tasks ? '\n\nЗадачи:\n' + tasks : ''}`);
- notifyFounders(`🌅 Назначен дежурный\n\n${person.name} · ${formatDateRu(targetDate)}${tasks ? '\n\nЗадачи:\n' + tasks : ''}`);
+  notifyStaffMember(person, `🌅 Вы назначены дежурным\n\nДата: ${formatDateRu(targetDate)}${tasks ? '\n\nЗадачи:\n' + tasks : ''}`);
+  notifyFounders(`🌅 Назначен дежурный\n\n${person.name} · ${formatDateRu(targetDate)}${tasks ? '\n\nЗадачи:\n' + tasks : ''}`);
 
- showToast(`${person.name} назначен(а) дежурным ✓`);
- renderDutyScreen();
+  showToast(`${person.name} назначен(а) дежурным ✓`);
+  renderDutyScreen();
+ } catch (err) {
+  console.error('confirmDuty error', err);
+  showToast('Не удалось назначить дежурного');
+ }
 }
 
 
@@ -18634,7 +18663,9 @@ function openStaffView(staffId, replaceCurrent = false) {
  if (!replaceCurrent) goTo('screen-staff-view');
 }
 
+let assignDutyFromEmployeeProfileSubmitting = false;
 async function assignDutyFromEmployeeProfile() {
+ if (assignDutyFromEmployeeProfileSubmitting) return;
  if (!hasManagementSession()) {
   showToast('Назначать дежурного может только управление');
   return;
@@ -18671,6 +18702,7 @@ async function assignDutyFromEmployeeProfile() {
   notificationType: 'dutyAssignment'
  };
 
+ assignDutyFromEmployeeProfileSubmitting = true;
  try {
   setDutyAssignment(assignment);
   await setDutyAssignmentForDate(targetDate, assignment);
@@ -18688,6 +18720,8 @@ async function assignDutyFromEmployeeProfile() {
  } catch (error) {
   console.error('employee profile duty save error', error);
   showToast('Не удалось сохранить назначение');
+ } finally {
+  assignDutyFromEmployeeProfileSubmitting = false;
  }
 }
 
