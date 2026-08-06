@@ -1860,7 +1860,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm" data-i18n-skip></div>
-<div class="app-version" id="app-version-label">Версия 1.071</div>
+<div class="app-version" id="app-version-label">Версия 1.072</div>
  </div>
 </div>
 
@@ -4091,7 +4091,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.071";
+const APP_VERSION = "1.072";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
@@ -8772,8 +8772,18 @@ async function runActualChecklistDeadlineReminderCheck() {
      if (log[key]) continue;
 
      const text = buildActualChecklistEscalationText(dep, checklist, item);
-     const staffResult = await notifyDepartmentStaff(dep.id, text, { startParam: `checklist_${dep.id}`, buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
-     const mgmtResult = await notifyFounders(text, { startParam: `checklist_${dep.id}`, buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+     // Каждый пункт уведомляется независимо: если отправка сотруднику или
+     // учредителю по этому конкретному пункту упадёт с ошибкой (сеть,
+     // невалидный telegramId и т.п.), это не должно прерывать проверку
+     // остальных пунктов/чек-листов/подразделений в этом же цикле.
+     let staffResult = null;
+     let mgmtResult = null;
+     try {
+      staffResult = await notifyDepartmentStaff(dep.id, text, { startParam: `checklist_${dep.id}`, buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+     } catch (err) { console.warn('checklist escalation staff notify failed', key, err); }
+     try {
+      mgmtResult = await notifyFounders(text, { startParam: `checklist_${dep.id}`, buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+     } catch (err) { console.warn('checklist escalation founder notify failed', key, err); }
      if ((staffResult && staffResult.ok !== false) || (mgmtResult && mgmtResult.ok !== false)) {
       log[key] = new Date().toISOString();
       changed = true;
@@ -15451,6 +15461,10 @@ async function confirmCloseRepairRequest() {
  const closeText = `✅ Заявка на ремонт закрыта\n\nТехник: ${req.technicianName}\nОт: ${req.departmentName || req.sourceRoleLabel || 'Подразделение'} · ${req.staffName || 'Сотрудник'}\n${req.text || ''}${resolutionText ? '\n\nКомментарий: ' + resolutionText : ''}`;
  notifyRepairTechnicians(closeText, { startParam: 'technician_repairs', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
  notifyFounders(closeText, { startParam: 'founder_repairs', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+ const reporterStaff = getStaff().find(s => String(s.id) === String(req.staffId));
+ if (reporterStaff) {
+  notifyStaffMember(reporterStaff, `✅ Ваша заявка на ремонт закрыта\n\n${req.text || ''}${resolutionText ? '\n\nКомментарий техника: ' + resolutionText : ''}`);
+ }
  activeRepairClosePhotos = [];
  showToast('Заявка закрыта ✓');
  renderRepairView();
@@ -20897,8 +20911,14 @@ async function submitActualChecklistBuilder() {
    mode: activeActualChecklistBuilderMode,
    items: normalizeActualChecklistItems(activeActualChecklistBuilderItems)
   };
+  const isNewChecklist = existingIndex < 0;
   if (existingIndex >= 0) list[existingIndex] = updated; else list.push(updated);
   await saveActualChecklists(dep.id, list);
+  if (isNewChecklist) {
+   const createdText = `📋 Новый чек-лист\n\nПодразделение: ${dep.name}\nЧек-лист: ${title}\nТип: ${getActualChecklistModeLabel(updated.mode)}\nПунктов: ${updated.items.length}`;
+   notifyDepartmentStaff(dep.id, createdText, { startParam: `checklist_${dep.id}`, buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+   notifyFounders(createdText, { startParam: `checklist_${dep.id}`, buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+  }
   showToast(existingIndex >= 0 ? 'Чек-лист сохранён ✓' : 'Чек-лист создан ✓');
   goBack();
   renderChecklistSettings();
