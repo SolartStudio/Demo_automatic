@@ -1860,7 +1860,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm" data-i18n-skip></div>
-<div class="app-version" id="app-version-label">Версия 1.066</div>
+<div class="app-version" id="app-version-label">Версия 1.067</div>
  </div>
 </div>
 
@@ -1948,6 +1948,24 @@
  <div class="error-msg" id="employee-join-error">Введите имя</div>
  </div>
  <button class="btn btn-primary" onclick="submitEmployeeJoinConfirm()">Готово</button>
+ </div>
+</div>
+
+<!-- ===== SCREEN: EMPLOYEE PENDING APPROVAL ===== -->
+<div class="screen" id="screen-employee-pending">
+ <div class="content content-padded">
+ <div class="empty" style="padding-top:60px;">
+ <div class="empty-icon" id="employee-pending-icon">⏳</div>
+ <div class="empty-title" id="employee-pending-title">Заявка отправлена</div>
+ <div class="empty-sub" id="employee-pending-sub">Учредитель или администратор должен подтвердить вход</div>
+ </div>
+ <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-top:8px;">
+ <div style="font-size:13px;color:var(--text-3);margin-bottom:4px;">Имя</div>
+ <div style="font-size:16px;font-weight:600;margin-bottom:12px;" id="employee-pending-name" data-i18n-skip></div>
+ <div style="font-size:13px;color:var(--text-3);margin-bottom:4px;">Подразделение</div>
+ <div style="font-size:16px;font-weight:600;" id="employee-pending-department" data-i18n-skip></div>
+ </div>
+ <button class="btn btn-secondary" style="margin-top:16px;" onclick="retryEmployeePendingCheck()">Проверить ещё раз</button>
  </div>
 </div>
 
@@ -4073,7 +4091,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.066";
+const APP_VERSION = "1.067";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
@@ -4316,6 +4334,27 @@ function activateTelegramEmployee(binding, staff, business = null) {
  const others = getStaff().filter(person => String(person.id) !== String(cleanStaff.id));
  appCache.staff = [...others, cleanStaff];
  LocalDB.set('staff', appCache.staff);
+ cacheTelegramEmployeeBinding({
+ telegramId: String(binding.telegramId),
+ businessId: String(binding.businessId),
+ staffId: String(binding.staffId),
+ role: cleanStaff.role || binding.role || 'waiter',
+ departmentId: cleanStaff.departmentId || binding.departmentId || '',
+ status: 'active',
+ updatedAt: binding.updatedAt || new Date().toISOString()
+ });
+ InspectStorage.removeItem('pendingJoinDepartmentId');
+ InspectStorage.removeItem('pendingJoinDepartmentName');
+ LocalDB.remove('pendingJoinDepartment');
+
+ // Заявка ещё не одобрена учредителем/администратором — при каждом заходе
+ // (в том числе после перезагрузки Mini App) показываем экран ожидания, а
+ // не пускаем в подразделение. Биндинг Telegram при этом остаётся активным:
+ // как только заявку одобрят, тот же live-listener подхватит новый статус.
+ if (isStaffPending(cleanStaff)) {
+  showEmployeePendingScreen(cleanStaff, getDepartment(cleanStaff.departmentId));
+  return cleanStaff;
+ }
 
  if (cleanStaff.role === 'admin') {
   // Администратор — Telegram ID уже подтверждён этой привязкой, повторный
@@ -4331,19 +4370,11 @@ function activateTelegramEmployee(binding, staff, business = null) {
  } else {
   setCurrentStaffSession(cleanStaff);
  }
- cacheTelegramEmployeeBinding({
- telegramId: String(binding.telegramId),
- businessId: String(binding.businessId),
- staffId: String(binding.staffId),
- role: cleanStaff.role || binding.role || 'waiter',
- departmentId: cleanStaff.departmentId || binding.departmentId || '',
- status: 'active',
- updatedAt: binding.updatedAt || new Date().toISOString()
- });
- InspectStorage.removeItem('pendingJoinDepartmentId');
- InspectStorage.removeItem('pendingJoinDepartmentName');
- LocalDB.remove('pendingJoinDepartment');
  return cleanStaff;
+}
+
+function isStaffPending(staff) {
+ return Boolean(staff && staff.status === 'pending');
 }
 
 async function restoreTelegramEmployeeBinding() {
@@ -9215,6 +9246,119 @@ async function submitEmployeeCode() {
  location.reload();
 }
 
+// ============================================================
+// EMPLOYEE APPROVAL — новая заявка по коду подразделения не даёт доступ
+// сама по себе: сотрудник видит экран ожидания, пока учредитель или
+// администратор явно её не подтвердит. Экран слушает тот же общий
+// live-listener сотрудников (biz('staff').onSnapshot в init()), поэтому
+// переход в меню происходит сам, без перезагрузки и без отдельного опроса.
+// ============================================================
+function getPendingApprovalStaffId() {
+ return InspectStorage.getItem('pendingApprovalStaffId');
+}
+
+function setPendingApprovalStaffId(id) {
+ if (id) InspectStorage.setItem('pendingApprovalStaffId', String(id));
+ else InspectStorage.removeItem('pendingApprovalStaffId');
+}
+
+function showEmployeePendingScreen(staff, dep) {
+ setPendingApprovalStaffId(staff.id);
+ const icon = document.getElementById('employee-pending-icon');
+ const title = document.getElementById('employee-pending-title');
+ const sub = document.getElementById('employee-pending-sub');
+ const nameEl = document.getElementById('employee-pending-name');
+ const depEl = document.getElementById('employee-pending-department');
+ if (icon) icon.textContent = '⏳';
+ if (title) title.textContent = 'Заявка отправлена';
+ if (sub) sub.textContent = 'Учредитель или администратор должен подтвердить вход';
+ if (nameEl) nameEl.textContent = staff.name || '';
+ if (depEl) depEl.textContent = dep ? dep.name : '';
+ screenStack = ['screen-home', 'screen-employee-pending'];
+ document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active'));
+ document.getElementById('screen-employee-pending')?.classList.add('active');
+}
+
+function renderEmployeePendingDeclined() {
+ setPendingApprovalStaffId(null);
+ const icon = document.getElementById('employee-pending-icon');
+ const title = document.getElementById('employee-pending-title');
+ const sub = document.getElementById('employee-pending-sub');
+ if (icon) icon.textContent = '✕';
+ if (title) title.textContent = 'Заявка отклонена';
+ if (sub) sub.textContent = 'Обратитесь к учредителю или администратору подразделения';
+}
+
+function finishStaffApproval(staff) {
+ clearFounderSession();
+ clearAdminSession();
+ clearCurrentAdminProfile();
+ screenStack = ['screen-home'];
+ document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active'));
+ document.getElementById('screen-home')?.classList.add('active');
+
+ if (staff.role === 'admin') {
+  // Как и при обычной первой регистрации администратора — пароль всё
+  // равно нужно ввести отдельно, подтверждение заявки его не заменяет.
+  const adminProfile = { ...staff, role: 'admin', roleLabel: 'Администратор' };
+  saveAdminProfile(adminProfile).catch(err => console.warn('admin profile sync deferred', err));
+  setCurrentAdminProfile(adminProfile);
+  showToast('Вас подтвердили ✓ Введите пароль администратора');
+  enterBusinessAdministrator(staff.departmentId);
+ } else {
+  setCurrentStaffSession(staff);
+  showToast('Вас подтвердили ✓ Добро пожаловать');
+  goTo('screen-waiter-menu');
+  renderWaiterMenu();
+ }
+}
+
+// Вызывается из refreshScreen(), когда активен экран ожидания и приходят
+// свежие данные о сотрудниках (через живой listener или ручную проверку).
+function checkPendingApprovalStatus() {
+ const staffId = getPendingApprovalStaffId();
+ if (!staffId) return;
+ const staff = getStaff().find(s => String(s.id) === String(staffId));
+
+ if (!staff) {
+  // Запись удалена — заявку отклонили.
+  renderEmployeePendingDeclined();
+  return;
+ }
+ if (isStaffPending(staff)) return; // всё ещё ждём решения
+
+ setPendingApprovalStaffId(null);
+ finishStaffApproval(staff);
+}
+
+async function retryEmployeePendingCheck() {
+ // Ручная проверка на случай нестабильного интернета — тот же путь, что и
+ // автоматическое обновление, просто по нажатию кнопки «Проверить ещё раз».
+ const staffId = getPendingApprovalStaffId();
+ if (!staffId) return;
+ showToast('Проверяем статус...');
+ try {
+  if (CLOUD_ENABLED && db) {
+   const doc = await db.collection('staff').doc(String(staffId)).get();
+   if (doc.exists) {
+    const staff = { id: doc.id, ...doc.data() };
+    appCache.staff = [...getStaff().filter(s => String(s.id) !== String(staffId)), staff];
+   } else {
+    appCache.staff = getStaff().filter(s => String(s.id) !== String(staffId));
+   }
+   LocalDB.set('staff', appCache.staff);
+  }
+ } catch (err) { console.warn('pending approval check error', err); }
+ checkPendingApprovalStatus();
+}
+
+async function notifyNewStaffJoinRequest(staff, dep) {
+ const depName = dep ? dep.name : '';
+ const text = `🆕 Новая заявка на вход\n\n${staff.name || 'Сотрудник'}${depName ? ' · ' + depName : ''}\n\nОткройте «Все сотрудники» в меню управления, чтобы подтвердить или отклонить`;
+ await notifyFounders(text, { startParam: 'all_staff', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+ await notifyRole('admin', text, { startParam: 'all_staff', buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+}
+
 async function submitEmployeeJoinConfirm() {
  const nameInput = document.getElementById('employee-join-name');
  const err = document.getElementById('employee-join-error');
@@ -9246,6 +9390,10 @@ async function submitEmployeeJoinConfirm() {
  return;
  }
  const nowIso = new Date().toISOString();
+ // Новая заявка всегда стартует со статусом «ожидает подтверждения» —
+ // учредитель или администратор должен явно её одобрить, прежде чем
+ // человек попадёт в подразделение. Это защита от входа по утёкшему коду:
+ // код сам по себе больше не даёт доступ, только право отправить заявку.
  const staffDraft = {
  id: 'staff_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
  login: getTelegramWebAppUsername() || '@telegram',
@@ -9253,7 +9401,7 @@ async function submitEmployeeJoinConfirm() {
  role: dep && dep.isAdminDepartment ? 'admin' : 'waiter',
  departmentId: String(depId),
  roleLabel: dep && dep.isAdminDepartment ? 'Администратор' : (dep ? dep.name : (InspectStorage.getItem('pendingJoinDepartmentName') || getRoleLabel('waiter'))),
- approvedAt: nowIso,
+ status: 'pending',
  createdAt: nowIso,
  updatedAt: nowIso
  };
@@ -9283,6 +9431,16 @@ async function submitEmployeeJoinConfirm() {
  clearFounderSession();
  clearAdminSession();
  clearCurrentAdminProfile();
+ InspectStorage.removeItem('pendingJoinDepartmentId');
+ InspectStorage.removeItem('pendingJoinDepartmentName');
+ LocalDB.remove('pendingJoinDepartment');
+
+ if (isStaffPending(staffMember)) {
+  notifyNewStaffJoinRequest(staffMember, dep).catch(err => console.warn('join request notify skipped', err));
+  showEmployeePendingScreen(staffMember, dep);
+  return;
+ }
+
  if (dep && dep.isAdminDepartment) {
   const adminProfile = { ...staffMember, role:'admin', roleLabel:'Администратор', departmentId:String(depId), businessId:getCurrentBusinessId() };
   await saveAdminProfile(adminProfile);
@@ -9291,9 +9449,6 @@ async function submitEmployeeJoinConfirm() {
  } else {
   setCurrentStaffSession(staffMember);
  }
- InspectStorage.removeItem('pendingJoinDepartmentId');
- InspectStorage.removeItem('pendingJoinDepartmentName');
- LocalDB.remove('pendingJoinDepartment');
  showToast(dep && dep.isAdminDepartment ? 'Регистрация завершена. Введите пароль администратора' : 'Добро пожаловать ✓');
  screenStack = ['screen-home'];
  document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active'));
@@ -9401,6 +9556,7 @@ function refreshScreen(id) {
  if (id === 'screen-founder-menu') renderFounderMenu();
  if (id === 'screen-department-manage') renderDepartmentManage();
  if (id === 'screen-admin-department-manage') renderAdminDepartmentManage();
+ if (id === 'screen-employee-pending') checkPendingApprovalStatus();
  if (id === 'screen-generic-process-list') renderGenericProcessList();
  if (id === 'screen-event-calendar') renderEventCalendar();
  if (id === 'screen-checklist-settings') renderChecklistSettings();
@@ -11014,6 +11170,20 @@ function renderFounderMenu() {
 
  const departments = getDepartments();
  let html = '';
+
+ // «Все сотрудники» — тут же подтверждают заявки на вход (защита от входа
+ // по утёкшему коду подразделения). Видно и учредителю, и администратору —
+ // они управляют одним и тем же списком подразделений.
+ const pendingCount = getPendingStaffCount();
+ html += `
+ <div class="menu-item" onclick="openFounderAllEmployees()">
+ <div class="menu-icon">👥</div>
+ <div class="menu-text">
+ <div class="menu-title-row"><div class="menu-title">Все сотрудники</div>${departmentUnreadBadgeHtml(pendingCount, 'Заявок на вход')}</div>
+ <div class="menu-desc">${pendingCount ? plural(pendingCount, 'заявка ждёт', 'заявки ждут', 'заявок ждёт') + ' подтверждения' : 'Список и заявки на вход'}</div>
+ </div>
+ <span class="menu-arrow">›</span>
+ </div>`;
 
  departments.forEach(dep => {
  const count = dep.processes ? dep.processes.length : 0;
@@ -17187,7 +17357,12 @@ function findFounderEmployee(employeeKey) {
  return null;
 }
 
+function getPendingStaffCount() {
+ return getStaff().filter(isStaffPending).length;
+}
+
 function openFounderAllEmployees() {
+ if (!hasManagementSession()) { showToast('Доступно только учредителю или администратору'); return; }
  renderFounderAllEmployees();
  goTo('screen-founder-all-employees');
 }
@@ -17195,7 +17370,13 @@ function openFounderAllEmployees() {
 function renderFounderAllEmployees() {
  const list = document.getElementById('founder-all-employees-list');
  if (!list) return;
- const employees = getAllEmployeesForFounder();
+ // Заявки, ждущие решения, всегда показываем первыми — это главная причина
+ // вообще открывать этот экран.
+ const employees = getAllEmployeesForFounder().slice().sort((a, b) => {
+  const ap = isStaffPending(a) ? 0 : 1;
+  const bp = isStaffPending(b) ? 0 : 1;
+  return ap - bp;
+ });
 
  if (!employees.length) {
  list.innerHTML = `<div class="empty">
@@ -17206,16 +17387,37 @@ function renderFounderAllEmployees() {
  return;
  }
 
- list.innerHTML = employees.map(s => `
+ list.innerHTML = employees.map(s => {
+ const pending = isStaffPending(s);
+ const depName = s.departmentId ? (getDepartment(s.departmentId)?.name || '') : '';
+ const subLine = [getStaffRole(s), s.login].filter(Boolean).join(' · ');
+
+ if (pending) {
+ return `
+ <div class="staff-item" style="align-items:flex-start;">
+ <div class="staff-avatar">${escapeHtml((s.name || 'С').charAt(0).toUpperCase())}</div>
+ <div style="flex:1;min-width:0;cursor:pointer;" onclick="openStaffView('${escapeHtml(s._key)}')">
+ <div class="staff-name" data-i18n-skip>${escapeHtml(s.name || 'Сотрудник')}</div>
+ <div class="staff-login">${escapeHtml(subLine)}${depName ? ' · ' + escapeHtml(depName) : ''}</div>
+ <div style="margin-top:4px;font-size:12px;font-weight:700;color:var(--accent);">⏳ Ожидает подтверждения</div>
+ </div>
+ <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+ <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();approveStaffJoinRequest('${s.id}')">Подтвердить</button>
+ <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openDeleteStaffModal('${escapeHtml(s._key)}')">Отклонить</button>
+ </div>
+ </div>`;
+ }
+
+ return `
  <div class="staff-item" onclick="openStaffView('${escapeHtml(s._key)}')">
  <div class="staff-avatar">${escapeHtml((s.name || 'С').charAt(0).toUpperCase())}</div>
  <div style="flex:1;">
  <div class="staff-name">${escapeHtml(s.name || 'Сотрудник')}</div>
- <div class="staff-login">${escapeHtml(getStaffRole(s))}${s.login ? ' · ' + escapeHtml(s.login) : ''}</div>
+ <div class="staff-login">${escapeHtml(subLine)}${depName ? ' · ' + escapeHtml(depName) : ''}</div>
  </div>
  <span class="menu-arrow">›</span>
- </div>
- `).join('');
+ </div>`;
+ }).join('');
 }
 
 async function deleteAdminProfileById(adminId) {
@@ -18314,6 +18516,7 @@ function openStaffView(staffId, replaceCurrent = false) {
  <div style="font-size:16px;font-weight:500;margin-bottom:12px;">${escapeHtml(s.login || '—')}</div>
  <div style="font-size:13px;color:var(--text-3);margin-bottom:4px;">Дата добавления</div>
  <div style="font-size:16px;font-weight:500;margin-bottom:12px;">${escapeHtml(s.createdAt ? new Date(s.createdAt).toLocaleString('ru-RU') : '—')}</div>
+ ${isStaffPending(s) ? `<div style="font-size:13px;color:var(--text-3);margin-bottom:4px;">Статус</div><div style="font-size:16px;font-weight:700;color:var(--accent);margin-bottom:12px;">⏳ Ожидает подтверждения</div>` : ''}
  ${s.approvedAt ? `<div style="font-size:13px;color:var(--text-3);margin-bottom:4px;">Одобрен</div><div style="font-size:16px;font-weight:500;margin-bottom:12px;">${escapeHtml(new Date(s.approvedAt).toLocaleString('ru-RU'))}</div>` : ''}
  ${s._employeeType === 'staff' ? `<div style="font-size:13px;color:var(--text-3);margin-bottom:4px;">Аттестация</div><div style="font-size:16px;font-weight:500;">${escapeHtml(getAttestationBestText(s))}</div>` : ''}
  </div>
@@ -18444,6 +18647,7 @@ async function assignDutyFromEmployeeProfile() {
 
 let staffIdToDelete = null;
 let deleteStaffReturnToDepartment = false;
+let deleteStaffReturnToAllStaff = false;
 
 function openDeleteStaffModal(staffId) {
  const person = findFounderEmployee(staffId);
@@ -18453,7 +18657,13 @@ function openDeleteStaffModal(staffId) {
  document.getElementById('screen-department-manage') &&
  document.getElementById('screen-department-manage').classList.contains('active')
  );
- document.getElementById('delete-staff-sub').textContent = `${person.name || 'Сотрудник'} · ${getStaffRole(person)} будет удалён из системы. Отчеты и история останутся.`;
+ deleteStaffReturnToAllStaff = Boolean(
+ document.getElementById('screen-founder-all-employees') &&
+ document.getElementById('screen-founder-all-employees').classList.contains('active')
+ );
+ document.getElementById('delete-staff-sub').textContent = isStaffPending(person)
+ ? `Заявка на вход ${person.name || 'сотрудника'} будет отклонена. Он сможет отправить заявку заново по коду подразделения.`
+ : `${person.name || 'Сотрудник'} · ${getStaffRole(person)} будет удалён из системы. Отчеты и история останутся.`;
  openModal('modal-delete-staff');
 }
 
@@ -18476,6 +18686,9 @@ async function confirmDeleteStaff() {
  if (deleteStaffReturnToDepartment) {
  deleteStaffReturnToDepartment = false;
  renderDepartmentManage();
+ } else if (deleteStaffReturnToAllStaff) {
+ deleteStaffReturnToAllStaff = false;
+ renderFounderAllEmployees();
  } else {
  goBack();
  }
@@ -18483,6 +18696,42 @@ async function confirmDeleteStaff() {
  console.error(e);
  showToast('Ошибка удаления сотрудника');
  }
+}
+
+// Учредитель или администратор подтверждает заявку на вход. Для
+// подразделения «Администратор» одноразовый код регистрации гасится именно
+// здесь, в момент подтверждения — а не при самой подаче заявки: пока заявку
+// не одобрили, код должен оставаться рабочим (вдруг заявку отклонят, и код
+// нужно будет отдать настоящему кандидату без повторной генерации).
+async function approveStaffJoinRequest(staffId) {
+ if (!hasManagementSession()) { showToast('Подтверждать вход может только учредитель или администратор'); return; }
+ const staff = getStaff().find(s => String(s.id) === String(staffId));
+ if (!staff) { showToast('Заявка не найдена'); return; }
+ if (!isStaffPending(staff)) { renderFounderAllEmployees(); return; }
+
+ const nowIso = new Date().toISOString();
+ const updated = { ...staff, status: 'approved', approvedAt: nowIso, updatedAt: nowIso };
+ appCache.staff = getStaff().map(s => String(s.id) === String(staffId) ? updated : s);
+ LocalDB.set('staff', appCache.staff);
+
+ try {
+  if (CLOUD_ENABLED && db) {
+   await biz('staff').doc(String(staffId)).set({ status: 'approved', approvedAt: nowIso, updatedAt: nowIso }, { merge: true });
+  }
+  if (updated.role === 'admin' && updated.departmentId) {
+   const dep = getDepartment(updated.departmentId);
+   if (dep && dep.isAdminDepartment && !dep.adminRegistered) {
+    await updateDepartment(dep.id, { adminRegistered: true, adminStaffId: String(updated.id), joinCode: null });
+   }
+  }
+ } catch (err) {
+  console.error('approve staff error', err);
+  showToast('Ошибка сохранения. Попробуйте ещё раз');
+  return;
+ }
+
+ showToast('Сотрудник подтверждён ✓');
+ renderFounderAllEmployees();
 }
 
 // ============================================================
@@ -20536,7 +20785,13 @@ function removeActualChecklistBuilderItem(itemId) {
  renderActualChecklistBuilderItems();
 }
 
+let actualChecklistBuilderSubmitting = false;
 async function submitActualChecklistBuilder() {
+ // Тот же двойной тап, что и с созданием событий/закрытием задач: пока
+ // сохранение в процессе, повторные нажатия на «Создать чек-лист»
+ // игнорируются, иначе при подвисании интернета получаются два чек-листа
+ // с одним и тем же содержимым.
+ if (actualChecklistBuilderSubmitting) return;
  const dep = requireFounderDepartmentAccess(activeChecklistDepartmentId);
  if (!dep) return;
  const titleInput = document.getElementById('actual-checklist-title');
@@ -20544,27 +20799,32 @@ async function submitActualChecklistBuilder() {
  if (!title) { showToast('Введите название чек-листа'); return; }
  if (!activeActualChecklistBuilderItems.length) { showToast('Добавьте хотя бы один пункт'); return; }
 
- const list = getActualChecklists(dep.id);
- const existingIndex = activeActualChecklistBuilderId ? list.findIndex(cl => String(cl.id) === activeActualChecklistBuilderId) : -1;
- const base = existingIndex >= 0 ? list[existingIndex] : {
-  id: `actcl_${Date.now()}_${Math.random().toString(36).slice(2,6)}`,
-  createdAt: new Date().toISOString(),
-  archived: false,
-  completedAt: null,
-  progress: {},
-  progressByDate: {}
- };
- const updated = {
-  ...base,
-  title,
-  mode: activeActualChecklistBuilderMode,
-  items: normalizeActualChecklistItems(activeActualChecklistBuilderItems)
- };
- if (existingIndex >= 0) list[existingIndex] = updated; else list.push(updated);
- await saveActualChecklists(dep.id, list);
- showToast(existingIndex >= 0 ? 'Чек-лист сохранён ✓' : 'Чек-лист создан ✓');
- goBack();
- renderChecklistSettings();
+ actualChecklistBuilderSubmitting = true;
+ try {
+  const list = getActualChecklists(dep.id);
+  const existingIndex = activeActualChecklistBuilderId ? list.findIndex(cl => String(cl.id) === activeActualChecklistBuilderId) : -1;
+  const base = existingIndex >= 0 ? list[existingIndex] : {
+   id: `actcl_${Date.now()}_${Math.random().toString(36).slice(2,6)}`,
+   createdAt: new Date().toISOString(),
+   archived: false,
+   completedAt: null,
+   progress: {},
+   progressByDate: {}
+  };
+  const updated = {
+   ...base,
+   title,
+   mode: activeActualChecklistBuilderMode,
+   items: normalizeActualChecklistItems(activeActualChecklistBuilderItems)
+  };
+  if (existingIndex >= 0) list[existingIndex] = updated; else list.push(updated);
+  await saveActualChecklists(dep.id, list);
+  showToast(existingIndex >= 0 ? 'Чек-лист сохранён ✓' : 'Чек-лист создан ✓');
+  goBack();
+  renderChecklistSettings();
+ } finally {
+  actualChecklistBuilderSubmitting = false;
+ }
 }
 
 let actualChecklistIdPendingDelete = null;
@@ -20734,7 +20994,12 @@ function renderActualChecklistFillScreen() {
    actionHtml = controls;
   }
 
-  return `${connector}<div class="actual-checklist-item ${isDone ? 'done' : 'pending'}">
+  // Приглушённый/серый вид «ещё не сделано» нужен только учредителю/админу
+  // в режиме просмотра — это у них сигнал «сотрудник пока не выполнил».
+  // У самого сотрудника на экране заполнения все пункты должны быть
+  // одинаково чёткими и читаемыми, иначе сложно понять, что делать дальше.
+  const itemStateClass = isDone ? 'done' : (readOnly ? 'pending' : '');
+  return `${connector}<div class="actual-checklist-item ${itemStateClass}">
    <div class="actual-checklist-item-head">
     <div class="checklist-question-number">${index + 1}</div>
     <div class="actual-checklist-item-title">${escapeHtml(item.text)}</div>
