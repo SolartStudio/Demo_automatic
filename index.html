@@ -1509,8 +1509,8 @@
 
  /* CHECKLIST PROCESS */
  .checklist-tabs {
- display:grid;
- grid-template-columns:repeat(2,minmax(0,1fr));
+ display:flex;
+ flex-wrap:wrap;
  gap:6px;
  background:var(--surface);
  border:1px solid var(--border-strong);
@@ -1520,13 +1520,15 @@
  box-shadow:var(--shadow-raised);
  }
  .checklist-tab {
+ flex:1 1 0;
+ min-width:90px;
  border:none;
  border-radius:11px;
  padding:12px 8px;
  background:transparent;
  color:var(--text-2);
  font:inherit;
- font-size:14px;
+ font-size:13px;
  font-weight:800;
  cursor:pointer;
  }
@@ -1672,6 +1674,114 @@
  }
  .checklist-result-answer:last-child { border-bottom:none; }
 
+ /* ACTUAL CHECKLIST («Фактический») — список созданных чек-листов у управления */
+ .actual-checklist-row {
+ display:flex;
+ align-items:center;
+ gap:12px;
+ background:var(--surface);
+ border:1px solid var(--border-strong);
+ border-radius:var(--radius);
+ padding:15px;
+ margin-bottom:10px;
+ box-shadow:var(--shadow-raised);
+ cursor:pointer;
+ }
+ .actual-checklist-row-text { flex:1; min-width:0; }
+ .actual-checklist-row-title { font-size:15px; font-weight:800; overflow-wrap:anywhere; }
+ .actual-checklist-row-meta { font-size:12px; color:var(--text-2); margin-top:4px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+ .actual-checklist-badge {
+ border-radius:999px;
+ padding:3px 9px;
+ font-size:11px;
+ font-weight:800;
+ background:var(--surface2);
+ border:1px solid var(--border);
+ color:var(--text-2);
+ }
+ .actual-checklist-badge.daily { color:var(--accent); border-color:var(--accent); }
+ .actual-checklist-progress-pill {
+ border-radius:999px;
+ padding:4px 11px;
+ font-size:12px;
+ font-weight:900;
+ background:var(--accent-soft);
+ color:var(--accent);
+ flex-shrink:0;
+ }
+ .actual-checklist-progress-pill.done-all { background:color-mix(in srgb,var(--success) 22%,var(--surface)); color:var(--success); }
+
+ /* ACTUAL CHECKLIST — заполнение: последовательные пункты со стрелкой-соединителем */
+ .actual-checklist-item {
+ background:var(--surface);
+ border:1px solid var(--border-strong);
+ border-radius:var(--radius);
+ padding:17px;
+ box-shadow:var(--shadow-raised);
+ transition:opacity .15s, filter .15s;
+ }
+ .actual-checklist-item.pending {
+ opacity:.55;
+ filter:grayscale(.6);
+ }
+ .actual-checklist-item.done {
+ opacity:1;
+ filter:none;
+ border-color:var(--success);
+ }
+ .actual-checklist-connector {
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ height:26px;
+ position:relative;
+ }
+ .actual-checklist-connector::before {
+ content:'';
+ position:absolute;
+ top:0;
+ bottom:6px;
+ width:1px;
+ background:var(--border-strong);
+ }
+ .actual-checklist-connector-arrow {
+ position:relative;
+ color:var(--text-3);
+ font-size:13px;
+ background:var(--bg);
+ line-height:1;
+ padding-top:14px;
+ }
+ .actual-checklist-item-head { display:flex; align-items:flex-start; gap:12px; }
+ .actual-checklist-item-title { flex:1; min-width:0; font-size:15px; font-weight:800; line-height:1.4; overflow-wrap:anywhere; }
+ .actual-checklist-deadline {
+ display:inline-flex;
+ align-items:center;
+ gap:5px;
+ margin-top:7px;
+ font-size:12px;
+ font-weight:800;
+ color:var(--text-2);
+ }
+ .actual-checklist-status {
+ display:inline-flex;
+ align-items:center;
+ gap:5px;
+ margin-top:9px;
+ font-size:12px;
+ font-weight:900;
+ padding:5px 10px;
+ border-radius:999px;
+ }
+ .actual-checklist-status.ontime { background:color-mix(in srgb,var(--success) 20%,var(--surface)); color:var(--success); }
+ .actual-checklist-status.late { background:color-mix(in srgb,var(--danger) 16%,var(--surface)); color:var(--danger); }
+ .actual-checklist-counter {
+ text-align:center;
+ font-size:13px;
+ font-weight:800;
+ color:var(--text-2);
+ margin-bottom:16px;
+ }
 
  /* EVENT CALENDAR */
  .event-calendar-toolbar { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; }
@@ -1750,7 +1860,7 @@
  </div>
  <div class="home-footer">
  <div class="logo-sm" data-i18n-skip></div>
-<div class="app-version" id="app-version-label">Версия 1.059</div>
+<div class="app-version" id="app-version-label">Версия 1.066</div>
  </div>
 </div>
 
@@ -2591,6 +2701,16 @@
  <div class="content content-padded" id="dep-manage-content"></div>
 </div>
 
+<!-- ===== SCREEN: ADMIN DEPARTMENT MANAGE (упрощённый экран «Администратора» —
+     только код регистрации сотрудника и удаление подразделения, без процессов) ===== -->
+<div class="screen" id="screen-admin-department-manage">
+ <div class="header">
+ <button class="back-btn" onclick="goBack()">←</button>
+ <span class="header-title" id="admin-dep-manage-title" data-i18n-skip>Администратор</span>
+ </div>
+ <div class="content content-padded" id="admin-dep-manage-content"></div>
+</div>
+
 
 <!-- ===== SCREEN: EVENT CALENDAR ===== -->
 <div class="screen" id="screen-event-calendar">
@@ -2646,11 +2766,12 @@
   <div class="checklist-tabs">
    <button class="checklist-tab active" id="checklist-settings-tab-opening" onclick="switchChecklistSettingsType('opening')">Открытие смены</button>
    <button class="checklist-tab" id="checklist-settings-tab-closing" onclick="switchChecklistSettingsType('closing')">Закрытие смены</button>
+   <button class="checklist-tab" id="checklist-settings-tab-actual" onclick="switchChecklistSettingsType('actual')">Фактический</button>
   </div>
-  <div class="doc-placeholder">Создайте обязательные вопросы. Сотрудник не сможет отправить чек-лист, пока не ответит на каждый пункт и не приложит требуемые фотографии.</div>
+  <div class="doc-placeholder" id="checklist-settings-hint">Создайте обязательные вопросы. Сотрудник не сможет отправить чек-лист, пока не ответит на каждый пункт и не приложит требуемые фотографии.</div>
   <div id="checklist-settings-list"></div>
-  <div class="section-label">Добавить пункт</div>
-  <div class="card" style="cursor:default;">
+  <div class="section-label" id="checklist-settings-add-label">Добавить пункт</div>
+  <div class="card" id="checklist-settings-add-card" style="cursor:default;">
    <div class="field">
     <label>Текст вопроса</label>
     <textarea id="checklist-question-text" placeholder="Например: Бокалы натёрты?"></textarea>
@@ -2660,6 +2781,72 @@
     <span style="font-size:14px;font-weight:700;">Обязательно прикрепить фото</span>
    </label>
    <button class="btn btn-primary" onclick="addChecklistQuestion()">+ Добавить пункт</button>
+  </div>
+  <button class="btn btn-primary" id="checklist-settings-actual-add-btn" style="display:none;" onclick="openActualChecklistBuilder()">+ Создать чек-лист</button>
+ </div>
+</div>
+
+<!-- ===== SCREEN: ACTUAL CHECKLIST BUILDER (конструктор «Фактического» чек-листа) ===== -->
+<div class="screen" id="screen-actual-checklist-builder">
+ <div class="header">
+  <button class="back-btn" onclick="goBack()">←</button>
+  <span class="header-title" id="actual-checklist-builder-title">Новый чек-лист</span>
+ </div>
+ <div class="content content-padded">
+  <div class="field">
+   <label>Название чек-листа</label>
+   <input type="text" id="actual-checklist-title" placeholder="Например: Заказать пиво у поставщика">
+  </div>
+  <div class="section-label">Тип</div>
+  <div class="checklist-tabs" style="margin-bottom:20px;">
+   <button class="checklist-tab active" id="actual-checklist-mode-once" onclick="setActualChecklistBuilderMode('once')">Разовый</button>
+   <button class="checklist-tab" id="actual-checklist-mode-daily" onclick="setActualChecklistBuilderMode('daily')">Ежедневный</button>
+  </div>
+  <div class="doc-placeholder" id="actual-checklist-mode-hint">Разовый — уходит из задач и остаётся в истории сразу после выполнения всех пунктов.</div>
+  <div class="section-label">Пункты</div>
+  <div id="actual-checklist-builder-items"></div>
+  <div class="card" style="cursor:default;">
+   <div class="field">
+    <label>Текст пункта</label>
+    <textarea id="actual-checklist-item-text" placeholder="Например: Заказать пиво у поставщика"></textarea>
+   </div>
+   <div class="field">
+    <label>Тип пункта</label>
+    <select id="actual-checklist-item-type">
+     <option value="task">Задача (просто отметить выполненным)</option>
+     <option value="yesno">Вопрос (да / нет)</option>
+    </select>
+   </div>
+   <div class="field">
+    <label>Сделать до (необязательно)</label>
+    <input type="time" id="actual-checklist-item-deadline">
+   </div>
+   <label style="display:flex;align-items:center;gap:11px;margin-bottom:16px;cursor:pointer;">
+    <input type="checkbox" id="actual-checklist-item-photo-required" style="width:21px;height:21px;accent-color:var(--accent);">
+    <span style="font-size:14px;font-weight:700;">Обязательно прикрепить фото</span>
+   </label>
+   <button class="btn btn-secondary" onclick="addActualChecklistBuilderItem()">+ Добавить пункт</button>
+  </div>
+  <button class="btn btn-primary" style="margin-top:6px;" onclick="submitActualChecklistBuilder()">Сохранить чек-лист</button>
+ </div>
+</div>
+
+<!-- ===== SCREEN: ACTUAL CHECKLIST FILL / VIEW (заполнение сотрудником или просмотр учредителем) ===== -->
+<div class="screen" id="screen-actual-checklist-fill">
+ <div class="header">
+  <button class="back-btn" onclick="goBack()">←</button>
+  <span class="header-title" id="actual-checklist-fill-title">Чек-лист</span>
+ </div>
+ <div class="content content-padded" id="actual-checklist-fill-content"></div>
+</div>
+
+<div class="modal-overlay" id="modal-delete-actual-checklist">
+ <div class="modal">
+  <div class="modal-title">Удалить чек-лист?</div>
+  <div class="modal-sub" id="delete-actual-checklist-sub">Чек-лист и весь прогресс по нему будут удалены без возможности восстановления.</div>
+  <div class="modal-actions">
+   <button class="btn btn-secondary" onclick="closeModal('modal-delete-actual-checklist')">Отмена</button>
+   <button class="btn btn-danger" onclick="confirmDeleteActualChecklist()">Удалить</button>
   </div>
  </div>
 </div>
@@ -2674,6 +2861,7 @@
   <div class="checklist-tabs">
    <button class="checklist-tab active" id="checklist-fill-tab-opening" onclick="switchChecklistFillType('opening')">Открытие смены</button>
    <button class="checklist-tab" id="checklist-fill-tab-closing" onclick="switchChecklistFillType('closing')">Закрытие смены</button>
+   <button class="checklist-tab" id="checklist-fill-tab-actual" onclick="switchChecklistFillType('actual')">Фактический</button>
   </div>
   <div id="checklist-fill-content"></div>
  </div>
@@ -3885,12 +4073,12 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.059";
+const APP_VERSION = "1.066";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
  label: APP_VERSION_LABEL,
- updatedAt: "2026-08-05"
+ updatedAt: "2026-08-06"
 };
 
 let db = null;
@@ -3979,6 +4167,7 @@ const appCache = {
  cookStaffReports: [],
  adminTrainingReports: [],
  technicianRepairReminderLog: {},
+ actualChecklistReminderLog: {},
  founderTasks: [],
  forgottenItems: [],
  anonymousFeedback: [],
@@ -4127,7 +4316,21 @@ function activateTelegramEmployee(binding, staff, business = null) {
  const others = getStaff().filter(person => String(person.id) !== String(cleanStaff.id));
  appCache.staff = [...others, cleanStaff];
  LocalDB.set('staff', appCache.staff);
- setCurrentStaffSession(cleanStaff);
+
+ if (cleanStaff.role === 'admin') {
+  // Администратор — Telegram ID уже подтверждён этой привязкой, повторный
+  // ввод пароля не нужен: сразу поднимаем сессию администратора (тот же
+  // интерфейс управления, что у учредителя, без «Настроек»), а не обычную
+  // сессию сотрудника — иначе на каждой перезагрузке администратор попадал
+  // бы в общее меню сотрудника вместо панели управления.
+  const adminProfile = { ...cleanStaff, role: 'admin', roleLabel: 'Администратор' };
+  setCurrentAdminProfile(adminProfile);
+  setAdminSession(adminProfile);
+  saveAdminProfile(adminProfile).catch(err => console.warn('admin profile sync deferred', err));
+  InspectStorage.setItem('founderActiveRole', 'founder');
+ } else {
+  setCurrentStaffSession(cleanStaff);
+ }
  cacheTelegramEmployeeBinding({
  telegramId: String(binding.telegramId),
  businessId: String(binding.businessId),
@@ -4446,7 +4649,7 @@ function hasManagementSession() {
 }
 
 function getAdministratorDepartment() {
- return getDepartments().find(dep => dep && dep.isAdminDepartment) || null;
+ return getDepartments().find(isAdministratorDepartment) || null;
 }
 
 function hasBusinessAdministrator() {
@@ -4688,6 +4891,7 @@ async function initCloud() {
  appCache.cookStaffReports = LocalDB.get("cookStaffReports") || [];
  appCache.adminTrainingReports = LocalDB.get("adminTrainingReports") || [];
  appCache.technicianRepairReminderLog = LocalDB.get("technicianRepairReminderLog") || {};
+ appCache.actualChecklistReminderLog = LocalDB.get("actualChecklistReminderLog") || {};
  appCache.founderTasks = LocalDB.get("founderTasks") || [];
  appCache.forgottenItems = LocalDB.get("forgottenItems") || [];
  appCache.anonymousFeedback = sanitizeAnonymousFeedbackList(LocalDB.get("anonymousFeedback") || []);
@@ -4932,6 +5136,8 @@ async function initCloud() {
  appCache.adminShiftHandover = data.adminShiftHandover || LocalDB.get("adminShiftHandover") || null;
  appCache.technicianRepairReminderLog = data.technicianRepairReminderLog || LocalDB.get("technicianRepairReminderLog") || {};
  LocalDB.set("technicianRepairReminderLog", appCache.technicianRepairReminderLog);
+ appCache.actualChecklistReminderLog = data.actualChecklistReminderLog || LocalDB.get("actualChecklistReminderLog") || {};
+ LocalDB.set("actualChecklistReminderLog", appCache.actualChecklistReminderLog);
  LocalDB.set("inventoryDraft", appCache.inventoryDraft);
  LocalDB.set("photoReportDrafts", appCache.photoReportDrafts);
  LocalDB.set("kpiContent", appCache.kpiContent);
@@ -5021,8 +5227,10 @@ async function loadCloudData() {
  appCache.stopList = settings.stopList || LocalDB.get("stopList") || getDefaultStopList();
  appCache.adminShiftHandover = settings.adminShiftHandover || LocalDB.get("adminShiftHandover") || null;
  appCache.technicianRepairReminderLog = settings.technicianRepairReminderLog || LocalDB.get("technicianRepairReminderLog") || {};
+ appCache.actualChecklistReminderLog = settings.actualChecklistReminderLog || LocalDB.get("actualChecklistReminderLog") || {};
  LocalDB.set("adminShiftHandover", appCache.adminShiftHandover);
  LocalDB.set("technicianRepairReminderLog", appCache.technicianRepairReminderLog);
+ LocalDB.set("actualChecklistReminderLog", appCache.actualChecklistReminderLog);
 
  if (!settingsDoc.exists) {
  await db.collection("settings").doc(getCurrentBusinessId()).set({
@@ -5034,6 +5242,7 @@ async function loadCloudData() {
  stopList: appCache.stopList || getDefaultStopList(),
  adminShiftHandover: appCache.adminShiftHandover || null,
  technicianRepairReminderLog: appCache.technicianRepairReminderLog || {},
+ actualChecklistReminderLog: appCache.actualChecklistReminderLog || {},
  photoReportDrafts: appCache.photoReportDrafts || [],
  updatedAt: new Date().toISOString()
  }, { merge: true });
@@ -5226,6 +5435,20 @@ function isTechnicianDepartment(department) {
  );
 }
 
+// Как и у «Техника», распознаём «Администратора» не только по флагу
+// isAdminDepartment (его могло не быть у подразделений, созданных раньше,
+// до появления отдельного флоу «Добавить администратора»), но и по имени —
+// чтобы старые/ранее созданные вручную подразделения тоже не вели в тупик.
+function isAdministratorDepartment(department) {
+ if (!department) return false;
+ const name = String(department.name || '').trim().toLowerCase();
+ return Boolean(
+ department.isAdminDepartment === true ||
+ name === 'администратор' ||
+ name === 'администраторы'
+ );
+}
+
 function getTechnicianDepartment() {
  return getDepartments().find(isTechnicianDepartment) || null;
 }
@@ -5252,8 +5475,7 @@ async function createTechnicianDepartmentForRepairs() {
  inventoryConfig: { items: [] },
  statisticsConfig: { metrics: [] },
  finesConfig: { employeeVisible: true },
- createdAt: new Date().toISOString(),
- ...(extraFields && typeof extraFields === 'object' ? extraFields : {})
+ createdAt: new Date().toISOString()
  };
  await setDepartments([...getDepartments(), technicianDepartment]);
  renderHomeGrid();
@@ -5578,7 +5800,11 @@ async function createDepartment(name, logoText, extraFields = {}) {
  inventoryConfig: { items: [] },
  statisticsConfig: { metrics: [] },
  finesConfig: { employeeVisible: true },
- createdAt: new Date().toISOString()
+ createdAt: new Date().toISOString(),
+ // Раньше extraFields принимался, но никогда не подмешивался в объект —
+ // из-за этого «Администратор» создавался БЕЗ isAdminDepartment/adminPassword/
+ // joinCode, и вход администратора и по коду, и по паролю не мог сработать.
+ ...(extraFields && typeof extraFields === 'object' ? extraFields : {})
  };
 
  const arr = [...getDepartments(), dep];
@@ -8417,6 +8643,92 @@ function startTechnicianRepairReminderTimer() {
  technicianRepairReminderTimer = setInterval(runTechnicianRepairReminderCheck, 60 * 1000);
 }
 
+// ============================================================
+// ACTUAL CHECKLIST DEADLINE REMINDERS — уведомление о пунктах чек-листа,
+// у которых был указан дедлайн и время которого прошло, а пункт так и не
+// отметили выполненным. Уходит и сотрудникам подразделения, и
+// управлению/админам. Проверяются только чек-листы, где вообще есть пункты
+// с дедлайном; повторно один и тот же пропуск не присылается (для
+// ежедневных чек-листов — не чаще одного раза за календарный день).
+// ============================================================
+let actualChecklistReminderTimer = null;
+let actualChecklistReminderBusy = false;
+
+function getActualChecklistReminderLog() {
+ return appCache.actualChecklistReminderLog || {};
+}
+
+async function setActualChecklistReminderLog(log) {
+ appCache.actualChecklistReminderLog = log || {};
+ LocalDB.set("actualChecklistReminderLog", appCache.actualChecklistReminderLog);
+ if (CLOUD_ENABLED && db) {
+ await db.collection("settings").doc(getCurrentBusinessId()).set({
+ actualChecklistReminderLog: appCache.actualChecklistReminderLog,
+ updatedAt: new Date().toISOString()
+ }, { merge: true });
+ }
+}
+
+function notifyDepartmentStaff(departmentId, textValue, options = {}) {
+ const ids = getDepartmentStaffList(departmentId).map(getTelegramIdForStaff).filter(Boolean);
+ return notifyTelegramUsers([...new Set(ids)], textValue, options);
+}
+
+function buildActualChecklistEscalationText(dep, checklist, item) {
+ return `⏱ Пункт чек-листа просрочен\n\nПодразделение: ${dep && dep.name ? dep.name : ''}\nЧек-лист: ${checklist.title}\nПункт: ${item.text}\nНужно было сделать до ${item.deadlineTime}`;
+}
+
+async function runActualChecklistDeadlineReminderCheck() {
+ if (actualChecklistReminderBusy) return;
+ if (!TELEGRAM_PHOTO_ENABLED) return;
+ actualChecklistReminderBusy = true;
+ try {
+  let log = getActualChecklistReminderLog();
+  let changed = false;
+  const departments = getDepartments();
+
+  for (const dep of departments) {
+   const checklists = getActualChecklists(dep.id).filter(cl => !cl.archived);
+   for (const checklist of checklists) {
+    const itemsWithDeadline = checklist.items.filter(item => item.deadlineTime);
+    if (!itemsWithDeadline.length) continue; // нет пунктов с ограничением по времени — проверять нечего
+
+    const progress = getActualChecklistProgress(checklist);
+    const cycleKey = checklist.mode === 'daily' ? todayKey() : 'once';
+
+    for (const item of itemsWithDeadline) {
+     const state = progress[item.id];
+     if (state && state.done) continue; // выполнен — эскалация не нужна
+     if (!isDeadlinePassed(item.deadlineTime)) continue; // время ещё не вышло
+
+     const key = `${dep.id}::${checklist.id}::${item.id}::${cycleKey}`;
+     if (log[key]) continue;
+
+     const text = buildActualChecklistEscalationText(dep, checklist, item);
+     const staffResult = await notifyDepartmentStaff(dep.id, text, { startParam: `checklist_${dep.id}`, buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+     const mgmtResult = await notifyFounders(text, { startParam: `checklist_${dep.id}`, buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+     if ((staffResult && staffResult.ok !== false) || (mgmtResult && mgmtResult.ok !== false)) {
+      log[key] = new Date().toISOString();
+      changed = true;
+     }
+    }
+   }
+  }
+
+  if (changed) await setActualChecklistReminderLog(log);
+ } catch (err) {
+  console.warn('actual checklist reminder error', err);
+ } finally {
+  actualChecklistReminderBusy = false;
+ }
+}
+
+function startActualChecklistReminderTimer() {
+ if (actualChecklistReminderTimer) return;
+ runActualChecklistDeadlineReminderCheck();
+ actualChecklistReminderTimer = setInterval(runActualChecklistDeadlineReminderCheck, 60 * 1000);
+}
+
 
 
 // ============================================================
@@ -8621,9 +8933,20 @@ function renderHomeGrid() {
 function enterDepartmentRole(departmentId) {
  activePreviewDepartmentId = String(departmentId || '');
  const targetDepartment = getDepartment(activePreviewDepartmentId);
+ const isAdminDep = Boolean(targetDepartment && isAdministratorDepartment(targetDepartment));
 
- if (targetDepartment && targetDepartment.isAdminDepartment && !hasFounderSession()) {
+ if (isAdminDep && !hasFounderSession()) {
   enterBusinessAdministrator(targetDepartment.id);
+  return;
+ }
+
+ // «Администратор» — не обычное подразделение с процессами: у учредителя
+ // свободный вход в любое подразделение (как в «Вурдалаки»), но для
+ // администратора это тот же полный интерфейс управления, что у учредителя,
+ // а не список процессов конкретного подразделения (там их и не бывает).
+ if (isAdminDep && hasManagementSession()) {
+  goTo('screen-founder-menu');
+  renderFounderMenu();
   return;
  }
 
@@ -9077,11 +9400,14 @@ function refreshScreen(id) {
  if (id === 'screen-home') renderHomeGrid();
  if (id === 'screen-founder-menu') renderFounderMenu();
  if (id === 'screen-department-manage') renderDepartmentManage();
+ if (id === 'screen-admin-department-manage') renderAdminDepartmentManage();
  if (id === 'screen-generic-process-list') renderGenericProcessList();
  if (id === 'screen-event-calendar') renderEventCalendar();
  if (id === 'screen-checklist-settings') renderChecklistSettings();
  if (id === 'screen-checklist-fill') renderEmployeeChecklist();
  if (id === 'screen-founder-checklist-results') renderFounderChecklistResults();
+ if (id === 'screen-actual-checklist-builder') renderActualChecklistBuilderItems();
+ if (id === 'screen-actual-checklist-fill') renderActualChecklistFillScreen();
  if (id === 'screen-founder-payroll-list') renderFounderPayrollList();
  if (id === 'screen-founder-payroll-detail') renderFounderPayrollDetail();
  if (id === 'screen-settings') {
@@ -9227,6 +9553,9 @@ function addLocalPhotoToCameraTarget(localPhoto) {
  }
  if (cameraTarget === 'checklistAnswer' && cameraSectionKey) {
  return addChecklistAnswerPhoto(cameraSectionKey, localPhoto);
+ }
+ if (cameraTarget === 'actualChecklistItem' && cameraSectionKey) {
+ return addActualChecklistItemPhoto(cameraSectionKey, localPhoto);
  }
 
  showToast('Раздел фото не найден');
@@ -10689,12 +11018,26 @@ function renderFounderMenu() {
  departments.forEach(dep => {
  const count = dep.processes ? dep.processes.length : 0;
  const unreadCount = getDepartmentUnreadActivityCount(dep);
+ const isTech = isTechnicianDepartment(dep);
+ const isAdminDep = isAdministratorDepartment(dep);
+ // «Техник» — сразу список заявок на ремонт со статусом. «Администратор» —
+ // упрощённый экран (только код регистрации и удаление), без конструктора процессов.
+ const clickHandler = isTech
+  ? 'openFounderRepairs()'
+  : isAdminDep
+  ? `openAdminDepartmentManage('${dep.id}')`
+  : `openDepartmentManage('${dep.id}')`;
+ const desc = isTech
+  ? 'Заявки на ремонт от сотрудников'
+  : isAdminDep
+  ? (dep.adminRegistered ? 'Администратор зарегистрирован' : 'Код регистрации и пароль')
+  : `${count ? plural(count, 'процесс', 'процесса', 'процессов') : 'Процессы ещё не добавлены'} · настроить`;
  html += `
- <div class="menu-item" onclick="openDepartmentManage('${dep.id}')">
+ <div class="menu-item" onclick="${clickHandler}">
  <div class="menu-icon">🏷️</div>
  <div class="menu-text">
  <div class="menu-title-row"><div class="menu-title" data-i18n-skip>${escapeHtml(dep.name)}</div>${departmentUnreadBadgeHtml(unreadCount, 'Новых активностей')}</div>
- <div class="menu-desc">${count ? plural(count, 'процесс', 'процесса', 'процессов') : 'Процессы ещё не добавлены'} · настроить</div>
+ <div class="menu-desc">${desc}</div>
  </div>
  <span class="menu-arrow">›</span>
  </div>`;
@@ -10907,9 +11250,71 @@ async function submitDepartmentCreate() {
 let activeManagedDepartmentId = null;
 
 function openDepartmentManage(id) {
+ const dep = getDepartment(id);
+ if (dep && isAdministratorDepartment(dep)) {
+  openAdminDepartmentManage(id);
+  return;
+ }
+ if (dep && isTechnicianDepartment(dep)) {
+  openFounderRepairs();
+  return;
+ }
  activeManagedDepartmentId = id;
  renderDepartmentManage();
  goTo('screen-department-manage');
+}
+
+// «Администратор» — не обычное подразделение-конструктор: у него нет своих
+// процессов и настроек, только код регистрации сотрудника и удаление.
+function openAdminDepartmentManage(id) {
+ activeManagedDepartmentId = id;
+ renderAdminDepartmentManage();
+ goTo('screen-admin-department-manage');
+}
+
+function renderAdminDepartmentManage() {
+ const dep = getDepartment(activeManagedDepartmentId);
+ const content = document.getElementById('admin-dep-manage-content');
+ const titleEl = document.getElementById('admin-dep-manage-title');
+ if (!dep || !content) {
+  if (titleEl) titleEl.textContent = 'Администратор';
+  if (content) content.innerHTML = `<div class="empty" style="padding:60px 0;"><div class="empty-icon">👔</div><div class="empty-title">Подразделение не найдено</div></div>`;
+  return;
+ }
+ if (titleEl) titleEl.textContent = dep.name || 'Администратор';
+
+ let html = `<div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px;">
+ <div style="font-size:14px;color:var(--text-2);line-height:1.5;margin-bottom:14px;">Отправьте администратору код регистрации и пароль. После регистрации он войдёт по этому паролю и увидит панель управления, как у учредителя, без раздела «Настройки».</div>`;
+
+ if (dep.adminPassword && hasFounderSession()) {
+  html += `<div style="margin-bottom:12px;padding:12px;background:var(--surface2);border-radius:var(--radius-sm);">
+ <div style="font-size:12px;color:var(--text-3);margin-bottom:4px;">Пароль администратора</div>
+ <div style="font-size:18px;font-weight:700;" data-i18n-skip>${escapeHtml(dep.adminPassword)}</div>
+ </div>`;
+ }
+
+ if (dep.joinCode) {
+  html += `
+ <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+ <div style="flex:1;font-size:24px;font-weight:800;letter-spacing:4px;text-align:center;background:var(--surface2);border-radius:var(--radius-sm);padding:12px;" data-i18n-skip>${escapeHtml(dep.joinCode)}</div>
+ <button class="btn-icon btn-secondary" onclick="copyDepartmentJoinCode()" title="Скопировать">📋</button>
+ </div>
+ <button class="btn btn-secondary" onclick="generateAdminDepartmentJoinCode()">Сгенерировать новый код</button>`;
+ } else {
+  html += `<button class="btn btn-primary" onclick="generateAdminDepartmentJoinCode()">Добавить сотрудника</button>`;
+ }
+
+ html += `</div>
+ <button class="btn btn-danger" style="margin-top:16px;" onclick="openDeleteDepartmentModal()">Удалить подразделение</button>`;
+
+ content.innerHTML = html;
+}
+
+// Обёртка над generateDepartmentJoinCode(): та же логика создания кода, но
+// перерисовывает упрощённый экран администратора, а не общий экран подразделения.
+async function generateAdminDepartmentJoinCode() {
+ await generateDepartmentJoinCode();
+ renderAdminDepartmentManage();
 }
 
 function renderDepartmentManage() {
@@ -11240,7 +11645,7 @@ async function confirmDeleteDepartment() {
  activeManagedDepartmentId = null;
  closeModal('modal-delete-department');
  showToast('Подразделение удалено');
- screenStack = screenStack.filter(id => id !== 'screen-department-manage' && id !== 'screen-department-create' && id !== 'screen-department-add-process' && id !== 'screen-department-photo-config' && id !== 'screen-department-inventory-config' && id !== 'screen-department-fines-settings');
+ screenStack = screenStack.filter(id => id !== 'screen-department-manage' && id !== 'screen-department-create' && id !== 'screen-department-add-process' && id !== 'screen-department-photo-config' && id !== 'screen-department-inventory-config' && id !== 'screen-department-fines-settings' && id !== 'screen-admin-department-manage');
  renderHomeGrid();
  goTo('screen-founder-menu');
  renderFounderMenu();
@@ -13500,7 +13905,9 @@ function closeFounderTaskByWaiter() {
  openModal('modal-close-task-confirm');
 }
 
+let founderTaskCloseSubmitting = false;
 async function confirmCloseFounderTaskByWaiter() {
+ if (founderTaskCloseSubmitting) return;
  closeModal('modal-close-task-confirm');
  const task = getFounderTaskById(activeWaiterTaskId);
  const staff = task ? getCurrentTaskStaff(getTaskDepartmentId(task)) : null;
@@ -13513,6 +13920,7 @@ async function confirmCloseFounderTaskByWaiter() {
  showToast('Для закрытия нужны текст и фото');
  return;
  }
+ founderTaskCloseSubmitting = true;
  try {
  showToast('Закрываем задачу...');
  const closePhotos = await uploadTaskPhotos(activeWaiterTaskClosePhotos, 'taskClosed');
@@ -13539,6 +13947,8 @@ async function confirmCloseFounderTaskByWaiter() {
  } else {
  showToast('Ошибка закрытия задачи');
  }
+ } finally {
+ founderTaskCloseSubmitting = false;
  }
 }
 
@@ -18190,6 +18600,7 @@ async function init() {
  appCache.bathmasterOrders = LocalDB.get("bathmasterOrders") || appCache.bathmasterOrders || [];
  appCache.repairRequests = LocalDB.get("repairRequests") || appCache.repairRequests || [];
  appCache.technicianRepairReminderLog = LocalDB.get("technicianRepairReminderLog") || appCache.technicianRepairReminderLog || {};
+ appCache.actualChecklistReminderLog = LocalDB.get("actualChecklistReminderLog") || appCache.actualChecklistReminderLog || {};
  appCache.photoReportDrafts = LocalDB.get("photoReportDrafts") || appCache.photoReportDrafts || [];
  appCache.founderTasks = LocalDB.get("founderTasks") || appCache.founderTasks || [];
  appCache.anonymousFeedback = sanitizeAnonymousFeedbackList(LocalDB.get("anonymousFeedback") || appCache.anonymousFeedback || []);
@@ -18224,6 +18635,7 @@ async function init() {
  renderFounderRepairs();
  updateUnreadBadges();
  startTechnicianRepairReminderTimer();
+ startActualChecklistReminderTimer();
  startFounderTaskReminderTimer();
  initLang();
  setupGlobalSwipeBack();
@@ -19527,7 +19939,7 @@ function openChecklistSettings(departmentId) {
 }
 
 function switchChecklistSettingsType(type) {
- activeChecklistSettingsType = type === 'closing' ? 'closing' : 'opening';
+ activeChecklistSettingsType = type === 'closing' ? 'closing' : (type === 'actual' ? 'actual' : 'opening');
  renderChecklistSettings();
 }
 
@@ -19539,6 +19951,26 @@ function renderChecklistSettings() {
  if (title) title.textContent = `Чек-лист · ${dep.name}`;
  document.getElementById('checklist-settings-tab-opening')?.classList.toggle('active', activeChecklistSettingsType === 'opening');
  document.getElementById('checklist-settings-tab-closing')?.classList.toggle('active', activeChecklistSettingsType === 'closing');
+ document.getElementById('checklist-settings-tab-actual')?.classList.toggle('active', activeChecklistSettingsType === 'actual');
+
+ const hint = document.getElementById('checklist-settings-hint');
+ const addLabel = document.getElementById('checklist-settings-add-label');
+ const addCard = document.getElementById('checklist-settings-add-card');
+ const actualAddBtn = document.getElementById('checklist-settings-actual-add-btn');
+
+ if (activeChecklistSettingsType === 'actual') {
+  if (hint) hint.textContent = 'Чек-листы для длинных задач на день. Разовый уходит из задач и остаётся в истории сразу после выполнения. Ежедневный повторяется каждый день, пока его не удалят.';
+  if (addLabel) addLabel.style.display = 'none';
+  if (addCard) addCard.style.display = 'none';
+  if (actualAddBtn) actualAddBtn.style.display = 'block';
+  renderActualChecklistSettingsList(dep, list);
+  return;
+ }
+ if (hint) hint.textContent = 'Создайте обязательные вопросы. Сотрудник не сможет отправить чек-лист, пока не ответит на каждый пункт и не приложит требуемые фотографии.';
+ if (addLabel) addLabel.style.display = '';
+ if (addCard) addCard.style.display = '';
+ if (actualAddBtn) actualAddBtn.style.display = 'none';
+
  const rows = getChecklistConfigForDepartment(dep.id)[activeChecklistSettingsType];
  list.innerHTML = rows.length ? `
   <div class="section-label">${getChecklistTypeLabel(activeChecklistSettingsType)} · ${rows.length}</div>
@@ -19618,7 +20050,7 @@ function openEmployeeChecklist(departmentId) {
 }
 
 function switchChecklistFillType(type) {
- activeChecklistFillType = type === 'closing' ? 'closing' : 'opening';
+ activeChecklistFillType = type === 'closing' ? 'closing' : (type === 'actual' ? 'actual' : 'opening');
  renderEmployeeChecklist();
 }
 
@@ -19665,6 +20097,12 @@ function renderEmployeeChecklist() {
  if (title) title.textContent = `Чек-лист · ${dep.name}`;
  document.getElementById('checklist-fill-tab-opening')?.classList.toggle('active', activeChecklistFillType === 'opening');
  document.getElementById('checklist-fill-tab-closing')?.classList.toggle('active', activeChecklistFillType === 'closing');
+ document.getElementById('checklist-fill-tab-actual')?.classList.toggle('active', activeChecklistFillType === 'actual');
+
+ if (activeChecklistFillType === 'actual') {
+  renderActualChecklistFillTabList(dep, content);
+  return;
+ }
 
  const rows = getChecklistConfigForDepartment(dep.id)[activeChecklistFillType];
  const draft = activeChecklistDrafts[activeChecklistFillType];
@@ -19859,7 +20297,7 @@ function renderFounderChecklistResults() {
   .filter(item => String(item.departmentId) === String(dep.id))
   .sort((a,b) => getTimeMs(b.submittedAt) - getTimeMs(a.submittedAt));
 
- content.innerHTML = rows.length ? rows.map(item => {
+ const submissionsHtml = rows.length ? rows.map(item => {
   const answers = Array.isArray(item.answers) ? item.answers : [];
   const yesCount = answers.filter(answer => answer.answer === 'yes').length;
   const noCount = answers.filter(answer => answer.answer === 'no').length;
@@ -19881,6 +20319,34 @@ function renderFounderChecklistResults() {
   <div class="empty-title">Отправленных чек-листов пока нет</div>
   <div class="empty-sub">После заполнения сотрудником результат появится здесь</div>
  </div>`;
+
+ const allActual = getActualChecklists(dep.id);
+ const activeActual = allActual.filter(cl => !cl.archived);
+ const archivedActual = allActual.filter(cl => cl.archived);
+ const actualRowHtml = cl => {
+  const { done, total } = getActualChecklistCounts(cl);
+  const allDone = total > 0 && done === total;
+  return `<div class="actual-checklist-row" onclick="openActualChecklistFill('${cl.id}','view')">
+   <div class="actual-checklist-row-text">
+    <div class="actual-checklist-row-title" data-i18n-skip>${escapeHtml(cl.title)}</div>
+    <div class="actual-checklist-row-meta">
+     <span class="actual-checklist-badge${cl.mode === 'daily' ? ' daily' : ''}">${getActualChecklistModeLabel(cl.mode)}</span>
+    </div>
+   </div>
+   <span class="actual-checklist-progress-pill${allDone ? ' done-all' : ''}">${done}/${total}</span>
+  </div>`;
+ };
+ let actualHtml = `<div class="section-label" style="margin-top:24px;">Фактический · активные</div>`;
+ actualHtml += activeActual.length ? activeActual.map(actualRowHtml).join('') : `<div class="empty" style="padding:20px 0;">
+  <div class="empty-icon">☑️</div>
+  <div class="empty-title">Активных чек-листов нет</div>
+ </div>`;
+ if (archivedActual.length) {
+  actualHtml += `<div class="section-label" style="margin-top:18px;">Фактический · история</div>`;
+  actualHtml += archivedActual.map(actualRowHtml).join('');
+ }
+
+ content.innerHTML = submissionsHtml + actualHtml;
 }
 
 function openChecklistSubmission(submissionId) {
@@ -19908,6 +20374,496 @@ function openChecklistSubmission(submissionId) {
    }).join('')}
   </div>`;
  openModal('modal-checklist-submission');
+}
+
+// ============================================================
+// ACTUAL CHECKLIST («Фактический») — чек-листы для длинных задач.
+// В отличие от «Открытие/Закрытие смены» (фиксированный список вопросов),
+// тут можно создавать НЕСКОЛЬКО именованных чек-листов: разовый (уходит из
+// задач и остаётся только в истории после выполнения всех пунктов) или
+// ежедневный (прогресс сбрасывается каждый новый день, сам чек-лист живёт,
+// пока его не удалит админ/учредитель).
+// ============================================================
+
+function todayKey() { return toDateKey(new Date()); }
+
+function normalizeActualChecklistItems(items) {
+ const seen = new Set();
+ return (Array.isArray(items) ? items : []).map((item, index) => {
+  const text = String(item && item.text || '').trim();
+  if (!text) return null;
+  let id = String(item && item.id || '');
+  if (!id || seen.has(id)) id = `actitem_${Date.now()}_${index}_${Math.random().toString(36).slice(2,6)}`;
+  seen.add(id);
+  // «photo» оставлен для обратной совместимости со старыми чек-листами —
+  // ведёт себя как «task» с обязательным фото.
+  const rawType = item && item.type;
+  const type = rawType === 'yesno' ? 'yesno' : 'task';
+  const deadlineTime = item && /^\d{2}:\d{2}$/.test(String(item.deadlineTime || '')) ? String(item.deadlineTime) : null;
+  const photoRequired = Boolean(item && item.photoRequired) || rawType === 'photo';
+  return { id, text, type, deadlineTime, photoRequired };
+ }).filter(Boolean);
+}
+
+function normalizeActualChecklists(list) {
+ const seen = new Set();
+ return (Array.isArray(list) ? list : []).map((cl, index) => {
+  const title = String(cl && cl.title || '').trim();
+  if (!title) return null;
+  let id = String(cl && cl.id || '');
+  if (!id || seen.has(id)) id = `actcl_${Date.now()}_${index}_${Math.random().toString(36).slice(2,6)}`;
+  seen.add(id);
+  return {
+   id,
+   title,
+   mode: cl && cl.mode === 'daily' ? 'daily' : 'once',
+   items: normalizeActualChecklistItems(cl && cl.items),
+   createdAt: (cl && cl.createdAt) || new Date().toISOString(),
+   archived: Boolean(cl && cl.archived),
+   completedAt: (cl && cl.completedAt) || null,
+   progress: cl && typeof cl.progress === 'object' && cl.progress ? cl.progress : {},
+   progressByDate: cl && typeof cl.progressByDate === 'object' && cl.progressByDate ? cl.progressByDate : {}
+  };
+ }).filter(Boolean);
+}
+
+function getActualChecklists(departmentId) {
+ const dep = getDepartment(departmentId);
+ return dep ? normalizeActualChecklists(dep.actualChecklists) : [];
+}
+
+function getActualChecklistById(departmentId, checklistId) {
+ return getActualChecklists(departmentId).find(cl => String(cl.id) === String(checklistId)) || null;
+}
+
+function getActualChecklistProgress(checklist) {
+ if (!checklist) return {};
+ if (checklist.mode === 'daily') return (checklist.progressByDate && checklist.progressByDate[todayKey()]) || {};
+ return checklist.progress || {};
+}
+
+function getActualChecklistCounts(checklist) {
+ const progress = getActualChecklistProgress(checklist);
+ const total = checklist.items.length;
+ const done = checklist.items.filter(item => progress[item.id] && progress[item.id].done).length;
+ return { done, total };
+}
+
+function getActualChecklistModeLabel(mode) { return mode === 'daily' ? 'Ежедневный' : 'Разовый'; }
+
+async function saveActualChecklists(departmentId, checklists) {
+ await updateDepartment(departmentId, { actualChecklists: checklists });
+}
+
+// ---- КОНСТРУКТОР (создание/редактирование учредителем или администратором) ----
+let activeActualChecklistBuilderId = null;
+let activeActualChecklistBuilderMode = 'once';
+let activeActualChecklistBuilderItems = [];
+
+function openActualChecklistBuilder(checklistId = null) {
+ const dep = requireFounderDepartmentAccess(activeChecklistDepartmentId);
+ if (!dep) return;
+ activeActualChecklistBuilderId = checklistId ? String(checklistId) : null;
+ const existing = checklistId ? getActualChecklistById(dep.id, checklistId) : null;
+ activeActualChecklistBuilderMode = existing ? existing.mode : 'once';
+ activeActualChecklistBuilderItems = existing ? existing.items.map(item => ({ ...item })) : [];
+ const titleInput = document.getElementById('actual-checklist-title');
+ if (titleInput) titleInput.value = existing ? existing.title : '';
+ const textEl = document.getElementById('actual-checklist-item-text');
+ const typeEl = document.getElementById('actual-checklist-item-type');
+ const deadlineEl = document.getElementById('actual-checklist-item-deadline');
+ if (textEl) textEl.value = '';
+ if (typeEl) typeEl.value = 'task';
+ if (deadlineEl) deadlineEl.value = '';
+ const screenTitle = document.getElementById('actual-checklist-builder-title');
+ if (screenTitle) screenTitle.textContent = existing ? 'Изменить чек-лист' : 'Новый чек-лист';
+ setActualChecklistBuilderMode(activeActualChecklistBuilderMode);
+ renderActualChecklistBuilderItems();
+ goTo('screen-actual-checklist-builder');
+}
+
+function setActualChecklistBuilderMode(mode) {
+ activeActualChecklistBuilderMode = mode === 'daily' ? 'daily' : 'once';
+ document.getElementById('actual-checklist-mode-once')?.classList.toggle('active', activeActualChecklistBuilderMode === 'once');
+ document.getElementById('actual-checklist-mode-daily')?.classList.toggle('active', activeActualChecklistBuilderMode === 'daily');
+ const hint = document.getElementById('actual-checklist-mode-hint');
+ if (hint) hint.textContent = activeActualChecklistBuilderMode === 'daily'
+  ? 'Ежедневный — прогресс сбрасывается каждый новый день, сам чек-лист остаётся, пока его не удалит админ или учредитель.'
+  : 'Разовый — уходит из задач и остаётся в истории сразу после выполнения всех пунктов.';
+}
+
+function renderActualChecklistBuilderItems() {
+ const el = document.getElementById('actual-checklist-builder-items');
+ if (!el) return;
+ const typeLabels = { task: 'Задача', yesno: 'Да / нет' };
+ el.innerHTML = activeActualChecklistBuilderItems.length ? activeActualChecklistBuilderItems.map((item, index) => `
+  <div class="checklist-config-item">
+   <div class="checklist-question-number">${index + 1}</div>
+   <div style="flex:1;min-width:0;">
+    <div style="font-size:15px;font-weight:800;line-height:1.4;overflow-wrap:anywhere;">${escapeHtml(item.text)}</div>
+    <div class="checklist-photo-required">${typeLabels[item.type] || 'Задача'}${item.deadlineTime ? ` · до ${escapeHtml(item.deadlineTime)}` : ''}${item.photoRequired ? ' · 📷 фото обязательно' : ''}</div>
+   </div>
+   <button class="btn btn-secondary btn-sm" onclick="removeActualChecklistBuilderItem('${item.id}')" aria-label="Удалить пункт">✕</button>
+  </div>`).join('') : `<div class="empty" style="padding:20px 0;">
+  <div class="empty-icon">☑️</div>
+  <div class="empty-title">Пунктов пока нет</div>
+ </div>`;
+}
+
+function addActualChecklistBuilderItem() {
+ const textEl = document.getElementById('actual-checklist-item-text');
+ const typeEl = document.getElementById('actual-checklist-item-type');
+ const deadlineEl = document.getElementById('actual-checklist-item-deadline');
+ const photoEl = document.getElementById('actual-checklist-item-photo-required');
+ const text = String(textEl && textEl.value || '').trim();
+ if (!text) { showToast('Введите текст пункта'); return; }
+ activeActualChecklistBuilderItems.push({
+  id: `actitem_${Date.now()}_${Math.random().toString(36).slice(2,6)}`,
+  text,
+  type: (typeEl && typeEl.value) || 'task',
+  deadlineTime: (deadlineEl && deadlineEl.value) || null,
+  photoRequired: Boolean(photoEl && photoEl.checked)
+ });
+ if (textEl) textEl.value = '';
+ if (typeEl) typeEl.value = 'task';
+ if (deadlineEl) deadlineEl.value = '';
+ if (photoEl) photoEl.checked = false;
+ renderActualChecklistBuilderItems();
+}
+
+function removeActualChecklistBuilderItem(itemId) {
+ activeActualChecklistBuilderItems = activeActualChecklistBuilderItems.filter(item => String(item.id) !== String(itemId));
+ renderActualChecklistBuilderItems();
+}
+
+async function submitActualChecklistBuilder() {
+ const dep = requireFounderDepartmentAccess(activeChecklistDepartmentId);
+ if (!dep) return;
+ const titleInput = document.getElementById('actual-checklist-title');
+ const title = String(titleInput && titleInput.value || '').trim();
+ if (!title) { showToast('Введите название чек-листа'); return; }
+ if (!activeActualChecklistBuilderItems.length) { showToast('Добавьте хотя бы один пункт'); return; }
+
+ const list = getActualChecklists(dep.id);
+ const existingIndex = activeActualChecklistBuilderId ? list.findIndex(cl => String(cl.id) === activeActualChecklistBuilderId) : -1;
+ const base = existingIndex >= 0 ? list[existingIndex] : {
+  id: `actcl_${Date.now()}_${Math.random().toString(36).slice(2,6)}`,
+  createdAt: new Date().toISOString(),
+  archived: false,
+  completedAt: null,
+  progress: {},
+  progressByDate: {}
+ };
+ const updated = {
+  ...base,
+  title,
+  mode: activeActualChecklistBuilderMode,
+  items: normalizeActualChecklistItems(activeActualChecklistBuilderItems)
+ };
+ if (existingIndex >= 0) list[existingIndex] = updated; else list.push(updated);
+ await saveActualChecklists(dep.id, list);
+ showToast(existingIndex >= 0 ? 'Чек-лист сохранён ✓' : 'Чек-лист создан ✓');
+ goBack();
+ renderChecklistSettings();
+}
+
+let actualChecklistIdPendingDelete = null;
+
+function deleteActualChecklistConfirm(checklistId) {
+ const dep = getDepartment(activeChecklistDepartmentId);
+ const checklist = dep ? getActualChecklistById(dep.id, checklistId) : null;
+ actualChecklistIdPendingDelete = String(checklistId);
+ const subEl = document.getElementById('delete-actual-checklist-sub');
+ if (subEl) subEl.textContent = `«${checklist ? checklist.title : ''}» и весь прогресс по нему будут удалены без возможности восстановления.`;
+ openModal('modal-delete-actual-checklist');
+}
+
+async function confirmDeleteActualChecklist() {
+ const dep = requireFounderDepartmentAccess(activeChecklistDepartmentId);
+ if (!dep || !actualChecklistIdPendingDelete) { closeModal('modal-delete-actual-checklist'); return; }
+ const list = getActualChecklists(dep.id).filter(cl => String(cl.id) !== String(actualChecklistIdPendingDelete));
+ await saveActualChecklists(dep.id, list);
+ actualChecklistIdPendingDelete = null;
+ closeModal('modal-delete-actual-checklist');
+ showToast('Чек-лист удалён');
+ renderChecklistSettings();
+}
+
+// ---- СПИСОК У УЧРЕДИТЕЛЯ/АДМИНА (вкладка «Фактический» в настройках) ----
+function renderActualChecklistSettingsList(dep, listEl) {
+ const all = getActualChecklists(dep.id);
+ const active = all.filter(cl => !cl.archived);
+ const archived = all.filter(cl => cl.archived);
+
+ const rowHtml = (cl, clickable) => {
+  const { done, total } = getActualChecklistCounts(cl);
+  const allDone = total > 0 && done === total;
+  return `<div class="actual-checklist-row" ${clickable ? `onclick="openActualChecklistBuilder('${cl.id}')"` : `onclick="openActualChecklistFill('${cl.id}','view')"`}>
+   <div class="actual-checklist-row-text">
+    <div class="actual-checklist-row-title" data-i18n-skip>${escapeHtml(cl.title)}</div>
+    <div class="actual-checklist-row-meta">
+     <span class="actual-checklist-badge${cl.mode === 'daily' ? ' daily' : ''}">${getActualChecklistModeLabel(cl.mode)}</span>
+     <span>${total} · пункт${total === 1 ? '' : total < 5 ? 'а' : 'ов'}</span>
+    </div>
+   </div>
+   <span class="actual-checklist-progress-pill${allDone ? ' done-all' : ''}">${done}/${total}</span>
+   ${clickable ? `<button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();deleteActualChecklistConfirm('${cl.id}')" aria-label="Удалить" style="margin-left:8px;">✕</button>` : ''}
+  </div>`;
+ };
+
+ let html = '';
+ html += `<div class="section-label">Активные · ${active.length}</div>`;
+ html += active.length ? active.map(cl => rowHtml(cl, true)).join('') : `<div class="empty" style="padding:24px 0;">
+  <div class="empty-icon">☑️</div>
+  <div class="empty-title">Чек-листов пока нет</div>
+  <div class="empty-sub">Создайте первый ниже</div>
+ </div>`;
+
+ if (archived.length) {
+  html += `<div class="section-label" style="margin-top:18px;">История · ${archived.length}</div>`;
+  html += archived.map(cl => rowHtml(cl, false)).join('');
+ }
+
+ listEl.innerHTML = html;
+}
+
+// ---- СПИСОК У СОТРУДНИКА (вкладка «Фактический» в заполнении) ----
+function renderActualChecklistFillTabList(dep, contentEl) {
+ const active = getActualChecklists(dep.id).filter(cl => !cl.archived);
+ if (!active.length) {
+  contentEl.innerHTML = `<div class="empty" style="padding:45px 0;">
+   <div class="empty-icon">☑️</div>
+   <div class="empty-title">Чек-листов пока нет</div>
+   <div class="empty-sub">Управление ещё не создало ни одного «Фактического» чек-листа</div>
+  </div>`;
+  return;
+ }
+ contentEl.innerHTML = active.map(cl => {
+  const { done, total } = getActualChecklistCounts(cl);
+  const allDone = total > 0 && done === total;
+  return `<div class="actual-checklist-row" onclick="openActualChecklistFill('${cl.id}','fill')">
+   <div class="actual-checklist-row-text">
+    <div class="actual-checklist-row-title" data-i18n-skip>${escapeHtml(cl.title)}</div>
+    <div class="actual-checklist-row-meta">
+     <span class="actual-checklist-badge${cl.mode === 'daily' ? ' daily' : ''}">${getActualChecklistModeLabel(cl.mode)}</span>
+    </div>
+   </div>
+   <span class="actual-checklist-progress-pill${allDone ? ' done-all' : ''}">${done}/${total}</span>
+  </div>`;
+ }).join('');
+}
+
+// ---- ЗАПОЛНЕНИЕ / ПРОСМОТР ----
+let activeActualChecklistId = null;
+let activeActualChecklistViewMode = 'fill'; // 'fill' — сотрудник, 'view' — учредитель/админ (только просмотр)
+
+function openActualChecklistFill(checklistId, mode = 'fill') {
+ activeActualChecklistId = String(checklistId);
+ activeActualChecklistViewMode = mode === 'view' ? 'view' : 'fill';
+ renderActualChecklistFillScreen();
+ goTo('screen-actual-checklist-fill');
+}
+
+function formatDeadlineTime(time) { return time ? `до ${time}` : ''; }
+
+function isDeadlinePassed(deadlineTime) {
+ if (!deadlineTime) return false;
+ const now = new Date();
+ const [h, m] = deadlineTime.split(':').map(Number);
+ const deadline = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
+ return now.getTime() > deadline.getTime();
+}
+
+function renderActualChecklistFillScreen() {
+ const dep = getDepartment(activeChecklistDepartmentId);
+ const checklist = dep ? getActualChecklistById(dep.id, activeActualChecklistId) : null;
+ const title = document.getElementById('actual-checklist-fill-title');
+ const content = document.getElementById('actual-checklist-fill-content');
+ if (!content) return;
+ if (!dep || !checklist) {
+  if (title) title.textContent = 'Чек-лист';
+  content.innerHTML = `<div class="empty" style="padding:60px 0;"><div class="empty-icon">☑️</div><div class="empty-title">Чек-лист не найден</div></div>`;
+  return;
+ }
+ if (title) title.textContent = checklist.title;
+ const progress = getActualChecklistProgress(checklist);
+ const { done, total } = getActualChecklistCounts(checklist);
+ const readOnly = activeActualChecklistViewMode === 'view';
+
+ const itemsHtml = checklist.items.map((item, index) => {
+  const state = progress[item.id] || null;
+  const isDone = Boolean(state && state.done);
+  const hasPendingAnswer = Boolean(state && !state.done && state.answer); // да/нет выбран, фото ещё не приложено
+  const deadlinePassed = isDeadlinePassed(item.deadlineTime);
+  const connector = index === 0 ? '' : `<div class="actual-checklist-connector"><span class="actual-checklist-connector-arrow">↓</span></div>`;
+
+  let actionHtml = '';
+  if (readOnly) {
+   actionHtml = isDone
+    ? `<div class="actual-checklist-status ${state.onTime === false ? 'late' : 'ontime'}">✓ ${state.onTime === false ? 'Сделано' : 'Сделано вовремя'}${state.by ? ' · ' + escapeHtml(state.by) : ''}</div>`
+    : `<div class="actual-checklist-status late" style="background:var(--surface2);color:var(--text-3);">Не выполнено</div>`;
+   if (item.type === 'yesno' && state && state.answer) {
+    actionHtml += `<div style="margin-top:8px;font-size:14px;font-weight:900;color:${state.answer === 'yes' ? 'var(--success)' : 'var(--danger)'};">${state.answer === 'yes' ? 'Да' : 'Нет'}</div>`;
+   }
+   if (item.photoRequired && state && state.photo) {
+    const src = getPhotoDisplaySrc(state.photo);
+    if (src) actionHtml += `<img src="${escapeHtml(src)}" alt="" style="width:100%;max-height:220px;object-fit:cover;border-radius:14px;margin-top:10px;border:1px solid var(--border);">`;
+   }
+  } else if (isDone) {
+   actionHtml = `<div class="actual-checklist-status ${state.onTime === false ? 'late' : 'ontime'}">✓ ${state.onTime === false ? 'Сделано' : 'Сделано вовремя'}</div>`;
+  } else {
+   // Пункт ещё не завершён — собираем нужные элементы управления по порядку:
+   // да/нет (если вопрос) → фото (если обязательно) → кнопка «Отметить выполненным» (если задача без фото).
+   let controls = '';
+   if (item.type === 'yesno') {
+    controls += `<div class="checklist-answer-row">
+     <button class="checklist-answer-btn yes${state && state.answer === 'yes' ? ' selected' : ''}" onclick="setActualChecklistAnswerItem('${item.id}','yes')">Да</button>
+     <button class="checklist-answer-btn no${state && state.answer === 'no' ? ' selected' : ''}" onclick="setActualChecklistAnswerItem('${item.id}','no')">Нет</button>
+    </div>`;
+   }
+   if (item.photoRequired) {
+    const readyForPhoto = item.type !== 'yesno' || hasPendingAnswer;
+    if (readyForPhoto) {
+     controls += `<button type="button" class="add-photo-btn" style="margin-top:12px;" onclick="openCameraModal('actualChecklistItem','${item.id}')"><span>📷</span><span>Прикрепить фото и завершить</span></button>`;
+    } else {
+     controls += `<div class="checklist-photo-required" style="margin-top:10px;">📷 Сначала выберите ответ, затем прикрепите фото</div>`;
+    }
+   } else if (item.type !== 'yesno') {
+    controls += `<button class="btn btn-primary" style="margin-top:12px;" onclick="completeActualChecklistTaskItem('${item.id}')">Отметить выполненным</button>`;
+   }
+   actionHtml = controls;
+  }
+
+  return `${connector}<div class="actual-checklist-item ${isDone ? 'done' : 'pending'}">
+   <div class="actual-checklist-item-head">
+    <div class="checklist-question-number">${index + 1}</div>
+    <div class="actual-checklist-item-title">${escapeHtml(item.text)}</div>
+   </div>
+   ${item.photoRequired ? '<div class="checklist-photo-required">📷 Обязательно приложить фото</div>' : ''}
+   ${item.deadlineTime ? `<div class="actual-checklist-deadline">⏱ ${escapeHtml(formatDeadlineTime(item.deadlineTime))}${!isDone && deadlinePassed ? ' · время вышло' : ''}</div>` : ''}
+   ${actionHtml}
+  </div>`;
+ }).join('');
+
+ content.innerHTML = `
+  <div class="actual-checklist-counter">Выполнено ${done} / ${total}</div>
+  ${itemsHtml}
+ `;
+}
+
+async function persistActualChecklistProgress(dep, checklist, itemId, entry) {
+ const list = getActualChecklists(dep.id);
+ const idx = list.findIndex(cl => String(cl.id) === String(checklist.id));
+ if (idx === -1) return null;
+ const target = list[idx];
+ if (target.mode === 'daily') {
+  const key = todayKey();
+  target.progressByDate = { ...(target.progressByDate || {}) };
+  target.progressByDate[key] = { ...(target.progressByDate[key] || {}), [itemId]: entry };
+ } else {
+  target.progress = { ...(target.progress || {}), [itemId]: entry };
+  const allDone = target.items.every(item => target.progress[item.id] && target.progress[item.id].done);
+  if (allDone && !target.archived) {
+   target.archived = true;
+   target.completedAt = new Date().toISOString();
+  }
+ }
+ list[idx] = target;
+ await saveActualChecklists(dep.id, list);
+ return target;
+}
+
+// Защита от повторной отправки при двойном/многократном тапе (медленный
+// интернет и т.п.): пока действие по конкретному пункту в процессе, повторные
+// тапы по нему игнорируются — дубли не создаются.
+const actualChecklistItemsInFlight = new Set();
+
+async function completeActualChecklistTaskItem(itemId) {
+ if (actualChecklistItemsInFlight.has(itemId)) return;
+ const dep = getDepartment(activeChecklistDepartmentId);
+ const checklist = dep ? getActualChecklistById(dep.id, activeActualChecklistId) : null;
+ if (!dep || !checklist) return;
+ const item = checklist.items.find(row => String(row.id) === String(itemId));
+ if (!item || item.photoRequired) return;
+ actualChecklistItemsInFlight.add(itemId);
+ try {
+  const onTime = item.deadlineTime ? !isDeadlinePassed(item.deadlineTime) : null;
+  const staff = getWaiter();
+  const updated = await persistActualChecklistProgress(dep, checklist, itemId, {
+   done: true, onTime, at: new Date().toISOString(), by: staff ? staff.name : ''
+  });
+  await afterActualChecklistItemCompleted(updated);
+ } finally {
+  actualChecklistItemsInFlight.delete(itemId);
+ }
+}
+
+async function setActualChecklistAnswerItem(itemId, answer) {
+ if (actualChecklistItemsInFlight.has(itemId)) return;
+ const dep = getDepartment(activeChecklistDepartmentId);
+ const checklist = dep ? getActualChecklistById(dep.id, activeActualChecklistId) : null;
+ if (!dep || !checklist) return;
+ const item = checklist.items.find(row => String(row.id) === String(itemId));
+ if (!item) return;
+ actualChecklistItemsInFlight.add(itemId);
+ try {
+  const normalizedAnswer = answer === 'no' ? 'no' : 'yes';
+  if (item.photoRequired) {
+   // Ответ выбран, но пункт завершится только после фото — не выполнено, не архивируем.
+   const updated = await persistActualChecklistProgress(dep, checklist, itemId, {
+    done: false, answer: normalizedAnswer
+   });
+   renderActualChecklistFillScreen();
+   return;
+  }
+  const onTime = item.deadlineTime ? !isDeadlinePassed(item.deadlineTime) : null;
+  const staff = getWaiter();
+  const updated = await persistActualChecklistProgress(dep, checklist, itemId, {
+   done: true, onTime, at: new Date().toISOString(), by: staff ? staff.name : '', answer: normalizedAnswer
+  });
+  await afterActualChecklistItemCompleted(updated);
+ } finally {
+  actualChecklistItemsInFlight.delete(itemId);
+ }
+}
+
+async function addActualChecklistItemPhoto(itemId, localPhoto) {
+ if (actualChecklistItemsInFlight.has(itemId)) return false;
+ const dep = getDepartment(activeChecklistDepartmentId);
+ const checklist = dep ? getActualChecklistById(dep.id, activeActualChecklistId) : null;
+ if (!dep || !checklist) return false;
+ const item = checklist.items.find(row => String(row.id) === String(itemId));
+ if (!item || !item.photoRequired) { showToast('Для этого пункта фото не требуется'); return false; }
+ actualChecklistItemsInFlight.add(itemId);
+ try {
+  showToast('Отправляем фото...');
+  const photo = await uploadChecklistPhoto(localPhoto, `actual_${checklist.id}_${itemId}`);
+  const onTime = item.deadlineTime ? !isDeadlinePassed(item.deadlineTime) : null;
+  const staff = getWaiter();
+  const progress = getActualChecklistProgress(checklist);
+  const pending = progress[itemId] || {};
+  const updated = await persistActualChecklistProgress(dep, checklist, itemId, {
+   ...pending, done: true, onTime, at: new Date().toISOString(), by: staff ? staff.name : '', photo
+  });
+  await afterActualChecklistItemCompleted(updated);
+  return true;
+ } finally {
+  actualChecklistItemsInFlight.delete(itemId);
+ }
+}
+
+async function afterActualChecklistItemCompleted(checklist) {
+ if (!checklist) return;
+ activeActualChecklistId = String(checklist.id);
+ const { done, total } = getActualChecklistCounts(checklist);
+ if (checklist.mode === 'once' && checklist.archived) {
+  showToast('Чек-лист выполнен ✓');
+  goBack();
+  renderActualChecklistFillTabList(getDepartment(activeChecklistDepartmentId), document.getElementById('checklist-fill-content'));
+  return;
+ }
+ showToast(`Отмечено ✓ (${done}/${total})`);
+ renderActualChecklistFillScreen();
 }
 
 // ============================================================
@@ -20014,28 +20970,35 @@ function selectEventPriority(priority) {
  document.querySelectorAll('.event-priority-option').forEach(el => el.classList.toggle('selected', el.dataset.priority === selectedEventCalendarPriority));
 }
 
+let calendarEventSubmitting = false;
 async function createCalendarEvent() {
  if (!activeEventCalendarFounderMode || !hasManagementSession()) { showToast('Создавать события может управление'); return; }
+ if (calendarEventSubmitting) return;
  const dep = getDepartment(activeEventCalendarDepartmentId);
  const input = document.getElementById('event-calendar-text');
  const text = input ? input.value.trim() : '';
  if (!dep || !selectedEventCalendarDate || !text) { showToast('Введите текст события'); return; }
- const event = {
-  id: 'calendar_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
-  departmentId: String(dep.id), departmentName: dep.name,
-  date: selectedEventCalendarDate, text,
-  priority: selectedEventCalendarPriority,
-  createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
- };
- appCache.calendarEvents = [...getCalendarEvents(), event];
- LocalDB.set('calendarEvents', appCache.calendarEvents);
+ calendarEventSubmitting = true;
  try {
-  if (CLOUD_ENABLED && db) await biz('calendarEvents').doc(String(event.id)).set(event, { merge:true });
- } catch (err) { console.warn('calendar event cloud save deferred', err); }
- notifyCalendarEventUpdate(event, 'создано').catch(err => console.warn('calendar notification skipped', err));
- showToast('Событие создано ✓');
- renderEventCalendar();
- openEventCalendarDay(selectedEventCalendarDate);
+  const event = {
+   id: 'calendar_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+   departmentId: String(dep.id), departmentName: dep.name,
+   date: selectedEventCalendarDate, text,
+   priority: selectedEventCalendarPriority,
+   createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+  };
+  appCache.calendarEvents = [...getCalendarEvents(), event];
+  LocalDB.set('calendarEvents', appCache.calendarEvents);
+  try {
+   if (CLOUD_ENABLED && db) await biz('calendarEvents').doc(String(event.id)).set(event, { merge:true });
+  } catch (err) { console.warn('calendar event cloud save deferred', err); }
+  notifyCalendarEventUpdate(event, 'создано').catch(err => console.warn('calendar notification skipped', err));
+  showToast('Событие создано ✓');
+  renderEventCalendar();
+  openEventCalendarDay(selectedEventCalendarDate);
+ } finally {
+  calendarEventSubmitting = false;
+ }
 }
 
 async function deleteCalendarEvent(eventId) {
