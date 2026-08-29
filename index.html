@@ -3696,7 +3696,7 @@
 <div class="modal-overlay" id="modal-staff-logout">
  <div class="modal">
  <div class="modal-title">Выйти из аккаунта</div>
- <div class="modal-sub" style="margin-bottom:16px;color:var(--danger);font-weight:700;">Ваша карточка сотрудника удалится, и вы больше не сможете зайти без приглашения управления.</div>
+ <div class="modal-sub" style="margin-bottom:16px;">Вы выйдете из аккаунта на этом устройстве. Карточка сотрудника сохранится — для входа снова понадобится тот же код или логин.</div>
  <div class="modal-actions">
  <button class="btn btn-danger" onclick="confirmDepartmentStaffLogout()">Да, выйти</button>
  <button class="btn btn-secondary" onclick="closeModal('modal-staff-logout')">Отмена</button>
@@ -4134,7 +4134,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.073";
+const APP_VERSION = "1.074";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
@@ -18129,17 +18129,18 @@ function openDepartmentLogoutConfirm() {
 
 function confirmDepartmentStaffLogout() {
  closeModal('modal-staff-logout');
- const w = getWaiter();
- if (!w || !w.id) {
- goHome();
- return;
- }
- Promise.resolve(deleteStaff(w.id)).then(() => {
- renderWaiterMenu();
- }).catch(err => {
- console.error(err);
- showToast('Не удалось выйти, попробуйте ещё раз');
- });
+ clearCurrentWaiter();
+ setCurrentBusinessId(null);
+ appCache.business = null;
+ activePreviewDepartmentId = '';
+ activeManagedDepartmentId = null;
+ activeGenericProcessDeptId = null;
+ activeGenericProcessKey = null;
+ // Same exit path as founderLogout(): drop the business context entirely and
+ // reload straight to the account chooser (Войти в бизнес / Создать бизнес),
+ // instead of leaving a dangling menu screen with no valid staff session.
+ InspectStorage.setItem('accountSelectionMode', '1');
+ location.reload();
 }
 
 function changePassword() {
@@ -19326,7 +19327,7 @@ const RU_UZ_DICT = {
 "Напишите текст предложения": "Taklif matnini yozing",
 "На кого жалоба": "Kim ustidan shikoyat",
 "Выйти из аккаунта": "Akkauntdan chiqish",
-"Ваша карточка сотрудника удалится, и вы больше не сможете зайти без приглашения управления.": "Xodim kartangiz o'chiriladi va boshqaruv taklifisiz qayta kira olmaysiz.",
+"Вы выйдете из аккаунта на этом устройстве. Карточка сотрудника сохранится — для входа снова понадобится тот же код или логин.": "Siz ushbu qurilmada akkauntdan chiqasiz. Xodim kartangiz saqlanib qoladi — qayta kirish uchun avvalgi kod yoki login kerak bo'ladi.",
 "Не удалось выйти, попробуйте ещё раз": "Chiqib bo'lmadi, qayta urinib ko'ring",
 "Выйти на главный экран": "Bosh ekranga chiqish",
 "Сохраните данные для входа": "Kirish ma'lumotlarini saqlab qo'ying",
