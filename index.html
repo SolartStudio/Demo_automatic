@@ -2015,7 +2015,7 @@
  </div>
  <div class="content" style="padding-top: 24px;">
  <div style="margin-bottom: 28px;">
- <div style="font-size: 13px; color: var(--text-3); margin-bottom: 4px;" id="waiter-menu-role-label" data-i18n-skip>Сотрудник</div>
+ <div style="font-size: 17px; font-weight: 600; color: var(--text-2); margin-bottom: 4px;" id="waiter-menu-role-label" data-i18n-skip>Сотрудник</div>
  <div style="font-size: 24px; font-weight: 700;" id="waiter-menu-name" data-i18n-skip>—</div>
  </div>
  <div id="duty-banner" style="display:none;" class="duty-badge">
@@ -2026,9 +2026,12 @@
  <div class="section-label">Меню</div>
  <div id="waiter-menu-dynamic"></div>
 </div>
- <div class="footer" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+ <div class="footer" style="display:flex; flex-direction:column; gap:10px;">
+ <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
  <span class="logo-sm">(ваш логотип)</span>
  <button class="btn btn-secondary btn-sm" onclick="goHome()">Выйти на главный экран</button>
+ </div>
+ <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="openDepartmentLogoutConfirm()">Выйти из аккаунта</button>
  </div>
 </div>
 
@@ -3420,7 +3423,7 @@
 <div class="screen" id="screen-repair-view"><div class="header"><button class="back-btn" onclick="goBack()">←</button><span class="header-title" id="repair-view-title">Заявка</span></div><div class="content content-padded" id="repair-view-content"></div></div>
 
 <!-- ===== SCREEN: FOUNDER REPAIRS ===== -->
-<div class="screen" id="screen-founder-repairs"><div class="header"><button class="back-btn" onclick="goBack()">←</button><span class="header-title">Поломки</span></div><div class="content"><div id="founder-repairs-list"></div></div></div>
+<div class="screen" id="screen-founder-repairs"><div class="header"><button class="back-btn" onclick="goBack()">←</button><span class="header-title">Поломки</span></div><div class="content"><button class="btn btn-primary" style="margin-bottom:14px;" onclick="openFounderRepairCreatePicker()">+ Создать заявку</button><div id="founder-repairs-list"></div></div></div>
 
 
 <!-- ===== SCREEN: FOUNDER ADMINS ===== -->
@@ -3689,6 +3692,29 @@
  </div>
 </div>
 
+<!-- ===== MODAL: DEPARTMENT STAFF LOGOUT CONFIRM ===== -->
+<div class="modal-overlay" id="modal-staff-logout">
+ <div class="modal">
+ <div class="modal-title">Выйти из аккаунта</div>
+ <div class="modal-sub" style="margin-bottom:16px;color:var(--danger);font-weight:700;">Ваша карточка сотрудника удалится, и вы больше не сможете зайти без приглашения управления.</div>
+ <div class="modal-actions">
+ <button class="btn btn-danger" onclick="confirmDepartmentStaffLogout()">Да, выйти</button>
+ <button class="btn btn-secondary" onclick="closeModal('modal-staff-logout')">Отмена</button>
+ </div>
+ </div>
+</div>
+
+<!-- ===== MODAL: FOUNDER REPAIR CREATE - PICK DEPARTMENT ===== -->
+<div class="modal-overlay" id="modal-founder-repair-pick">
+ <div class="modal">
+ <div class="modal-title">Создать заявку — выберите подразделение</div>
+ <div id="founder-repair-pick-list" style="margin-top:8px;"></div>
+ <div class="modal-actions">
+ <button class="btn btn-secondary" onclick="closeModal('modal-founder-repair-pick')">Отмена</button>
+ </div>
+ </div>
+</div>
+
 <!-- ===== MODAL: CONFIRM SEND ===== -->
 <div class="modal-overlay" id="modal-confirm">
  <div class="modal">
@@ -3770,6 +3796,23 @@
 
 <!-- ===== MODAL: CLOSE TASK CONFIRM ===== -->
 <div class="modal-overlay" id="modal-close-task-confirm"><div class="modal"><div class="modal-title">Закрыть задачу?</div><div class="modal-sub">Управление увидит, кто закрыл задачу, время и прикрепленные фото.</div><div class="modal-actions"><button class="btn btn-primary" onclick="confirmCloseFounderTaskByWaiter()">Да, закрыть</button><button class="btn btn-secondary" onclick="closeModal('modal-close-task-confirm')">Нет, вернуться</button></div></div></div>
+
+<!-- ===== MODAL: RETURN TASK WITH COMMENT ===== -->
+<div class="modal-overlay" id="modal-return-task-comment">
+ <div class="modal">
+ <div class="modal-title">Вернуть задачу?</div>
+ <div class="modal-sub">Задача снова станет открытой, а ответственный сотрудник получит уведомление с вашим комментарием.</div>
+ <div class="field">
+ <label>Комментарий</label>
+ <textarea id="return-task-comment-text" placeholder="Что нужно исправить или доделать"></textarea>
+ <div class="error-msg" id="return-task-comment-error">Напишите комментарий</div>
+ </div>
+ <div class="modal-actions">
+ <button class="btn btn-danger" onclick="confirmReturnFounderTask()">Вернуть с комментарием</button>
+ <button class="btn btn-secondary" onclick="closeModal('modal-return-task-comment')">Отмена</button>
+ </div>
+ </div>
+</div>
 
 <!-- ===== MODAL: REPAIR CONFIRM ===== -->
 <div class="modal-overlay" id="modal-repair-confirm"><div class="modal"><div class="modal-title">Отправить заявку?</div><div class="modal-sub">Проверьте текст и фото. Техник увидит заявку после отправки.</div><div class="modal-actions"><button class="btn btn-primary" onclick="confirmRepairRequest()">Да, отправить</button><button class="btn btn-secondary" onclick="closeModal('modal-repair-confirm')">Нет, вернуться</button></div></div></div>
@@ -4091,12 +4134,12 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.072";
+const APP_VERSION = "1.073";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
  label: APP_VERSION_LABEL,
- updatedAt: "2026-08-06"
+ updatedAt: "2026-08-29"
 };
 
 let db = null;
@@ -8985,7 +9028,7 @@ function renderHomeGrid() {
  <div class="role-card active-role" onclick="enterFounder()">
  <div class="role-icon">&#128081;</div>
  <div class="role-copy">
- <span class="role-name">Управление</span>
+ <span class="role-name">Учредитель</span>
  <div class="role-desc">Отчёты, аналитика, управление подразделениями</div>
  </div>
  <span class="role-arrow">→</span>
@@ -10517,7 +10560,10 @@ function openStaffProcess(key) {
  case 'photoReport': openDepartmentReport(); return;
  case 'tasks': openStaffTasks(access.departmentId || 'waiter'); return;
  case 'inventory': openStaffInventory(); return;
- case 'statistics': openStaffDepartmentStatistics(); return;
+ case 'statistics':
+ if (access.founderAccess) openFounderDepartmentStatistics(access.departmentId);
+ else openStaffDepartmentStatistics();
+ return;
  case 'fines':
  if (access.founderAccess) openFounderDepartmentFines(access.departmentId);
  else openMyFines();
@@ -11563,7 +11609,7 @@ function renderDepartmentManage() {
  if (titleEl) titleEl.textContent = dep.name;
 
  const departmentStaff = getDepartmentStaffList(dep.id);
- let html = `<div class="section-label">Процессы</div>`;
+ let html = `<div class="section-label" style="font-size:15px;">Процессы</div>`;
 
  if (!dep.processes.length) {
  html += `<div class="empty" style="padding:24px 0;">
@@ -11628,7 +11674,7 @@ function renderDepartmentManage() {
  `}
  </div>
  <div class="divider"></div>
- <div class="section-label">Настройки</div>`;
+ <div class="section-label" style="font-size:15px;">Настройки процессов</div>`;
 
  dep.processes.forEach(p => {
  const openAttr = p.key === 'photoReport'
@@ -13518,6 +13564,98 @@ function getFounderTaskById(taskId) {
  return getFounderTasks().find(task => String(task.id) === String(taskId)) || null;
 }
 
+let activeReturnTaskId = null;
+
+function founderAcceptTask(taskId) {
+ if (!hasManagementSession()) return;
+ const task = getFounderTaskById(taskId);
+ if (!task) {
+ showToast('Задача не найдена');
+ return;
+ }
+ const founder = getCurrentFounderProfile() || getFounderActor('founder');
+ task.accepted = true;
+ task.acceptedAt = new Date().toISOString();
+ task.acceptedById = founder && founder.id ? String(founder.id) : '';
+ task.acceptedByName = founder && founder.name ? founder.name : 'Учредитель';
+ updateFounderTask(task).then(() => {
+ renderFounderTasks();
+ showToast('Задача принята ✓');
+ }).catch(e => {
+ console.error(e);
+ showToast('Ошибка');
+ });
+}
+
+function openReturnFounderTask(taskId) {
+ if (!hasManagementSession()) return;
+ activeReturnTaskId = taskId;
+ const field = document.getElementById('return-task-comment-text');
+ if (field) field.value = '';
+ const err = document.getElementById('return-task-comment-error');
+ if (err) err.classList.remove('show');
+ openModal('modal-return-task-comment');
+}
+
+async function confirmReturnFounderTask() {
+ const commentValue = (document.getElementById('return-task-comment-text')?.value || '').trim();
+ const err = document.getElementById('return-task-comment-error');
+ if (!commentValue) {
+ if (err) err.classList.add('show');
+ return;
+ }
+ if (err) err.classList.remove('show');
+ const task = getFounderTaskById(activeReturnTaskId);
+ if (!task) {
+ showToast('Задача не найдена');
+ closeModal('modal-return-task-comment');
+ return;
+ }
+ try {
+ const founder = getCurrentFounderProfile() || getFounderActor('founder');
+ task.status = 'open';
+ task.accepted = false;
+ task.acceptedAt = '';
+ task.acceptedById = '';
+ task.acceptedByName = '';
+ task.returnComment = commentValue;
+ task.returnedAt = new Date().toISOString();
+ task.returnedById = founder && founder.id ? String(founder.id) : '';
+ task.returnedByName = founder && founder.name ? founder.name : 'Учредитель';
+ task.returnCount = (task.returnCount || 0) + 1;
+ task.closedAt = '';
+ task.closedById = '';
+ task.closedByName = '';
+ task.closedByLogin = '';
+ task.closeText = '';
+ task.closePhotos = [];
+ task.readBy = [];
+ await updateFounderTask(task);
+
+ const departmentId = getTaskDepartmentId(task);
+ const departmentStaff = getTaskDepartmentStaff(departmentId);
+ const responsibleStaff = task.responsibleStaffId
+ ? departmentStaff.find(staff => String(staff.id) === String(task.responsibleStaffId))
+ : null;
+ const notifyText = `↩️ Задача возвращена на доработку\n\n${task.text || ''}\n\nКомментарий: ${commentValue}\n\nОткройте приложение → Срочные задачи`;
+ if (responsibleStaff) {
+ notifyStaffMember(responsibleStaff, notifyText, { startParam: `task_${task.id}`, buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+ } else {
+ const audienceIds = getTelegramIdsForDepartment(departmentId);
+ if (audienceIds.length) {
+ notifyTelegramUsers(audienceIds, notifyText, { startParam: `task_${task.id}`, buttonText: NOTIFICATION_OPEN_BUTTON_TEXT });
+ }
+ }
+
+ closeModal('modal-return-task-comment');
+ renderFounderTasks();
+ showToast('Задача возвращена');
+ } catch (e) {
+ console.error(e);
+ showToast('Ошибка возврата задачи');
+ }
+}
+
 function updateFounderTaskLocal(task) {
  if (!task) return;
  appCache.founderTasks = getFounderTasks().map(item =>
@@ -13770,6 +13908,12 @@ function renderFounderTasks() {
  </div>
  ${task.closeText ? `<div class="doc-placeholder" style="white-space:pre-line;color:var(--text);margin-top:12px;"><b>Результат:</b><br>${escapeHtml(task.closeText)}</div>` : ''}
  ${closePhotosHtml}
+ ${task.returnComment ? `<div class="doc-placeholder" style="white-space:pre-line;color:var(--danger);border-color:var(--danger);margin-top:12px;"><b>Возвращена с комментарием${task.returnedByName ? ' · ' + escapeHtml(task.returnedByName) : ''}${task.returnedAt ? ' · ' + escapeHtml(formatDateTimeShort(task.returnedAt)) : ''}:</b><br>${escapeHtml(task.returnComment)}</div>` : ''}
+ ${task.status === 'closed' && !task.accepted ? `<div style="display:flex;gap:10px;margin-top:14px;">
+ <button class="btn btn-primary" style="flex:1;background:var(--success);border-color:var(--success);" onclick="founderAcceptTask('${escapeHtml(task.id)}')">Принять</button>
+ <button class="btn btn-danger" style="flex:1;" onclick="openReturnFounderTask('${escapeHtml(task.id)}')">Вернуть с комментарием</button>
+ </div>` : ''}
+ ${task.status === 'closed' && task.accepted ? `<div style="font-size:12px;color:var(--success);margin-top:12px;font-weight:700;">✓ Принято${task.acceptedByName ? ' · ' + escapeHtml(task.acceptedByName) : ''}${task.acceptedAt ? ' · ' + escapeHtml(formatDateTimeShort(task.acceptedAt)) : ''}</div>` : ''}
  </div>`;
  }).join('') : `<div class="empty" style="padding:34px 0;"><div class="empty-icon">✅</div><div class="empty-title">Задач пока нет</div><div class="empty-sub">Создайте задачу для подразделения «${escapeHtml(departmentName)}»</div></div>`;
 
@@ -15138,9 +15282,12 @@ function getRepairActor(sourceRole) {
  const waiter = getWaiter();
  const department = getDepartment(sourceRole);
  if (department) {
- return waiter && String(getStaffDepartmentId(waiter) || '') === String(department.id)
- ? waiter
- : null;
+ if (waiter && String(getStaffDepartmentId(waiter) || '') === String(department.id)) return waiter;
+ // Учредитель создаёт заявку напрямую из своего меню «Поломки», не заходя
+ // в предпросмотр подразделения — используем тот же виртуальный актор,
+ // что и при обычном предпросмотре.
+ if (hasManagementSession()) return getFounderDepartmentPreviewActor(department.id);
+ return null;
  }
  return waiter;
 }
@@ -15501,6 +15648,28 @@ function openFounderRepairs() {
  renderFounderRepairs();
  updateUnreadBadges();
  goTo('screen-founder-repairs');
+}
+
+function openFounderRepairCreatePicker() {
+ if (!hasManagementSession()) { showToast('Доступно только управлению'); return; }
+ const eligible = getDepartments().filter(dep =>
+ !isTechnicianDepartment(dep) &&
+ Array.isArray(dep.processes) &&
+ dep.processes.some(p => p.key === 'repair')
+ );
+ const list = document.getElementById('founder-repair-pick-list');
+ if (!list) return;
+ if (!eligible.length) {
+ list.innerHTML = `<div class="empty" style="padding:24px 0;"><div class="empty-icon">🛠️</div><div class="empty-title">Нет подразделений с процессом «Поломки»</div><div class="empty-sub">Добавьте процесс «Поломки» в нужное подразделение</div></div>`;
+ } else {
+ list.innerHTML = eligible.map(dep => `
+ <div class="menu-item" onclick="closeModal('modal-founder-repair-pick'); openRepairCreate('${dep.id}');">
+ <div class="menu-icon">🏷️</div>
+ <div class="menu-text"><div class="menu-title" data-i18n-skip>${escapeHtml(dep.name)}</div></div>
+ <span class="menu-arrow">›</span>
+ </div>`).join('');
+ }
+ openModal('modal-founder-repair-pick');
 }
 function renderFounderRepairs() {
  const list = document.getElementById('founder-repairs-list');
@@ -17950,6 +18119,29 @@ function founderLogout() {
  location.reload();
 }
 
+function openDepartmentLogoutConfirm() {
+ if (hasManagementSession()) {
+ openFounderLogoutConfirm();
+ return;
+ }
+ openModal('modal-staff-logout');
+}
+
+function confirmDepartmentStaffLogout() {
+ closeModal('modal-staff-logout');
+ const w = getWaiter();
+ if (!w || !w.id) {
+ goHome();
+ return;
+ }
+ Promise.resolve(deleteStaff(w.id)).then(() => {
+ renderWaiterMenu();
+ }).catch(err => {
+ console.error(err);
+ showToast('Не удалось выйти, попробуйте ещё раз');
+ });
+}
+
 function changePassword() {
  const np = document.getElementById('new-pwd').value;
  const cp = document.getElementById('confirm-pwd').value;
@@ -19134,6 +19326,8 @@ const RU_UZ_DICT = {
 "Напишите текст предложения": "Taklif matnini yozing",
 "На кого жалоба": "Kim ustidan shikoyat",
 "Выйти из аккаунта": "Akkauntdan chiqish",
+"Ваша карточка сотрудника удалится, и вы больше не сможете зайти без приглашения управления.": "Xodim kartangiz o'chiriladi va boshqaruv taklifisiz qayta kira olmaysiz.",
+"Не удалось выйти, попробуйте ещё раз": "Chiqib bo'lmadi, qayta urinib ko'ring",
 "Выйти на главный экран": "Bosh ekranga chiqish",
 "Сохраните данные для входа": "Kirish ma'lumotlarini saqlab qo'ying",
 "Да, выйти": "Ha, chiqish",
@@ -19143,6 +19337,7 @@ const RU_UZ_DICT = {
 "Имя владельца": "Egasi ismi",
 "Управление ·": "Boshqaruv ·",
 "Управление": "Boshqaruv",
+"Учредитель": "Ta'sischi",
 "Аккаунт": "Akkaunt",
 "Динамика показателей": "Ko'rsatkichlar dinamikasi",
 "Двигайте график влево или вправо пальцем.": "Grafikni barmoq bilan chapga yoki o'ngga suring.",
