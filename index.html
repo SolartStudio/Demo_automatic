@@ -1861,6 +1861,7 @@
  <div class="home-footer">
  <div class="logo-sm" data-i18n-skip></div>
 <div class="app-version" id="app-version-label">Версия 1.072</div>
+ <button class="btn btn-secondary btn-sm" style="width:100%;margin-top:12px;border-style:dashed;" onclick="if (confirm('Выйти из текущей сессии и вернуться к экрану входа/регистрации?')) emergencyExitToLanding();">Временно: выйти в меню входа</button>
  </div>
 </div>
 
@@ -4134,7 +4135,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.074";
+const APP_VERSION = "1.076";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
@@ -4250,6 +4251,23 @@ const InspectStorage = {
  setItem: (key, value) => window.localStorage.setItem(storageKey(key), value),
  removeItem: key => window.localStorage.removeItem(storageKey(key))
 };
+
+// Emergency escape hatch: wipes only this app's own local/session storage
+// keys (nothing in Firestore is touched) and reloads to a clean start.
+// Used by the ?startapp=reset deep link and by the temporary "Выйти в меню
+// входа" button on the home screen, for when a corrupted local session
+// strands a device on a screen it no longer has rights to.
+function emergencyExitToLanding() {
+ try {
+ Object.keys(window.localStorage)
+ .filter(k => k.indexOf(STORAGE_NAMESPACE) === 0)
+ .forEach(k => window.localStorage.removeItem(k));
+ Object.keys(window.sessionStorage)
+ .filter(k => k.indexOf(STORAGE_NAMESPACE) === 0)
+ .forEach(k => window.sessionStorage.removeItem(k));
+ } catch (_) {}
+ location.reload();
+}
 
 const InspectSessionStorage = {
  getItem: key => window.sessionStorage.getItem(storageKey(key)),
@@ -8889,6 +8907,18 @@ function routeAfterRoleOpen(callback) {
 function runPendingDeepLinkRoute() {
  const route = String(pendingDeepLinkRoute || '').trim();
  if (!route || deepLinkHandled) return;
+
+ // Emergency escape hatch: open the Mini App via a link ending in
+ // ?startapp=reset (or send /reset to the bot if it forwards start params).
+ // Wipes only this app's own localStorage/sessionStorage keys — no Firestore
+ // data is touched — then reloads straight to the account chooser. Exists
+ // because a corrupted local session can otherwise strand a device on a
+ // screen it no longer has rights to, with no in-app way out.
+ if (route === 'reset' || route === 'hard_reset') {
+ deepLinkHandled = true;
+ emergencyExitToLanding();
+ return;
+ }
 
  const openStaffRoute = (role, opener) => {
  if (role === 'admin') {
