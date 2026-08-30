@@ -1861,7 +1861,6 @@
  <div class="home-footer">
  <div class="logo-sm" data-i18n-skip></div>
 <div class="app-version" id="app-version-label">Версия 1.072</div>
- <button class="btn btn-secondary btn-sm" style="width:100%;margin-top:12px;border-style:dashed;" onclick="if (confirm('Выйти из текущей сессии и вернуться к экрану входа/регистрации?')) emergencyExitToLanding();">Временно: выйти в меню входа</button>
  </div>
 </div>
 
@@ -4135,7 +4134,7 @@ const CLOUD_ENABLED = !firebaseConfig.apiKey.includes("PASTE_");
 const TELEGRAM_PHOTO_ENABLED = !TELEGRAM_PHOTO_WORKER_URL.includes("PASTE_");
 
 // App version marker for rollback/testing notes.
-const APP_VERSION = "1.076";
+const APP_VERSION = "1.078";
 const APP_VERSION_LABEL = `Версия ${APP_VERSION}`;
 window.APP_VERSION_INFO = {
  version: APP_VERSION,
@@ -19368,7 +19367,24 @@ const RU_UZ_DICT = {
 "Имя владельца": "Egasi ismi",
 "Управление ·": "Boshqaruv ·",
 "Управление": "Boshqaruv",
-"Учредитель": "Ta'sischi",
+"+ Создать заявку": "+ Ariza yaratish",
+"Создать заявку — выберите подразделение": "Ariza yaratish — bo'limni tanlang",
+"Вернуть задачу?": "Vazifani qaytarasizmi?",
+"Задача снова станет открытой, а ответственный сотрудник получит уведомление с вашим комментарием.": "Vazifa yana ochiq holatga qaytadi, mas'ul xodimga sizning izohingiz bilan bildirishnoma yuboriladi.",
+"Что нужно исправить или доделать": "Nimani tuzatish yoki yakunlash kerak",
+"Напишите комментарий": "Izoh yozing",
+"Вернуть с комментарием": "Izoh bilan qaytarish",
+"Задача принята ✓": "Vazifa qabul qilindi ✓",
+"Ошибка": "Xatolik",
+"Задача возвращена": "Vazifa qaytarildi",
+"Ошибка возврата задачи": "Vazifani qaytarishda xatolik",
+"Возвращена с комментарием": "Izoh bilan qaytarildi",
+"Принять": "Qabul qilish",
+"✓ Принято": "✓ Qabul qilindi",
+"Доступно только управлению": "Faqat boshqaruv uchun ochiq",
+"Нет подразделений с процессом «Поломки»": "«Nosozliklar» jarayoni bo'lgan bo'limlar yo'q",
+"Добавьте процесс «Поломки» в нужное подразделение": "Kerakli bo'limga «Nosozliklar» jarayonini qo'shing",
+"Настройки процессов": "Jarayonlar sozlamalari",
 "Аккаунт": "Akkaunt",
 "Динамика показателей": "Ko'rsatkichlar dinamikasi",
 "Двигайте график влево или вправо пальцем.": "Grafikni barmoq bilan chapga yoki o'ngga suring.",
